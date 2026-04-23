@@ -1,0 +1,225 @@
+/* ===== GLOBAL WEBSITE STYLE ===== */
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f6fa;
+    color: #222;
+}
+
+/* ===== HEADER IMAGE ===== */
+
+header {
+    width: 100%;
+    height: 120px;
+    overflow: hidden;
+    background: white;
+}
+
+header img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* ===== NAVIGATION BAR ===== */
+
+nav {
+    width: 100%;
+    height: 45px;
+    background: #0b2c6b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    position: relative;
+}
+
+nav a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    left: 0;
+    bottom: -5px;
+    background: white;
+    transition: 0.3s;
+}
+
+nav a:hover::after {
+    width: 100%;
+}
+
+/* ===== MAIN CONTENT CONTAINER ===== */
+
+.container {
+    max-width: 1200px;
+    margin: 25px auto;
+    background: white;
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* ===== PAGE LAYOUT ===== */
+
+.layout {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+}
+
+/* LEFT SIDE */
+
+.left {
+    flex: 2 1 600px; /* grow:2, shrink:1, basis:600px minimum width */
+    text-align: justify;
+    line-height: 1.7;
+}
+
+/* RIGHT SIDE */
+
+.right {
+    flex: 1 1 300px; /* grow:1, shrink:1, basis:300px minimum width */
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== COVER IMAGE ===== */
+
+.cover {
+    width: 100%;
+    height: 320px;
+    object-fit: contain;
+    background: #f5f6fa;
+    padding: 10px;
+}
+
+/* ===== CONTENT BOXES ===== */
+
+.box {
+    background: white;
+    padding: 18px;
+    margin-top: 18px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+    border-radius: 4px;
+}
+
+.box h3 {
+    margin-top: 0;
+    font-size: 16px;
+    color: #0b2c6b;
+}
+
+/* ===== HEADINGS ===== */
+
+h2, h3 {
+    color: #0b2c6b;
+}
+
+/* ===== RECENT ISSUES SLIDER ===== */
+
+.slider-container {
+    width: 100%;   /* full width */
+    clear: both;   /* push below floated/flex items */
+    margin-top: 50px;
+    position: relative;
+    overflow: hidden;
+}
+
+.slider-container h3 {
+    margin-bottom: 20px;
+}
+
+.slider {
+    display: flex;
+    gap: 20px;
+    transition: transform 0.6s ease-in-out;
+}
+
+/* Individual Covers */
+
+.slider img {
+    width: 200px;
+    height: 270px;
+    object-fit: cover;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease;
+}
+
+.slider img:hover {
+    transform: scale(1.05);
+}
+
+/* ===== SLIDER ARROWS ===== */
+
+.arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: white;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    cursor: pointer;
+    padding: 10px 14px;
+    font-size: 16px;
+    z-index: 10;
+}
+
+.left-arrow { left: 0; }
+.right-arrow { right: 0; }
+
+/* ===== ISSUE ARCHIVE GRID ===== */
+
+.issue-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
+    margin-top: 30px;
+}
+
+.issue-grid img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    transition: 0.3s;
+}
+
+.issue-grid img:hover {
+    transform: scale(1.03);
+}
+
+/* ===== EDITORIAL BOARD ===== */
+
+.member-card {
+    padding: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    border-radius: 4px;
+    background: white;
+}
+
+/* ===== FOOTER IMAGE ===== */
+
+footer {
+    width: 100%;
+    height: 70px;
+    overflow: hidden;
+    margin-top: 40px;
+}
+
+footer img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
