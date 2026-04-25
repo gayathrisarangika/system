@@ -6,21 +6,26 @@ use App\Models\Department;
 use App\Models\Journal;
 use App\Models\Conference;
 use App\Models\Symposium;
+use App\Models\Article;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class PublicController extends Controller
 {
     public function home()
     {
-        $departments = Department::all();
         return Inertia::render('Home', [
-            'departments' => $departments
+            'journals' => Journal::where('status', 'approved')->get(),
+            'conferences' => Conference::where('status', 'approved')->get(),
+            'symposiums' => Symposium::where('status', 'approved')->get(),
         ]);
     }
 
     public function journal(Journal $journal)
     {
+        $this->authorizeView($journal);
+
         $journal->load(['issues' => function ($query) {
             $query->orderBy('year', 'desc')->take(10);
         }]);
@@ -32,6 +37,8 @@ class PublicController extends Controller
 
     public function conference(Conference $conference)
     {
+        $this->authorizeView($conference);
+
         $conference->load(['proceedings' => function ($query) {
             $query->orderBy('year', 'desc')->take(10);
         }]);
@@ -43,6 +50,8 @@ class PublicController extends Controller
 
     public function symposium(Symposium $symposium)
     {
+        $this->authorizeView($symposium);
+
         $symposium->load(['proceedings' => function ($query) {
             $query->orderBy('year', 'desc')->take(10);
         }]);
@@ -54,6 +63,8 @@ class PublicController extends Controller
 
     public function editorialBoard(Journal $journal)
     {
+        $this->authorizeView($journal);
+
         return Inertia::render('Publications/EditorialBoard', [
             'journal' => $journal->load('editorialBoard'),
         ]);
@@ -61,8 +72,37 @@ class PublicController extends Controller
 
     public function journalArchive(Journal $journal)
     {
+        $this->authorizeView($journal);
+
         return Inertia::render('Publications/Archive', [
             'journal' => $journal->load('issues.articles'),
         ]);
+    }
+
+    public function article(Article $article)
+    {
+        $article->load('issue.journal');
+        $this->authorizeView($article->issue->journal);
+
+        return Inertia::render('Publications/Article', [
+            'article' => $article,
+            'journal' => $article->issue->journal,
+        ]);
+    }
+
+    private function authorizeView($model)
+    {
+        if ($model->status === 'approved') {
+            return;
+        }
+
+        if (Auth::check()) {
+            $user = Auth::user();
+            if ($user->role === 'admin' || $user->id === $model->editor_id) {
+                return;
+            }
+        }
+
+        abort(403, 'This publication is not yet approved.');
     }
 }

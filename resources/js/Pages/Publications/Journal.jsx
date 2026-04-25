@@ -3,76 +3,127 @@ import { Head, Link } from '@inertiajs/react';
 
 export default function Journal({ journal }) {
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-gray-50 flex flex-col">
             <Head title={journal.journal_title} />
             
-            <header className="bg-gray-100 py-10 px-6 flex justify-between items-center border-b">
-                <div className="flex-1 text-center md:text-left">
-                    <h1 className="text-4xl font-bold text-gray-900">{journal.journal_title}</h1>
-                    <h3 className="text-xl text-blue-900 mt-2">{journal.university_name}</h3>
-                </div>
-                {journal.university_logo && (
-                    <div className="hidden md:block">
-                        <img src={journal.university_logo} alt="Logo" className="max-h-32" />
+            {/* Header */}
+            <header className="bg-white border-b py-6">
+                <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div className="flex-1 text-center md:text-left">
+                        <h1 className="text-3xl md:text-4xl font-serif font-bold text-blue-900">{journal.journal_title}</h1>
+                        <p className="text-lg text-gray-600 mt-1 uppercase tracking-wide">{journal.university_name}</p>
                     </div>
-                )}
+                    {journal.university_logo && (
+                        <div className="flex-shrink-0">
+                            <img src={journal.university_logo} alt="University Logo" className="h-20 object-contain" />
+                        </div>
+                    )}
+                </div>
             </header>
 
-            <nav className="bg-blue-900 text-white flex justify-center gap-8 py-3 sticky top-0 z-10 shadow-md">
-                <Link href={`/journal/${journal.id}`} className="hover:text-blue-200 font-medium">Home</Link>
-                <Link href={`/journal/${journal.id}/editorial-board`} className="hover:text-blue-200 font-medium">Editorial Board</Link>
-                <Link href={`/journal/${journal.id}/archive`} className="hover:text-blue-200 font-medium">Issue Archive</Link>
-            </nav>
-
-            <main className="container mx-auto px-4 py-12">
-                <div className="flex flex-col lg:flex-row gap-12">
-                    <div className="flex-1">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-blue-900 pb-2 inline-block">About the Journal</h2>
-                        <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap">
-                            {journal.journal_details}
-                        </div>
-                    </div>
-
-                    <div className="lg:w-1/3 flex flex-col gap-8">
-                        {journal.cover_image && (
-                            <img src={journal.cover_image} alt="Journal Cover" className="w-full rounded-lg shadow-2xl" />
-                        )}
-
-                        <div className="bg-gray-50 p-6 rounded-xl border-l-4 border-blue-900 shadow-sm">
-                            <h3 className="text-xl font-bold text-blue-900 mb-4">Aim & Scope</h3>
-                            <p className="text-gray-700 whitespace-pre-wrap">{journal.aim_scope}</p>
-                        </div>
-
-                        <div className="bg-gray-50 p-6 rounded-xl border-l-4 border-blue-900 shadow-sm">
-                            <h3 className="text-xl font-bold text-blue-900 mb-4">Mission</h3>
-                            <p className="text-gray-700 whitespace-pre-wrap">{journal.mission}</p>
-                        </div>
+            {/* Navigation Bar */}
+            <nav className="bg-blue-900 text-white sticky top-0 z-50 shadow-md">
+                <div className="container mx-auto px-6">
+                    <div className="flex flex-wrap justify-center md:justify-start">
+                        <Link href={`/journal/${journal.id}`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Home</Link>
+                        <Link href={`/journal/${journal.id}`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">About</Link>
+                        <Link href={`/journal/${journal.id}/editorial-board`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Editorial</Link>
+                        <Link href={`/journal/${journal.id}/archive`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Current</Link>
+                        <Link href={`/journal/${journal.id}/archive`} className="px-6 py-4 hover:bg-blue-800 transition font-medium">Archive</Link>
                     </div>
                 </div>
+            </nav>
 
-                {journal.issues && journal.issues.length > 0 && (
-                    <div className="mt-20">
-                        <h3 className="text-2xl font-bold text-blue-900 mb-8">Recent Issues</h3>
-                        <div className="flex gap-6 overflow-x-auto pb-6 scrollbar-hide">
-                            {journal.issues.map(issue => (
-                                <Link key={issue.id} href={`/journal/${journal.id}/archive`} className="flex-shrink-0 group">
-                                    <img 
-                                        src={issue.cover_image} 
-                                        alt={`Volume ${issue.volume}`} 
-                                        className="w-48 h-64 object-cover rounded shadow-md group-hover:scale-105 transition duration-300"
-                                    />
-                                    <p className="mt-2 text-center text-sm font-medium text-gray-600">Vol. {issue.volume} No. {issue.issue} ({issue.year})</p>
-                                </Link>
-                            ))}
+            <div className="container mx-auto px-6 py-10 flex-1">
+                <div className="flex flex-col lg:flex-row gap-10">
+
+                    {/* Main Content */}
+                    <div className="flex-1 bg-white p-8 rounded-lg shadow-sm border border-gray-200">
+                        <section className="mb-10">
+                            <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-900 inline-block">About the Journal</h2>
+                            <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap font-serif text-lg">
+                                {journal.journal_details || "No description available."}
+                            </div>
+                        </section>
+
+                        {journal.issues && journal.issues.length > 0 && (
+                            <section>
+                                <h3 className="text-2xl font-bold text-blue-900 mb-6">Recent Issues</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                                    {journal.issues.map(issue => (
+                                        <Link key={issue.id} href={`/journal/${journal.id}/archive`} className="group flex flex-col items-center">
+                                            <div className="w-full aspect-[3/4] overflow-hidden rounded shadow-md transition-transform group-hover:scale-105 bg-gray-100">
+                                                {issue.cover_image ? (
+                                                    <img src={issue.cover_image} alt={`Vol ${issue.volume}`} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-gray-400 p-4 text-center font-serif">
+                                                        Vol. {issue.volume} No. {issue.issue}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <p className="mt-3 text-center font-medium text-gray-700 group-hover:text-blue-700">
+                                                Vol. {issue.volume} No. {issue.issue} ({issue.year})
+                                            </p>
+                                        </Link>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+                    </div>
+
+                    {/* Sidebar */}
+                    <aside className="lg:w-80 flex flex-col gap-8">
+                        {journal.cover_image && (
+                            <div className="bg-white p-2 rounded shadow-lg border border-gray-200">
+                                <img src={journal.cover_image} alt="Journal Cover" className="w-full h-auto" />
+                            </div>
+                        )}
+
+                        <div className="bg-blue-900 text-white p-6 rounded-lg shadow-md">
+                            <h3 className="text-xl font-bold mb-4 border-b border-blue-700 pb-2">Information</h3>
+                            <ul className="space-y-3 text-blue-100">
+                                <li><Link href="#" className="hover:text-white transition">For Authors</Link></li>
+                                <li><Link href="#" className="hover:text-white transition">For Reviewers</Link></li>
+                                <li><Link href="#" className="hover:text-white transition">Editorial Policies</Link></li>
+                                <li><Link href="#" className="hover:text-white transition">Contact Us</Link></li>
+                            </ul>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                            <h3 className="text-xl font-bold text-blue-900 mb-4">Aim & Scope</h3>
+                            <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap">
+                                {journal.aim_scope || "Information pending."}
+                            </p>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                            <h3 className="text-xl font-bold text-blue-900 mb-4">Mission</h3>
+                            <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap">
+                                {journal.mission || "Information pending."}
+                            </p>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+
+            {/* Footer */}
+            <footer className="bg-gray-800 text-white py-12">
+                <div className="container mx-auto px-6">
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-8 border-b border-gray-700 pb-8 mb-8">
+                        <div>
+                            <h2 className="text-2xl font-bold">{journal.journal_title}</h2>
+                            <p className="text-gray-400 mt-1">{journal.university_name}</p>
+                        </div>
+                        <div className="text-center md:text-right">
+                            <p className="text-gray-400">Powered by Publication Management System</p>
+                            <p className="text-gray-400 text-sm mt-1">&copy; {new Date().getFullYear()} All Rights Reserved.</p>
                         </div>
                     </div>
-                )}
-            </main>
-
-            <footer className="bg-gray-100 py-12 mt-20 border-t">
-                <div className="container mx-auto px-4 text-center">
-                    <h2 className="text-2xl font-bold text-gray-800">{journal.journal_title}</h2>
-                    <p className="mt-4 text-gray-500">&copy; {new Date().getFullYear()} {journal.university_name}</p>
+                    <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-500">
+                        <Link href="#" className="hover:text-gray-300">Privacy Policy</Link>
+                        <Link href="#" className="hover:text-gray-300">Terms & Conditions</Link>
+                        <Link href="#" className="hover:text-gray-300">Contact</Link>
+                    </div>
                 </div>
             </footer>
         </div>

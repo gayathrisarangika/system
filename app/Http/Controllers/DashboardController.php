@@ -39,6 +39,13 @@ class DashboardController extends Controller
         return back();
     }
 
+    public function rejectJournal(Journal $journal)
+    {
+        if (Auth::user()->role !== 'admin') abort(403);
+        $journal->update(['status' => 'rejected']);
+        return back();
+    }
+
     public function approveConference(Conference $conference)
     {
         if (Auth::user()->role !== 'admin') abort(403);
@@ -46,10 +53,24 @@ class DashboardController extends Controller
         return back();
     }
 
+    public function rejectConference(Conference $conference)
+    {
+        if (Auth::user()->role !== 'admin') abort(403);
+        $conference->update(['status' => 'rejected']);
+        return back();
+    }
+
     public function approveSymposium(Symposium $symposium)
     {
         if (Auth::user()->role !== 'admin') abort(403);
         $symposium->update(['status' => 'approved']);
+        return back();
+    }
+
+    public function rejectSymposium(Symposium $symposium)
+    {
+        if (Auth::user()->role !== 'admin') abort(403);
+        $symposium->update(['status' => 'rejected']);
         return back();
     }
 }
