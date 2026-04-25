@@ -21,15 +21,21 @@ Route::get('/', [PublicController::class, 'home'])->name('home');
 Route::get('/journal/{journal}', [PublicController::class, 'journal'])->name('journal.view');
 Route::get('/journal/{journal}/editorial-board', [PublicController::class, 'editorialBoard'])->name('journal.editorial_board');
 Route::get('/journal/{journal}/archive', [PublicController::class, 'journalArchive'])->name('journal.archive');
+Route::get('/article/{article}', [PublicController::class, 'article'])->name('article.view');
 
 Route::get('/conference/{conference}', [PublicController::class, 'conference'])->name('conference.view');
 Route::get('/symposium/{symposium}', [PublicController::class, 'symposium'])->name('symposium.view');
 
 Route::middleware('auth')->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
-    Route::post('/admin/approve/journal/{journal}', [DashboardController::class, 'approveJournal']);
-    Route::post('/admin/approve/conference/{conference}', [DashboardController::class, 'approveConference']);
-    Route::post('/admin/approve/symposium/{symposium}', [DashboardController::class, 'approveSymposium']);
+    Route::post('/admin/approve/journal/{journal}', [DashboardController::class, 'approveJournal'])->name('admin.approve.journal');
+    Route::post('/admin/reject/journal/{journal}', [DashboardController::class, 'rejectJournal'])->name('admin.reject.journal');
+
+    Route::post('/admin/approve/conference/{conference}', [DashboardController::class, 'approveConference'])->name('admin.approve.conference');
+    Route::post('/admin/reject/conference/{conference}', [DashboardController::class, 'rejectConference'])->name('admin.reject.conference');
+
+    Route::post('/admin/approve/symposium/{symposium}', [DashboardController::class, 'approveSymposium'])->name('admin.approve.symposium');
+    Route::post('/admin/reject/symposium/{symposium}', [DashboardController::class, 'rejectSymposium'])->name('admin.reject.symposium');
 
     Route::prefix('editor')->group(function () {
         Route::get('/journal/dashboard', [DashboardController::class, 'editor']);
