@@ -9,6 +9,7 @@ use App\Http\Controllers\SymposiumManagementController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/backend-login', [AuthController::class, 'showBackendSelector'])->name('backend.selector');
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
