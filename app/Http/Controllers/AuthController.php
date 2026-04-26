@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -10,6 +11,13 @@ use Inertia\Inertia;
 
 class AuthController extends Controller
 {
+    public function showBackendSelector()
+    {
+        return Inertia::render('Auth/BackendSelector', [
+            'departments' => Department::all(),
+        ]);
+    }
+
     public function showLogin(Request $request)
     {
         return Inertia::render('Auth/Login', [

@@ -13,7 +13,7 @@ export default function Home({ journals, conferences, symposiums }) {
                         <h1 className="text-xl font-bold text-gray-900 hidden sm:block">Publication Management System</h1>
                     </div>
                     <Link 
-                        href="/login"
+                        href="/backend-login"
                         className="bg-blue-900 text-white px-5 py-2 rounded-md font-semibold hover:bg-blue-800 transition"
                     >
                         Backend Login
