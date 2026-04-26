@@ -3,78 +3,81 @@ import { Head, Link } from '@inertiajs/react';
 
 export default function Archive({ journal }) {
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-gray-50 flex flex-col">
             <Head title={`Archive - ${journal.journal_title}`} />
             
-            <header className="bg-gray-100 py-10 px-6 text-center border-b">
-                <h1 className="text-4xl font-bold text-gray-900">{journal.journal_title}</h1>
-                <h2 className="text-2xl text-blue-900 mt-2 font-semibold">Issue Archive</h2>
+            <header className="bg-white border-b py-6">
+                <div className="container mx-auto px-6">
+                    <h1 className="text-3xl md:text-4xl font-serif font-bold text-blue-900 text-center md:text-left">{journal.journal_title}</h1>
+                    <p className="text-lg text-gray-600 mt-1 uppercase tracking-wide text-center md:text-left">{journal.university_name}</p>
+                </div>
             </header>
 
-            <nav className="bg-blue-900 text-white flex justify-center gap-8 py-3 sticky top-0 z-10 shadow-md">
-                <Link href={`/journal/${journal.id}`} className="hover:text-blue-200 font-medium">Home</Link>
-                <Link href={`/journal/${journal.id}/editorial-board`} className="hover:text-blue-200 font-medium">Editorial Board</Link>
-                <Link href={`/journal/${journal.id}/archive`} className="hover:text-blue-200 font-medium">Issue Archive</Link>
+            <nav className="bg-blue-900 text-white sticky top-0 z-50 shadow-md">
+                <div className="container mx-auto px-6">
+                    <div className="flex flex-wrap justify-center md:justify-start">
+                        <Link href={`/journal/${journal.id}`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Home</Link>
+                        <Link href={`/journal/${journal.id}/editorial-board`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Editorial Board</Link>
+                        <Link href={`/journal/${journal.id}/archive`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Current</Link>
+                        <Link href={`/journal/${journal.id}/archive`} className="px-6 py-4 hover:bg-blue-800 transition font-medium">Archive</Link>
+                    </div>
+                </div>
             </nav>
 
-            <main className="container mx-auto px-4 py-12 max-w-5xl">
+            <main className="container mx-auto px-6 py-12 flex-1">
+                <h2 className="text-3xl font-serif font-bold text-gray-900 mb-10 border-b-2 border-blue-900 pb-2 inline-block">Issue Archive</h2>
+                
                 {journal.issues && journal.issues.length > 0 ? (
-                    <div className="space-y-16">
+                    <div className="space-y-12">
                         {journal.issues.map(issue => (
-                            <div key={issue.id} className="bg-gray-50 rounded-2xl p-8 shadow-sm border border-gray-100">
-                                <div className="flex flex-col md:flex-row gap-8 items-start">
-                                    <div className="md:w-48 flex-shrink-0">
-                                        <img src={issue.cover_image} alt={`Issue ${issue.issue}`} className="w-full rounded shadow-lg" />
-                                        <div className="mt-4 text-center">
-                                            <p className="font-bold text-gray-800">Vol. {issue.volume} No. {issue.issue}</p>
-                                            <p className="text-gray-500 text-sm">Year {issue.year}</p>
-                                            {issue.pdf_link && (
-                                                <a 
-                                                    href={issue.pdf_link} 
-                                                    target="_blank" 
-                                                    className="inline-block mt-3 bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 transition"
-                                                >
-                                                    Full Issue PDF
-                                                </a>
-                                            )}
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="flex-1 w-full">
-                                        <h3 className="text-xl font-bold text-blue-900 mb-6 border-b pb-2">Articles in this Issue</h3>
-                                        <div className="space-y-6">
-                                            {issue.articles && issue.articles.length > 0 ? (
-                                                issue.articles.map(article => (
-                                                    <div key={article.id} className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:border-blue-300 transition">
-                                                        <h4 className="text-lg font-bold text-gray-900 leading-tight mb-2">{article.title}</h4>
-                                                        <p className="text-blue-700 text-sm font-medium mb-3 italic">{article.author}</p>
-                                                        <p className="text-gray-600 text-sm line-clamp-3 mb-4">{article.abstract}</p>
-                                                        <div className="flex justify-between items-center">
-                                                            <span className="text-xs text-gray-400">Keywords: {article.keywords}</span>
-                                                            <a href={article.pdf} target="_blank" className="text-blue-600 hover:underline font-semibold flex items-center gap-1">
-                                                                <span>PDF</span>
-                                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                                                </svg>
-                                                            </a>
+                            <div key={issue.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                                <div className="bg-gray-50 px-8 py-4 border-b flex justify-between items-center">
+                                    <h3 className="text-xl font-bold text-blue-900">Vol. {issue.volume} No. {issue.issue} ({issue.year})</h3>
+                                    {issue.pdf_link && (
+                                        <a href={issue.pdf_link} target="_blank" className="text-blue-700 font-bold hover:underline text-sm flex items-center gap-1">
+                                            Full Issue PDF
+                                        </a>
+                                    )}
+                                </div>
+                                <div className="p-8">
+                                    <div className="space-y-8">
+                                        {issue.articles && issue.articles.length > 0 ? (
+                                            issue.articles.map(article => (
+                                                <div key={article.id} className="group border-b border-gray-50 pb-8 last:border-0 last:pb-0">
+                                                    <Link href={`/article/${article.id}`} className="block">
+                                                        <h4 className="text-xl font-bold text-gray-900 group-hover:text-blue-900 transition leading-tight mb-2 font-serif">{article.title}</h4>
+                                                    </Link>
+                                                    <p className="text-blue-700 text-sm font-medium mb-3">{article.author}</p>
+                                                    <p className="text-gray-600 text-sm line-clamp-3 mb-4 leading-relaxed">{article.abstract}</p>
+                                                    <div className="flex flex-wrap justify-between items-center gap-4">
+                                                        <div className="flex gap-4">
+                                                            <Link href={`/article/${article.id}`} className="text-blue-900 font-bold text-sm hover:underline">Abstract</Link>
+                                                            <a href={article.pdf} target="_blank" className="text-blue-900 font-bold text-sm hover:underline">PDF</a>
                                                         </div>
+                                                        <span className="text-xs text-gray-400">Published: {new Date(article.created_at).toLocaleDateString()}</span>
                                                     </div>
-                                                ))
-                                            ) : (
-                                                <p className="text-gray-400 italic">No articles found for this issue.</p>
-                                            )}
-                                        </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="text-gray-400 italic">No articles found for this issue.</p>
+                                        )}
                                     </div>
                                 </div>
                             </div>
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center py-20 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
-                        <p className="text-gray-400 text-xl italic">The archive is currently empty.</p>
+                    <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-300">
+                        <p className="text-gray-400 text-xl italic font-serif">The archive is currently empty.</p>
                     </div>
                 )}
             </main>
+
+            <footer className="bg-gray-800 text-white py-8 mt-12">
+                <div className="container mx-auto px-6 text-center text-gray-400 text-sm font-serif">
+                    <p>&copy; {new Date().getFullYear()} {journal.university_name}. All Rights Reserved.</p>
+                </div>
+            </footer>
         </div>
     );
 }
