@@ -23,6 +23,7 @@ Route::get('/journal/{journal}', [PublicController::class, 'journal'])->name('jo
 Route::get('/journal/{journal}/editorial-board', [PublicController::class, 'editorialBoard'])->name('journal.editorial_board');
 Route::get('/journal/{journal}/archive', [PublicController::class, 'journalArchive'])->name('journal.archive');
 Route::get('/article/{article}', [PublicController::class, 'article'])->name('article.view');
+Route::get('/article/{article}/download', [PublicController::class, 'downloadArticle'])->name('article.download');
 
 Route::get('/conference/{conference}', [PublicController::class, 'conference'])->name('conference.view');
 Route::get('/symposium/{symposium}', [PublicController::class, 'symposium'])->name('symposium.view');
