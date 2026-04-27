@@ -7,11 +7,11 @@ export default function Journal({ journal }) {
             <Head title={journal.journal_title} />
             
             {/* Header */}
-            <header className="bg-white border-b py-6">
-                <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <header className="bg-white border-b py-8 shadow-sm">
+                <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
                     <div className="flex-1 text-center md:text-left">
-                        <h1 className="text-3xl md:text-4xl font-serif font-bold text-blue-900">{journal.journal_title}</h1>
-                        <p className="text-lg text-gray-600 mt-1 uppercase tracking-wide">{journal.university_name}</p>
+                        <h1 className="text-3xl md:text-4xl font-serif font-bold text-blue-900 leading-tight">{journal.journal_title}</h1>
+                        <p className="text-lg text-gray-600 mt-2 uppercase tracking-widest font-medium">{journal.university_name}</p>
                     </div>
                     {journal.university_logo && (
                         <div className="flex-shrink-0">
@@ -81,12 +81,22 @@ export default function Journal({ journal }) {
 
                         <div className="bg-blue-900 text-white p-6 rounded-lg shadow-md">
                             <h3 className="text-xl font-bold mb-4 border-b border-blue-700 pb-2">Information</h3>
-                            <ul className="space-y-3 text-blue-100">
-                                <li><Link href="#" className="hover:text-white transition">For Authors</Link></li>
-                                <li><Link href="#" className="hover:text-white transition">For Reviewers</Link></li>
-                                <li><Link href="#" className="hover:text-white transition">Editorial Policies</Link></li>
-                                <li><Link href="#" className="hover:text-white transition">Contact Us</Link></li>
-                            </ul>
+                            <div className="space-y-4">
+                                <div>
+                                    <p className="text-xs text-blue-300 uppercase tracking-wider mb-1 font-bold">ISSN</p>
+                                    <p className="text-lg font-mono tracking-tight">{journal.issn || "N/A"}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-blue-300 uppercase tracking-wider mb-1 font-bold">Online ISSN</p>
+                                    <p className="text-lg font-mono tracking-tight">{journal.online_issn || "N/A"}</p>
+                                </div>
+                                <ul className="space-y-3 text-blue-100 pt-2 border-t border-blue-800">
+                                    <li><Link href="#" className="hover:text-white transition flex items-center gap-2">For Authors</Link></li>
+                                    <li><Link href="#" className="hover:text-white transition flex items-center gap-2">For Reviewers</Link></li>
+                                    <li><Link href="#" className="hover:text-white transition flex items-center gap-2">Editorial Policies</Link></li>
+                                    <li><Link href="#" className="hover:text-white transition flex items-center gap-2">Contact Us</Link></li>
+                                </ul>
+                            </div>
                         </div>
 
                         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">

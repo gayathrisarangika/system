@@ -8,6 +8,8 @@ export default function Form({ journal = null }) {
         journal_details: journal?.journal_details || '',
         aim_scope: journal?.aim_scope || '',
         mission: journal?.mission || '',
+        issn: journal?.issn || '',
+        online_issn: journal?.online_issn || '',
         cover_image: null,
         university_logo: null,
         _method: journal ? 'PUT' : 'POST'
@@ -47,6 +49,16 @@ export default function Form({ journal = null }) {
                 <div>
                     <label className="block mb-1">Mission</label>
                     <textarea className="w-full border p-2 rounded" value={data.mission} onChange={e => setData('mission', e.target.value)} />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label className="block mb-1">ISSN</label>
+                        <input className="w-full border p-2 rounded" value={data.issn} onChange={e => setData('issn', e.target.value)} />
+                    </div>
+                    <div>
+                        <label className="block mb-1">Online ISSN</label>
+                        <input className="w-full border p-2 rounded" value={data.online_issn} onChange={e => setData('online_issn', e.target.value)} />
+                    </div>
                 </div>
                 <div>
                     <label className="block mb-1">Cover Image</label>
