@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Symposium extends Model
 {
+    protected $table = 'symposiums';
+
     protected $fillable = [
         'editor_id', 'department_id', 'symposium_title', 'university_name',
         'symposium_details', 'aim_scope', 'mission', 'university_logo', 'cover_image', 'status'
