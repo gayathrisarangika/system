@@ -6,10 +6,10 @@ export default function Archive({ journal }) {
         <div className="min-h-screen bg-gray-50 flex flex-col">
             <Head title={`Archive - ${journal.journal_title}`} />
             
-            <header className="bg-white border-b py-6">
+            <header className="bg-white border-b py-8 shadow-sm">
                 <div className="container mx-auto px-6">
-                    <h1 className="text-3xl md:text-4xl font-serif font-bold text-blue-900 text-center md:text-left">{journal.journal_title}</h1>
-                    <p className="text-lg text-gray-600 mt-1 uppercase tracking-wide text-center md:text-left">{journal.university_name}</p>
+                    <h1 className="text-3xl md:text-4xl font-serif font-bold text-blue-900 text-center md:text-left leading-tight">{journal.journal_title}</h1>
+                    <p className="text-lg text-gray-600 mt-2 uppercase tracking-widest font-medium text-center md:text-left">{journal.university_name}</p>
                 </div>
             </header>
 
@@ -54,7 +54,7 @@ export default function Archive({ journal }) {
                                                             <Link href={`/article/${article.id}`} className="text-blue-900 font-bold text-sm hover:underline">Abstract</Link>
                                                             <a href={article.pdf} target="_blank" className="text-blue-900 font-bold text-sm hover:underline">PDF</a>
                                                         </div>
-                                                        <span className="text-xs text-gray-400">Published: {new Date(article.created_at).toLocaleDateString()}</span>
+                                                        <span className="text-xs text-gray-400">Published: {new Date(article.published_date || article.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                                                     </div>
                                                 </div>
                                             ))

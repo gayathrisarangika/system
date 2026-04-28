@@ -7,10 +7,13 @@ export default function Home({ journals, conferences, symposiums }) {
             <Head title="Home" />
             
             <header className="bg-white border-b sticky top-0 z-50">
-                <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+                <div className="container mx-auto px-6 py-6 flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-blue-900 rounded-lg flex items-center justify-center text-white font-bold text-xl">P</div>
-                        <h1 className="text-xl font-bold text-gray-900 hidden sm:block">Publication Management System</h1>
+                        <div className="w-12 h-12 bg-blue-900 rounded-lg flex items-center justify-center text-white font-bold text-2xl shadow-lg">P</div>
+                        <div className="flex flex-col">
+                            <h1 className="text-2xl font-bold text-gray-900 leading-none">Publication Management System</h1>
+                            <p className="text-sm text-gray-500 font-medium tracking-tight">Faculty of Social Sciences and Languages</p>
+                        </div>
                     </div>
                     <Link 
                         href="/backend-login"
@@ -124,10 +127,18 @@ export default function Home({ journals, conferences, symposiums }) {
                 )}
             </main>
 
-            <footer className="bg-blue-900 text-white py-12">
-                <div className="container mx-auto px-6 text-center">
-                    <p className="font-bold text-lg mb-2">Faculty of Social Sciences and Languages</p>
-                    <p className="text-blue-200 text-sm">&copy; {new Date().getFullYear()} All rights reserved.</p>
+            <footer className="bg-gray-800 text-white py-12">
+                <div className="container mx-auto px-6">
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-8 border-b border-gray-700 pb-8 mb-8">
+                        <div className="text-center md:text-left">
+                            <h2 className="text-2xl font-bold">Publication Management System</h2>
+                            <p className="text-gray-400 mt-1">Faculty of Social Sciences and Languages</p>
+                        </div>
+                        <div className="text-center md:text-right">
+                            <p className="text-gray-400">Sabaragamuwa University of Sri Lanka</p>
+                            <p className="text-gray-400 text-sm mt-1">&copy; {new Date().getFullYear()} All Rights Reserved.</p>
+                        </div>
+                    </div>
                 </div>
             </footer>
         </div>
