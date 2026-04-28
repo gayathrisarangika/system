@@ -13,8 +13,22 @@ class AuthController extends Controller
 {
     public function showBackendSelector()
     {
-        return Inertia::render('Auth/BackendSelector', [
+        return Inertia::render('Auth/BackendSelector');
+    }
+
+    public function showDepartmentSelection(Request $request)
+    {
+        $type = $request->query('type', 'journal');
+        $journals = [];
+
+        if ($type === 'journal') {
+            $journals = \App\Models\Journal::where('status', 'approved')->get();
+        }
+
+        return Inertia::render('Auth/DepartmentSelection', [
             'departments' => Department::all(),
+            'journals' => $journals,
+            'type' => $type
         ]);
     }
 
@@ -85,6 +99,11 @@ class AuthController extends Controller
 
         return redirect()->route('login', ['id' => $request->dept_id, 'type' => $request->type])
             ->with('success', 'Registration successful. Please login.');
+    }
+
+    public function showForgotPassword()
+    {
+        return Inertia::render('Auth/ForgotPassword');
     }
 
     public function logout(Request $request)

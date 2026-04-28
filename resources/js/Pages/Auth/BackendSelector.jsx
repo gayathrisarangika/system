@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 
-export default function BackendSelector({ departments }) {
-    const [selectedType, setSelectedType] = useState(null);
-
+export default function BackendSelector() {
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
             <Head title="Publication Management System" />
@@ -18,24 +16,24 @@ export default function BackendSelector({ departments }) {
                     <h2 className="text-xl font-bold mb-6 text-gray-800">Select Publication Type</h2>
 
                     <div className="space-y-3">
-                        <button 
-                            onClick={() => setSelectedType('journal')}
-                            className="w-full py-3 bg-[#1f3a5f] text-white rounded-md hover:bg-[#2c5282] transition"
+                        <Link
+                            href="/backend-selection?type=journal"
+                            className="block w-full py-3 bg-[#1f3a5f] text-white rounded-md hover:bg-[#2c5282] transition"
                         >
                             Journal
-                        </button>
-                        <button 
-                            onClick={() => setSelectedType('conference')}
-                            className="w-full py-3 bg-[#1f3a5f] text-white rounded-md hover:bg-[#2c5282] transition"
+                        </Link>
+                        <Link
+                            href="/backend-selection?type=conference"
+                            className="block w-full py-3 bg-[#1f3a5f] text-white rounded-md hover:bg-[#2c5282] transition"
                         >
                             Conference
-                        </button>
-                        <button 
-                            onClick={() => setSelectedType('symposium')}
-                            className="w-full py-3 bg-[#1f3a5f] text-white rounded-md hover:bg-[#2c5282] transition"
+                        </Link>
+                        <Link
+                            href="/backend-selection?type=symposium"
+                            className="block w-full py-3 bg-[#1f3a5f] text-white rounded-md hover:bg-[#2c5282] transition"
                         >
                             Symposium
-                        </button>
+                        </Link>
                     </div>
 
                     <div className="mt-8">
@@ -46,23 +44,6 @@ export default function BackendSelector({ departments }) {
                             Admin Login
                         </Link>
                     </div>
-
-                    {selectedType && (
-                        <div className="mt-8 pt-6 border-t border-gray-200 text-left">
-                            <h3 className="text-lg font-bold mb-4 text-gray-800">Select Department</h3>
-                            <div className="space-y-2">
-                                {departments.map(dept => (
-                                    <Link 
-                                        key={dept.id}
-                                        href={`/department?id=${dept.id}&type=${selectedType}`}
-                                        className="block py-2 text-[#1f3a5f] hover:underline text-sm"
-                                    >
-                                        {dept.name}
-                                    </Link>
-                                ))}
-                            </div>
-                        </div>
-                    )}
                 </div>
             </main>
 

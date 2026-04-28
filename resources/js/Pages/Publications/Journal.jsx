@@ -28,7 +28,7 @@ export default function Journal({ journal }) {
                         <Link href={`/journal/${journal.id}`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Home</Link>
                         <Link href={`/journal/${journal.id}`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">About</Link>
                         <Link href={`/journal/${journal.id}/editorial-board`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Editorial</Link>
-                        <Link href={`/journal/${journal.id}/archive`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Current</Link>
+                        <Link href={`/journal/${journal.id}/current`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Current</Link>
                         <Link href={`/journal/${journal.id}/archive`} className="px-6 py-4 hover:bg-blue-800 transition font-medium">Archive</Link>
                     </div>
                 </div>
@@ -45,6 +45,42 @@ export default function Journal({ journal }) {
                                 {journal.journal_details || "No description available."}
                             </div>
                         </section>
+
+                        {journal.for_authors && (
+                            <section className="mb-10" id="for-authors">
+                                <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-900 inline-block">For Authors</h2>
+                                <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap font-serif text-lg">
+                                    {journal.for_authors}
+                                </div>
+                            </section>
+                        )}
+
+                        {journal.for_reviewers && (
+                            <section className="mb-10" id="for-reviewers">
+                                <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-900 inline-block">For Reviewers</h2>
+                                <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap font-serif text-lg">
+                                    {journal.for_reviewers}
+                                </div>
+                            </section>
+                        )}
+
+                        {journal.editorial_policies && (
+                            <section className="mb-10" id="editorial-policies">
+                                <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-900 inline-block">Editorial Policies</h2>
+                                <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap font-serif text-lg">
+                                    {journal.editorial_policies}
+                                </div>
+                            </section>
+                        )}
+
+                        {journal.contact_us && (
+                            <section className="mb-10" id="contact-us">
+                                <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-900 inline-block">Contact Us</h2>
+                                <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap font-serif text-lg">
+                                    {journal.contact_us}
+                                </div>
+                            </section>
+                        )}
 
                         {journal.issues && journal.issues.length > 0 && (
                             <section>
@@ -91,10 +127,10 @@ export default function Journal({ journal }) {
                                     <p className="text-lg font-mono tracking-tight">{journal.online_issn || "N/A"}</p>
                                 </div>
                                 <ul className="space-y-3 text-blue-100 pt-2 border-t border-blue-800">
-                                    <li><Link href="#" className="hover:text-white transition flex items-center gap-2">For Authors</Link></li>
-                                    <li><Link href="#" className="hover:text-white transition flex items-center gap-2">For Reviewers</Link></li>
-                                    <li><Link href="#" className="hover:text-white transition flex items-center gap-2">Editorial Policies</Link></li>
-                                    <li><Link href="#" className="hover:text-white transition flex items-center gap-2">Contact Us</Link></li>
+                                    <li><a href="#for-authors" className="hover:text-white transition flex items-center gap-2">For Authors</a></li>
+                                    <li><a href="#for-reviewers" className="hover:text-white transition flex items-center gap-2">For Reviewers</a></li>
+                                    <li><a href="#editorial-policies" className="hover:text-white transition flex items-center gap-2">Editorial Policies</a></li>
+                                    <li><a href="#contact-us" className="hover:text-white transition flex items-center gap-2">Contact Us</a></li>
                                 </ul>
                             </div>
                         </div>
