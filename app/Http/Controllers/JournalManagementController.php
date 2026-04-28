@@ -33,6 +33,8 @@ class JournalManagementController extends Controller
             'journal_details' => 'nullable',
             'aim_scope' => 'nullable',
             'mission' => 'nullable',
+            'issn' => 'nullable',
+            'online_issn' => 'nullable',
             'cover_image' => 'nullable|image',
             'university_logo' => 'nullable|image',
         ]);
@@ -70,6 +72,8 @@ class JournalManagementController extends Controller
             'journal_details' => 'nullable',
             'aim_scope' => 'nullable',
             'mission' => 'nullable',
+            'issn' => 'nullable',
+            'online_issn' => 'nullable',
         ]);
 
         if ($request->hasFile('cover_image')) {
@@ -129,6 +133,7 @@ class JournalManagementController extends Controller
             'volume' => 'required|integer',
             'issue' => 'required|integer',
             'year' => 'required|integer',
+            'published_date' => 'nullable|date',
             'is_current_issue' => 'boolean',
             'cover_image' => 'nullable|image',
             'pdf_link' => 'nullable|file|mimes:pdf',
@@ -163,6 +168,9 @@ class JournalManagementController extends Controller
             'author' => 'required',
             'abstract' => 'required',
             'keywords' => 'nullable',
+            'doi' => 'nullable',
+            'published_date' => 'nullable|date',
+            'pages' => 'nullable',
             'year' => 'required|integer',
             'pdf' => 'required|file|mimes:pdf',
         ]);

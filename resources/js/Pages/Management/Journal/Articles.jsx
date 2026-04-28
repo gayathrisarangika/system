@@ -7,6 +7,9 @@ export default function Articles({ issue, articles }) {
         author: '',
         abstract: '',
         keywords: '',
+        doi: '',
+        published_date: '',
+        pages: '',
         year: issue.year,
         pdf: null
     });
@@ -38,10 +41,24 @@ export default function Articles({ issue, articles }) {
                     <label className="block text-sm mb-1">Abstract</label>
                     <textarea className="w-full border p-2 rounded" rows="4" value={data.abstract} onChange={e => setData('abstract', e.target.value)} />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                     <div>
                         <label className="block text-sm mb-1">Keywords</label>
                         <input className="w-full border p-2 rounded" value={data.keywords} onChange={e => setData('keywords', e.target.value)} />
+                    </div>
+                    <div>
+                        <label className="block text-sm mb-1">DOI</label>
+                        <input className="w-full border p-2 rounded" value={data.doi} onChange={e => setData('doi', e.target.value)} />
+                    </div>
+                    <div>
+                        <label className="block text-sm mb-1">Pages</label>
+                        <input className="w-full border p-2 rounded" placeholder="e.g. 1-10" value={data.pages} onChange={e => setData('pages', e.target.value)} />
+                    </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm mb-1">Published Date</label>
+                        <input type="date" className="w-full border p-2 rounded" value={data.published_date} onChange={e => setData('published_date', e.target.value)} />
                     </div>
                     <div>
                         <label className="block text-sm mb-1">PDF File</label>

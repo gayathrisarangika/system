@@ -6,6 +6,7 @@ export default function Issues({ journal, issues }) {
         volume: '',
         issue: '',
         year: '',
+        published_date: '',
         is_current_issue: false,
         cover_image: null,
         pdf_link: null
@@ -36,6 +37,10 @@ export default function Issues({ journal, issues }) {
                     <div>
                         <label className="block text-sm mb-1">Year</label>
                         <input type="number" className="w-full border p-2 rounded" value={data.year} onChange={e => setData('year', e.target.value)} />
+                    </div>
+                    <div>
+                        <label className="block text-sm mb-1">Published Date</label>
+                        <input type="date" className="w-full border p-2 rounded" value={data.published_date} onChange={e => setData('published_date', e.target.value)} />
                     </div>
                 </div>
                 <div className="flex gap-4">

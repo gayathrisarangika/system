@@ -84,10 +84,22 @@ class PublicController extends Controller
         $article->load('issue.journal');
         $this->authorizeView($article->issue->journal);
 
+        $article->increment('views');
+
         return Inertia::render('Publications/Article', [
             'article' => $article,
             'journal' => $article->issue->journal,
         ]);
+    }
+
+    public function downloadArticle(Article $article)
+    {
+        $article->load('issue.journal');
+        $this->authorizeView($article->issue->journal);
+
+        $article->increment('downloads');
+
+        return redirect($article->pdf);
     }
 
     private function authorizeView($model)
