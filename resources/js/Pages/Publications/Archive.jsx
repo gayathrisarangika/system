@@ -1,10 +1,10 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 
-export default function Archive({ journal }) {
+export default function Archive({ journal, is_current }) {
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
-            <Head title={`Archive - ${journal.journal_title}`} />
+            <Head title={`${is_current ? 'Current' : 'Archive'} - ${journal.journal_title}`} />
             
             <header className="bg-white border-b py-8 shadow-sm">
                 <div className="container mx-auto px-6">
@@ -18,14 +18,16 @@ export default function Archive({ journal }) {
                     <div className="flex flex-wrap justify-center md:justify-start">
                         <Link href={`/journal/${journal.id}`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Home</Link>
                         <Link href={`/journal/${journal.id}/editorial-board`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Editorial Board</Link>
-                        <Link href={`/journal/${journal.id}/archive`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Current</Link>
+                        <Link href={`/journal/${journal.id}/current`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Current</Link>
                         <Link href={`/journal/${journal.id}/archive`} className="px-6 py-4 hover:bg-blue-800 transition font-medium">Archive</Link>
                     </div>
                 </div>
             </nav>
 
             <main className="container mx-auto px-6 py-12 flex-1">
-                <h2 className="text-3xl font-serif font-bold text-gray-900 mb-10 border-b-2 border-blue-900 pb-2 inline-block">Issue Archive</h2>
+                <h2 className="text-3xl font-serif font-bold text-gray-900 mb-10 border-b-2 border-blue-900 pb-2 inline-block">
+                    {is_current ? 'Current Issue' : 'Issue Archive'}
+                </h2>
                 
                 {journal.issues && journal.issues.length > 0 ? (
                     <div className="space-y-12">
@@ -48,7 +50,7 @@ export default function Archive({ journal }) {
                                                         <h4 className="text-xl font-bold text-gray-900 group-hover:text-blue-900 transition leading-tight mb-2 font-serif">{article.title}</h4>
                                                     </Link>
                                                     <p className="text-blue-700 text-sm font-medium mb-3">{article.author}</p>
-                                                    <p className="text-gray-600 text-sm line-clamp-3 mb-4 leading-relaxed">{article.abstract}</p>
+                                                    <p className="text-gray-600 text-sm line-clamp-3 mb-4 leading-relaxed text-justify">{article.abstract}</p>
                                                     <div className="flex flex-wrap justify-between items-center gap-4">
                                                         <div className="flex gap-4">
                                                             <Link href={`/article/${article.id}`} className="text-blue-900 font-bold text-sm hover:underline">Abstract</Link>
