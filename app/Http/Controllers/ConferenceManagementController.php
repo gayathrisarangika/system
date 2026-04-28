@@ -38,10 +38,10 @@ class ConferenceManagementController extends Controller
         $data['department_id'] = Auth::user()->department_id;
 
         if ($request->hasFile('cover_image')) {
-            $data['cover_image'] = '/storage/' . $request->file('cover_image')->store('covers', 'public');
+            $data['cover_image'] = $request->file('cover_image')->store('covers', 'public');
         }
         if ($request->hasFile('university_logo')) {
-            $data['university_logo'] = '/storage/' . $request->file('university_logo')->store('logos', 'public');
+            $data['university_logo'] = $request->file('university_logo')->store('logos', 'public');
         }
 
         Conference::create($data);
@@ -66,10 +66,10 @@ class ConferenceManagementController extends Controller
         ]);
 
         if ($request->hasFile('cover_image')) {
-            $data['cover_image'] = '/storage/' . $request->file('cover_image')->store('covers', 'public');
+            $data['cover_image'] = $request->file('cover_image')->store('covers', 'public');
         }
         if ($request->hasFile('university_logo')) {
-            $data['university_logo'] = '/storage/' . $request->file('university_logo')->store('logos', 'public');
+            $data['university_logo'] = $request->file('university_logo')->store('logos', 'public');
         }
 
         $conference->update($data);
@@ -117,10 +117,10 @@ class ConferenceManagementController extends Controller
         ]);
 
         if ($request->hasFile('pdf_link')) {
-            $data['pdf_link'] = '/storage/' . $request->file('pdf_link')->store('proceedings_pdfs', 'public');
+            $data['pdf_link'] = $request->file('pdf_link')->store('proceedings_pdfs', 'public');
         }
         if ($request->hasFile('cover_image')) {
-            $data['cover_image'] = '/storage/' . $request->file('cover_image')->store('proceedings_covers', 'public');
+            $data['cover_image'] = $request->file('cover_image')->store('proceedings_covers', 'public');
         }
 
         $conference->proceedings()->create($data);

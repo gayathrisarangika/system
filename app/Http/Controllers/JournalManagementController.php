@@ -50,11 +50,11 @@ class JournalManagementController extends Controller
         $data['status'] = 'pending';
 
         if ($request->hasFile('cover_image')) {
-            $data['cover_image'] = '/storage/' . $request->file('cover_image')->store('covers', 'public');
+            $data['cover_image'] = $request->file('cover_image')->store('covers', 'public');
         }
 
         if ($request->hasFile('university_logo')) {
-            $data['university_logo'] = '/storage/' . $request->file('university_logo')->store('logos', 'public');
+            $data['university_logo'] = $request->file('university_logo')->store('logos', 'public');
         }
 
         Journal::create($data);
@@ -87,11 +87,11 @@ class JournalManagementController extends Controller
         ]);
 
         if ($request->hasFile('cover_image')) {
-            $data['cover_image'] = '/storage/' . $request->file('cover_image')->store('covers', 'public');
+            $data['cover_image'] = $request->file('cover_image')->store('covers', 'public');
         }
 
         if ($request->hasFile('university_logo')) {
-            $data['university_logo'] = '/storage/' . $request->file('university_logo')->store('logos', 'public');
+            $data['university_logo'] = $request->file('university_logo')->store('logos', 'public');
         }
 
         $journal->update($data);
@@ -150,11 +150,11 @@ class JournalManagementController extends Controller
         ]);
 
         if ($request->hasFile('cover_image')) {
-            $data['cover_image'] = '/storage/' . $request->file('cover_image')->store('issue_covers', 'public');
+            $data['cover_image'] = $request->file('cover_image')->store('issue_covers', 'public');
         }
 
         if ($request->hasFile('pdf_link')) {
-            $data['pdf_link'] = '/storage/' . $request->file('pdf_link')->store('issue_pdfs', 'public');
+            $data['pdf_link'] = $request->file('pdf_link')->store('issue_pdfs', 'public');
         }
 
         $journal->issues()->create($data);
@@ -186,7 +186,7 @@ class JournalManagementController extends Controller
         ]);
 
         if ($request->hasFile('pdf')) {
-            $data['pdf'] = '/storage/' . $request->file('pdf')->store('articles', 'public');
+            $data['pdf'] = $request->file('pdf')->store('articles', 'public');
         }
 
         $issue->articles()->create($data);
@@ -209,7 +209,7 @@ class JournalManagementController extends Controller
         ]);
 
         if ($request->hasFile('pdf')) {
-            $data['pdf'] = '/storage/' . $request->file('pdf')->store('articles', 'public');
+            $data['pdf'] = $request->file('pdf')->store('articles', 'public');
         }
 
         $article->update($data);

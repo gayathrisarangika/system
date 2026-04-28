@@ -40,7 +40,7 @@ export default function Article({ article, journal }) {
                 <meta name="citation_journal_title" content={journal.journal_title} />
                 <meta name="citation_volume" content={article.issue.volume} />
                 <meta name="citation_issue" content={article.issue.issue} />
-                <meta name="citation_pdf_url" content={window.location.origin + article.pdf} />
+                <meta name="citation_pdf_url" content={article.pdf?.startsWith('http') ? article.pdf : (article.pdf ? window.location.origin + article.pdf : '')} />
             </Head>
             
             {/* Header */}
