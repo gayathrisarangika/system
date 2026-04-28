@@ -11,7 +11,7 @@ class Journal extends Model
     protected $fillable = [
         'editor_id', 'department_id', 'journal_title', 'university_name',
         'journal_details', 'aim_scope', 'mission', 'university_logo', 'cover_image', 'status',
-        'issn', 'online_issn'
+        'issn', 'online_issn', 'for_authors', 'for_reviewers', 'editorial_policies', 'contact_us'
     ];
 
     public function editor(): BelongsTo { return $this->belongsTo(User::class, 'editor_id'); }
