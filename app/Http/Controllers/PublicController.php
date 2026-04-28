@@ -118,6 +118,7 @@ class PublicController extends Controller
 
         $article->increment('downloads');
 
+        // $article->pdf is now an absolute URL from the accessor
         return redirect($article->pdf);
     }
 
