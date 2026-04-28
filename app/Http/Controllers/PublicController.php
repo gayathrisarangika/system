@@ -98,6 +98,15 @@ class PublicController extends Controller
         ]);
     }
 
+    public function journalContact(Journal $journal)
+    {
+        $this->authorizeView($journal);
+
+        return Inertia::render('Publications/ContactUs', [
+            'journal' => $journal,
+        ]);
+    }
+
     public function article(Article $article)
     {
         $article->load('issue.journal');
