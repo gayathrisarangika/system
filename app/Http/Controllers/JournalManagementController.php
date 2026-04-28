@@ -22,7 +22,9 @@ class JournalManagementController extends Controller
 
     public function create()
     {
-        return Inertia::render('Management/Journal/Form');
+        return Inertia::render('Management/Journal/Form', [
+            'pre_filled_title' => Auth::user()->journal_title
+        ]);
     }
 
     public function store(Request $request)
@@ -35,6 +37,10 @@ class JournalManagementController extends Controller
             'mission' => 'nullable',
             'issn' => 'nullable',
             'online_issn' => 'nullable',
+            'for_authors' => 'nullable',
+            'for_reviewers' => 'nullable',
+            'editorial_policies' => 'nullable',
+            'contact_us' => 'nullable',
             'cover_image' => 'nullable|image',
             'university_logo' => 'nullable|image',
         ]);
@@ -74,6 +80,10 @@ class JournalManagementController extends Controller
             'mission' => 'nullable',
             'issn' => 'nullable',
             'online_issn' => 'nullable',
+            'for_authors' => 'nullable',
+            'for_reviewers' => 'nullable',
+            'editorial_policies' => 'nullable',
+            'contact_us' => 'nullable',
         ]);
 
         if ($request->hasFile('cover_image')) {
@@ -180,6 +190,29 @@ class JournalManagementController extends Controller
         }
 
         $issue->articles()->create($data);
+        return back();
+    }
+
+    public function updateArticle(Request $request, Article $article)
+    {
+        $this->authorizeEditor($article->issue->journal);
+        $data = $request->validate([
+            'title' => 'required',
+            'author' => 'required',
+            'abstract' => 'required',
+            'keywords' => 'nullable',
+            'doi' => 'nullable',
+            'published_date' => 'nullable|date',
+            'pages' => 'nullable',
+            'year' => 'required|integer',
+            'pdf' => 'nullable|file|mimes:pdf',
+        ]);
+
+        if ($request->hasFile('pdf')) {
+            $data['pdf'] = '/storage/' . $request->file('pdf')->store('articles', 'public');
+        }
+
+        $article->update($data);
         return back();
     }
 

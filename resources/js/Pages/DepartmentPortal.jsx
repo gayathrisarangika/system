@@ -11,7 +11,7 @@ export default function DepartmentPortal({ department, type }) {
             </header>
 
             <div className="container mx-auto px-4 py-12">
-                <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <div className="grid md:grid-cols-1 gap-8 max-w-md mx-auto">
                     {/* Login Card */}
                     <div className="bg-white rounded-xl shadow-md p-8 border-t-4 border-blue-600">
                         <h2 className="text-2xl font-bold mb-6 text-gray-800">Login</h2>
@@ -24,17 +24,6 @@ export default function DepartmentPortal({ department, type }) {
                         </Link>
                     </div>
 
-                    {/* Register Card */}
-                    <div className="bg-white rounded-xl shadow-md p-8 border-t-4 border-green-600">
-                        <h2 className="text-2xl font-bold mb-6 text-gray-800">Register as Editor</h2>
-                        <p className="text-gray-600 mb-8">Join our team of editors for this department.</p>
-                        <Link 
-                            href={`/register?id=${department.id}&type=${type}`}
-                            className="inline-block w-full text-center bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition"
-                        >
-                            Register Now
-                        </Link>
-                    </div>
                 </div>
             </div>
         </div>

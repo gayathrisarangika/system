@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Journal;
 use App\Models\Conference;
 use App\Models\Symposium;
+use App\Models\User;
+use App\Models\Department;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -19,7 +22,30 @@ class DashboardController extends Controller
             'pendingJournals' => Journal::where('status', 'pending')->with('department')->get(),
             'pendingConferences' => Conference::where('status', 'pending')->with('department')->get(),
             'pendingSymposiums' => Symposium::where('status', 'pending')->with('department')->get(),
+            'departments' => Department::all(),
+            'users' => User::with('department')->get(),
         ]);
+    }
+
+    public function storeUser(Request $request)
+    {
+        if (Auth::user()->role !== 'admin') abort(403);
+
+        $data = $request->validate([
+            'name' => 'nullable|string',
+            'email' => 'nullable|email|unique:users',
+            'username' => 'required|unique:users',
+            'password' => 'required|min:6',
+            'department_id' => 'required|exists:departments,id',
+            'role' => 'required|in:admin,editor',
+            'journal_title' => 'nullable|string',
+        ]);
+
+        $data['password'] = Hash::make($data['password']);
+
+        User::create($data);
+
+        return back();
     }
 
     public function editor(Request $request)

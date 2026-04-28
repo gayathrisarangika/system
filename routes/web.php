@@ -10,10 +10,12 @@ use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/backend-login', [AuthController::class, 'showBackendSelector'])->name('backend.selector');
+Route::get('/backend-selection', [AuthController::class, 'showDepartmentSelection'])->name('backend.selection');
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
+Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/department', [DepartmentController::class, 'index'])->name('department');
@@ -21,6 +23,7 @@ Route::get('/department', [DepartmentController::class, 'index'])->name('departm
 Route::get('/', [PublicController::class, 'home'])->name('home');
 Route::get('/journal/{journal}', [PublicController::class, 'journal'])->name('journal.view');
 Route::get('/journal/{journal}/editorial-board', [PublicController::class, 'editorialBoard'])->name('journal.editorial_board');
+Route::get('/journal/{journal}/current', [PublicController::class, 'journalCurrent'])->name('journal.current');
 Route::get('/journal/{journal}/archive', [PublicController::class, 'journalArchive'])->name('journal.archive');
 Route::get('/article/{article}', [PublicController::class, 'article'])->name('article.view');
 Route::get('/article/{article}/download', [PublicController::class, 'downloadArticle'])->name('article.download');
@@ -30,6 +33,7 @@ Route::get('/symposium/{symposium}', [PublicController::class, 'symposium'])->na
 
 Route::middleware('auth')->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
+    Route::post('/admin/users', [DashboardController::class, 'storeUser'])->name('admin.users.store');
     Route::post('/admin/approve/journal/{journal}', [DashboardController::class, 'approveJournal'])->name('admin.approve.journal');
     Route::post('/admin/reject/journal/{journal}', [DashboardController::class, 'rejectJournal'])->name('admin.reject.journal');
     
@@ -59,6 +63,7 @@ Route::middleware('auth')->group(function () {
         
         Route::get('/journal/issue/{issue}/articles', [JournalManagementController::class, 'manageArticles'])->name('journal.articles');
         Route::post('/journal/issue/{issue}/articles', [JournalManagementController::class, 'storeArticle']);
+        Route::post('/journal/article/{article}', [JournalManagementController::class, 'updateArticle'])->name('journal.article.update');
 
         // Conference
         Route::get('/conference', [ConferenceManagementController::class, 'index'])->name('conference.index');

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useForm, Head } from '@inertiajs/react';
+import { useForm, Head, Link } from '@inertiajs/react';
 
 export default function Login({ dept_id, type }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -34,7 +34,10 @@ export default function Login({ dept_id, type }) {
                         />
                     </div>
                     <div className="mb-6">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                        <div className="flex justify-between items-center mb-2">
+                            <label className="block text-gray-700 text-sm font-bold">Password</label>
+                            <Link href="/forgot-password" size="sm" className="text-xs text-blue-600 hover:underline">Forgot Password?</Link>
+                        </div>
                         <input
                             type="password"
                             className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"

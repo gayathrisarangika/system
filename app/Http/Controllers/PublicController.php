@@ -70,12 +70,31 @@ class PublicController extends Controller
         ]);
     }
 
+    public function journalCurrent(Journal $journal)
+    {
+        $this->authorizeView($journal);
+
+        $latestIssue = $journal->issues()->orderBy('year', 'desc')->orderBy('volume', 'desc')->orderBy('issue', 'desc')->first();
+
+        return Inertia::render('Publications/Archive', [
+            'journal' => $journal->load(['issues' => function($q) use ($latestIssue) {
+                if ($latestIssue) {
+                    $q->where('id', $latestIssue->id)->with('articles');
+                } else {
+                    $q->with('articles');
+                }
+            }]),
+            'is_current' => true,
+        ]);
+    }
+
     public function journalArchive(Journal $journal)
     {
         $this->authorizeView($journal);
 
         return Inertia::render('Publications/Archive', [
             'journal' => $journal->load('issues.articles'),
+            'is_current' => false,
         ]);
     }
 
