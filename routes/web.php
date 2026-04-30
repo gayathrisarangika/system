@@ -25,6 +25,7 @@ Route::get('/journal/{journal}', [PublicController::class, 'journal'])->name('jo
 Route::get('/journal/{journal}/editorial-board', [PublicController::class, 'editorialBoard'])->name('journal.editorial_board');
 Route::get('/journal/{journal}/current', [PublicController::class, 'journalCurrent'])->name('journal.current');
 Route::get('/journal/{journal}/archive', [PublicController::class, 'journalArchive'])->name('journal.archive');
+Route::get('/journal/{journal}/contact', [PublicController::class, 'journalContact'])->name('journal.contact');
 Route::get('/article/{article}', [PublicController::class, 'article'])->name('article.view');
 Route::get('/article/{article}/download', [PublicController::class, 'downloadArticle'])->name('article.download');
 

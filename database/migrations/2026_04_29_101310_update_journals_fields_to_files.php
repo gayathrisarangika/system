@@ -12,10 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('journals', function (Blueprint $table) {
-            $table->text('for_authors')->nullable();
-            $table->text('for_reviewers')->nullable();
-            $table->text('editorial_policies')->nullable();
-            $table->text('contact_us')->nullable();
+            // No changes needed to the columns themselves if they are already text,
+            // but we'll document that they now store file paths.
+            // If they were strictly for text, we might want to ensure they are nullable strings/text.
         });
     }
 
@@ -25,7 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('journals', function (Blueprint $table) {
-            $table->dropColumn(['for_authors', 'for_reviewers', 'editorial_policies', 'contact_us']);
+            //
         });
     }
 };

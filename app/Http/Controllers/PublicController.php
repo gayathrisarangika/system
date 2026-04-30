@@ -98,6 +98,15 @@ class PublicController extends Controller
         ]);
     }
 
+    public function journalContact(Journal $journal)
+    {
+        $this->authorizeView($journal);
+
+        return Inertia::render('Publications/ContactUs', [
+            'journal' => $journal,
+        ]);
+    }
+
     public function article(Article $article)
     {
         $article->load('issue.journal');
@@ -118,7 +127,6 @@ class PublicController extends Controller
 
         $article->increment('downloads');
 
-        // $article->pdf is now an absolute URL from the accessor
         return redirect($article->pdf);
     }
 

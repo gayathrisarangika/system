@@ -14,7 +14,7 @@ class JournalManagementController extends Controller
 {
     public function index()
     {
-        $journals = Journal::where('editor_id', Auth::id())->get();
+        $journals = Journal::where('department_id', Auth::user()->department_id)->get();
         return Inertia::render('Management/Journal/List', [
             'journals' => $journals
         ]);
@@ -37,9 +37,9 @@ class JournalManagementController extends Controller
             'mission' => 'nullable',
             'issn' => 'nullable',
             'online_issn' => 'nullable',
-            'for_authors' => 'nullable',
-            'for_reviewers' => 'nullable',
-            'editorial_policies' => 'nullable',
+            'for_authors' => 'nullable|file|mimes:pdf',
+            'for_reviewers' => 'nullable|file|mimes:pdf',
+            'editorial_policies' => 'nullable|file|mimes:pdf',
             'contact_us' => 'nullable',
             'cover_image' => 'nullable|image',
             'university_logo' => 'nullable|image',
@@ -55,6 +55,16 @@ class JournalManagementController extends Controller
 
         if ($request->hasFile('university_logo')) {
             $data['university_logo'] = $request->file('university_logo')->store('logos', 'public');
+        }
+
+        if ($request->hasFile('for_authors')) {
+            $data['for_authors'] = $request->file('for_authors')->store('guidelines', 'public');
+        }
+        if ($request->hasFile('for_reviewers')) {
+            $data['for_reviewers'] = $request->file('for_reviewers')->store('guidelines', 'public');
+        }
+        if ($request->hasFile('editorial_policies')) {
+            $data['editorial_policies'] = $request->file('editorial_policies')->store('policies', 'public');
         }
 
         Journal::create($data);
@@ -80,9 +90,9 @@ class JournalManagementController extends Controller
             'mission' => 'nullable',
             'issn' => 'nullable',
             'online_issn' => 'nullable',
-            'for_authors' => 'nullable',
-            'for_reviewers' => 'nullable',
-            'editorial_policies' => 'nullable',
+            'for_authors' => 'nullable|file|mimes:pdf',
+            'for_reviewers' => 'nullable|file|mimes:pdf',
+            'editorial_policies' => 'nullable|file|mimes:pdf',
             'contact_us' => 'nullable',
         ]);
 
@@ -92,6 +102,16 @@ class JournalManagementController extends Controller
 
         if ($request->hasFile('university_logo')) {
             $data['university_logo'] = $request->file('university_logo')->store('logos', 'public');
+        }
+
+        if ($request->hasFile('for_authors')) {
+            $data['for_authors'] = $request->file('for_authors')->store('guidelines', 'public');
+        }
+        if ($request->hasFile('for_reviewers')) {
+            $data['for_reviewers'] = $request->file('for_reviewers')->store('guidelines', 'public');
+        }
+        if ($request->hasFile('editorial_policies')) {
+            $data['editorial_policies'] = $request->file('editorial_policies')->store('policies', 'public');
         }
 
         $journal->update($data);
@@ -150,7 +170,7 @@ class JournalManagementController extends Controller
         ]);
 
         if ($request->hasFile('cover_image')) {
-            $data['cover_image'] = $request->file('cover_image')->store('issue_covers', 'public');
+            $data['cover_image'] = '/storage/' . $request->file('cover_image')->store('issue_covers', 'public');
         }
 
         if ($request->hasFile('pdf_link')) {
@@ -209,7 +229,7 @@ class JournalManagementController extends Controller
         ]);
 
         if ($request->hasFile('pdf')) {
-            $data['pdf'] = $request->file('pdf')->store('articles', 'public');
+            $data['pdf'] = '/storage/' . $request->file('pdf')->store('articles', 'public');
         }
 
         $article->update($data);
@@ -218,7 +238,9 @@ class JournalManagementController extends Controller
 
     private function authorizeEditor(Journal $journal)
     {
-        if ($journal->editor_id !== Auth::id()) {
+        if (Auth::user()->role === 'admin') return;
+
+        if ($journal->department_id !== Auth::user()->department_id) {
             abort(403);
         }
     }

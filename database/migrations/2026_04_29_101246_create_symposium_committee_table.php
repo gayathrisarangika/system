@@ -4,11 +4,15 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
     public function up(): void {
-        Schema::create('conference_committee', function (Blueprint $table) {
+        Schema::create('symposium_committee', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('conference_id')->constrained('conferences')->onDelete('cascade');
+            $table->foreignId('symposium_id')->constrained('symposiums')->onDelete('cascade');
             $table->string('name');
             $table->string('affiliation')->nullable();
             $table->string('role')->nullable();
@@ -16,6 +20,6 @@ return new class extends Migration {
         });
     }
     public function down(): void {
-        Schema::dropIfExists('conference_committee');
+        Schema::dropIfExists('symposium_committee');
     }
 };

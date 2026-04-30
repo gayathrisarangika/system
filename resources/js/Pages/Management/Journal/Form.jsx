@@ -62,16 +62,22 @@ export default function Form({ journal = null, pre_filled_title = '' }) {
                     <textarea className="w-full border p-2 rounded" value={data.mission} onChange={e => setData('mission', e.target.value)} />
                 </div>
                 <div>
-                    <label className="block mb-1">For Authors</label>
-                    <textarea className="w-full border p-2 rounded" rows="4" value={data.for_authors} onChange={e => setData('for_authors', e.target.value)} />
+                    <label className="block mb-1">For Authors (PDF)</label>
+                    <input type="file" className="w-full border p-2 rounded" onChange={e => setData('for_authors', e.target.files[0])} />
+                    {journal?.for_authors && <p className="text-sm text-gray-500 mt-1">Current: <a href={journal.for_authors} target="_blank" className="text-blue-600 hover:underline">View PDF</a></p>}
+                    {errors.for_authors && <div className="text-red-500 text-sm">{errors.for_authors}</div>}
                 </div>
                 <div>
-                    <label className="block mb-1">For Reviewers</label>
-                    <textarea className="w-full border p-2 rounded" rows="4" value={data.for_reviewers} onChange={e => setData('for_reviewers', e.target.value)} />
+                    <label className="block mb-1">For Reviewers (PDF)</label>
+                    <input type="file" className="w-full border p-2 rounded" onChange={e => setData('for_reviewers', e.target.files[0])} />
+                    {journal?.for_reviewers && <p className="text-sm text-gray-500 mt-1">Current: <a href={journal.for_reviewers} target="_blank" className="text-blue-600 hover:underline">View PDF</a></p>}
+                    {errors.for_reviewers && <div className="text-red-500 text-sm">{errors.for_reviewers}</div>}
                 </div>
                 <div>
-                    <label className="block mb-1">Editorial Policies</label>
-                    <textarea className="w-full border p-2 rounded" rows="4" value={data.editorial_policies} onChange={e => setData('editorial_policies', e.target.value)} />
+                    <label className="block mb-1">Editorial Policies (PDF)</label>
+                    <input type="file" className="w-full border p-2 rounded" onChange={e => setData('editorial_policies', e.target.files[0])} />
+                    {journal?.editorial_policies && <p className="text-sm text-gray-500 mt-1">Current: <a href={journal.editorial_policies} target="_blank" className="text-blue-600 hover:underline">View PDF</a></p>}
+                    {errors.editorial_policies && <div className="text-red-500 text-sm">{errors.editorial_policies}</div>}
                 </div>
                 <div>
                     <label className="block mb-1">Contact Us</label>
