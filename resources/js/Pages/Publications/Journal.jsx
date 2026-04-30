@@ -49,8 +49,13 @@ export default function Journal({ journal }) {
                         {journal.for_authors && (
                             <section className="mb-10" id="for-authors">
                                 <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-900 inline-block">For Authors</h2>
-                                <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap font-serif text-lg">
-                                    {journal.for_authors}
+                                <div className="mt-4">
+                                    <a href={journal.for_authors} target="_blank" className="inline-flex items-center gap-2 bg-blue-900 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition shadow-md">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        Download Guidelines for Authors (PDF)
+                                    </a>
                                 </div>
                             </section>
                         )}
@@ -58,8 +63,13 @@ export default function Journal({ journal }) {
                         {journal.for_reviewers && (
                             <section className="mb-10" id="for-reviewers">
                                 <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-900 inline-block">For Reviewers</h2>
-                                <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap font-serif text-lg">
-                                    {journal.for_reviewers}
+                                <div className="mt-4">
+                                    <a href={journal.for_reviewers} target="_blank" className="inline-flex items-center gap-2 bg-blue-900 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition shadow-md">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        Download Guidelines for Reviewers (PDF)
+                                    </a>
                                 </div>
                             </section>
                         )}
@@ -67,20 +77,18 @@ export default function Journal({ journal }) {
                         {journal.editorial_policies && (
                             <section className="mb-10" id="editorial-policies">
                                 <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-900 inline-block">Editorial Policies</h2>
-                                <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap font-serif text-lg">
-                                    {journal.editorial_policies}
+                                <div className="mt-4">
+                                    <a href={journal.editorial_policies} target="_blank" className="inline-flex items-center gap-2 bg-blue-900 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition shadow-md">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        Download Editorial Policies (PDF)
+                                    </a>
                                 </div>
                             </section>
                         )}
 
-                        {journal.contact_us && (
-                            <section className="mb-10" id="contact-us">
-                                <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-900 inline-block">Contact Us</h2>
-                                <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap font-serif text-lg">
-                                    {journal.contact_us}
-                                </div>
-                            </section>
-                        )}
+                       
 
                         {journal.issues && journal.issues.length > 0 && (
                             <section>
@@ -130,7 +138,7 @@ export default function Journal({ journal }) {
                                     <li><a href="#for-authors" className="hover:text-white transition flex items-center gap-2">For Authors</a></li>
                                     <li><a href="#for-reviewers" className="hover:text-white transition flex items-center gap-2">For Reviewers</a></li>
                                     <li><a href="#editorial-policies" className="hover:text-white transition flex items-center gap-2">Editorial Policies</a></li>
-                                    <li><a href="#contact-us" className="hover:text-white transition flex items-center gap-2">Contact Us</a></li>
+                                    <li><Link href={`/journal/${journal.id}/contact`} className="hover:text-white transition flex items-center gap-2">Contact Us</Link></li>
                                 </ul>
                             </div>
                         </div>

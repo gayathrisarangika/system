@@ -9,11 +9,11 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('journal_title')->nullable();
-        });
+        if (Schema::hasTable('symposia') && !Schema::hasTable('symposiums')) {
+            Schema::rename('symposia', 'symposiums');
+        }
     }
 
     /**
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('journal_title');
-        });
+        if (Schema::hasTable('symposiums') && !Schema::hasTable('symposia')) {
+            Schema::rename('symposiums', 'symposia');
+        }
     }
 };
