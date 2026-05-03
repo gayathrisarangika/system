@@ -16,49 +16,45 @@ export default function DepartmentSelection({ departments, journals, type }) {
             <main className="flex-grow flex items-center justify-center p-6">
                 <div className="bg-white p-10 rounded-xl shadow-xl w-full max-w-4xl">
                     
-                    {type === 'journal' && journals.length > 0 ? (
-                        <div className="space-y-8">
-                            <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center border-b pb-4">Available Journals</h2>
-                            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {journals.map(journal => (
-                                    <Link 
-                                        key={journal.id}
-                                        href={`/department?id=${journal.department_id}&type=journal&journal_id=${journal.id}`}
-                                        className="flex flex-col h-full bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md hover:border-blue-200 transition-all group"
-                                    >
-                                        <div className="aspect-[3/4] bg-gray-50 rounded-t-xl overflow-hidden border-b">
-                                            {journal.cover_image ? (
-                                                <img src={journal.cover_image} alt={journal.journal_title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-gray-400 p-4 text-center text-xs italic">
-                                                    {journal.journal_title}
-                                                </div>
-                                            )}
+                    <div className="space-y-8">
+                        <h2 className="text-2xl font-bold mb-8 text-gray-800 text-center border-b pb-4">Available Departments</h2>
+                        <div className="grid gap-6">
+                            {departments.map(dept => (
+                                <div key={dept.id} className="bg-gray-50 border border-gray-200 rounded-xl p-6 shadow-sm">
+                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                                        <h3 className="text-xl font-bold text-[#1f3a5f]">{dept.name}</h3>
+                                        <Link
+                                            href={`/department?id=${dept.id}&type=${type}`}
+                                            className="px-4 py-2 bg-[#1f3a5f] text-white rounded text-sm font-bold hover:bg-blue-800 transition text-center whitespace-nowrap"
+                                        >
+                                            Select Department &rarr;
+                                        </Link>
+                                    </div>
+
+                                    {type === 'journal' && dept.journals && dept.journals.length > 0 && (
+                                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                            {dept.journals.map(journal => (
+                                                <Link
+                                                    key={journal.id}
+                                                    href={`/department?id=${dept.id}&type=journal&journal_id=${journal.id}`}
+                                                    className="p-4 bg-white border border-gray-100 rounded-lg shadow-sm hover:shadow-md hover:border-blue-200 transition-all group flex flex-col justify-center min-h-[100px]"
+                                                >
+                                                    <h4 className="font-bold text-[#1f3a5f] group-hover:text-blue-700 line-clamp-2 text-sm text-center">{journal.journal_title}</h4>
+                                                    <div className="mt-2 flex items-center justify-center">
+                                                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
+                                                            journal.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                                                        }`}>
+                                                            {journal.status}
+                                                        </span>
+                                                    </div>
+                                                </Link>
+                                            ))}
                                         </div>
-                                        <div className="p-4 flex-grow flex flex-col justify-between">
-                                            <h3 className="font-bold text-[#1f3a5f] group-hover:text-blue-700 line-clamp-2 text-sm">{journal.journal_title}</h3>
-                                            <p className="text-[10px] text-gray-400 mt-2 uppercase tracking-widest">{journal.university_name}</p>
-                                        </div>
-                                    </Link>
-                                ))}
-                            </div>
+                                    )}
+                                </div>
+                            ))}
                         </div>
-                    ) : (
-                        <div className="space-y-8">
-                            <h2 className="text-2xl font-bold mb-8 text-gray-800 text-center border-b pb-4">Available Departments</h2>
-                            <div className="grid sm:grid-cols-2 gap-4">
-                                {departments.map(dept => (
-                                    <Link 
-                                        key={dept.id}
-                                        href={`/department?id=${dept.id}&type=${type}`}
-                                        className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-[#1f3a5f] font-semibold hover:bg-[#1f3a5f] hover:text-white transition shadow-sm flex items-center justify-center text-center"
-                                    >
-                                        {dept.name}
-                                    </Link>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                    </div>
 
                     <div className="mt-12 text-center border-t pt-6">
                         <Link href="/backend-login" className="text-gray-500 hover:text-blue-900 flex items-center justify-center gap-2 font-medium">

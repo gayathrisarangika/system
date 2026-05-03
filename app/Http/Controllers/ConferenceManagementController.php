@@ -13,7 +13,7 @@ class ConferenceManagementController extends Controller
 {
     public function index()
     {
-        $conferences = Conference::where('editor_id', Auth::id())->get();
+        $conferences = Conference::where('department_id', Auth::user()->department_id)->get();
         return Inertia::render('Management/Conference/List', ['conferences' => $conferences]);
     }
 
@@ -30,19 +30,10 @@ class ConferenceManagementController extends Controller
             'conference_details' => 'nullable',
             'aim_scope' => 'nullable',
             'mission' => 'nullable',
-            'cover_image' => 'nullable|image',
-            'university_logo' => 'nullable|image',
         ]);
 
         $data['editor_id'] = Auth::id();
         $data['department_id'] = Auth::user()->department_id;
-
-        if ($request->hasFile('cover_image')) {
-            $data['cover_image'] = $request->file('cover_image')->store('covers', 'public');
-        }
-        if ($request->hasFile('university_logo')) {
-            $data['university_logo'] = $request->file('university_logo')->store('logos', 'public');
-        }
 
         Conference::create($data);
         return redirect()->route('conference.index');
@@ -64,13 +55,6 @@ class ConferenceManagementController extends Controller
             'aim_scope' => 'nullable',
             'mission' => 'nullable',
         ]);
-
-        if ($request->hasFile('cover_image')) {
-            $data['cover_image'] = $request->file('cover_image')->store('covers', 'public');
-        }
-        if ($request->hasFile('university_logo')) {
-            $data['university_logo'] = $request->file('university_logo')->store('logos', 'public');
-        }
 
         $conference->update($data);
         return redirect()->route('conference.index');
@@ -112,16 +96,7 @@ class ConferenceManagementController extends Controller
         $data = $request->validate([
             'year' => 'required|integer',
             'version' => 'required',
-            'pdf_link' => 'required|file|mimes:pdf',
-            'cover_image' => 'nullable|image',
         ]);
-
-        if ($request->hasFile('pdf_link')) {
-            $data['pdf_link'] = $request->file('pdf_link')->store('proceedings_pdfs', 'public');
-        }
-        if ($request->hasFile('cover_image')) {
-            $data['cover_image'] = $request->file('cover_image')->store('proceedings_covers', 'public');
-        }
 
         $conference->proceedings()->create($data);
         return back();
@@ -129,6 +104,10 @@ class ConferenceManagementController extends Controller
 
     private function authorizeEditor(Conference $conference)
     {
-        if ($conference->editor_id !== Auth::id()) abort(403);
+        if (Auth::user()->role === 'admin') return;
+
+        if ($conference->department_id !== Auth::user()->department_id) {
+            abort(403);
+        }
     }
 }
