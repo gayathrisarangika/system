@@ -22,11 +22,11 @@ class AuthController extends Controller
         $journals = [];
         
         if ($type === 'journal') {
-            $journals = \App\Models\Journal::where('status', 'approved')->get();
+            $journals = \App\Models\Journal::all();
         }
 
         return Inertia::render('Auth/DepartmentSelection', [
-            'departments' => Department::all(),
+            'departments' => Department::with('journals')->get(),
             'journals' => $journals,
             'type' => $type
         ]);

@@ -35,11 +35,6 @@ export default function Archive({ journal, is_current }) {
                             <div key={issue.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                                 <div className="bg-gray-50 px-8 py-4 border-b flex justify-between items-center">
                                     <h3 className="text-xl font-bold text-blue-900">Vol. {issue.volume} No. {issue.issue} ({issue.year})</h3>
-                                    {issue.pdf_link && (
-                                        <a href={issue.pdf_link} target="_blank" className="text-blue-700 font-bold hover:underline text-sm flex items-center gap-1">
-                                            Full Issue PDF
-                                        </a>
-                                    )}
                                 </div>
                                 <div className="p-8">
                                     <div className="space-y-8">
@@ -54,7 +49,6 @@ export default function Archive({ journal, is_current }) {
                                                     <div className="flex flex-wrap justify-between items-center gap-4">
                                                         <div className="flex gap-4">
                                                             <Link href={`/article/${article.id}`} className="text-blue-900 font-bold text-sm hover:underline">Abstract</Link>
-                                                            <a href={article.pdf} target="_blank" className="text-blue-900 font-bold text-sm hover:underline">PDF</a>
                                                         </div>
                                                         <span className="text-xs text-gray-400">Published: {new Date(article.published_date || article.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                                                     </div>
