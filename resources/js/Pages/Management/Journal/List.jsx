@@ -48,7 +48,7 @@ export default function List({ journals }) {
                                 </td>
                             </tr>
                         )) : (
-                            <tr><td colSpan="3" className="p-10 text-center text-gray-400 italic">You haven't created any journals yet.</td></tr>
+                            <tr><td colSpan="3" className="p-10 text-center text-gray-400 italic">No journals found for your department.</td></tr>
                         )}
                     </tbody>
                 </table>

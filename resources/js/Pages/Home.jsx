@@ -40,6 +40,15 @@ export default function Home({ journals, conferences, symposiums }) {
                             {journals.map(journal => (
                                 <Link key={journal.id} href={`/journal/${journal.id}`} className="group">
                                     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
+                                        <div className="aspect-[3/4] overflow-hidden bg-gray-100">
+                                            {journal.cover_image ? (
+                                                <img src={journal.cover_image} alt={journal.journal_title} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-gray-400 p-6 text-center italic font-serif">
+                                                    {journal.journal_title}
+                                                </div>
+                                            )}
+                                        </div>
                                         <div className="p-5">
                                             <h4 className="font-bold text-gray-900 group-hover:text-blue-700 transition-colors line-clamp-2 mb-1">{journal.journal_title}</h4>
                                             <p className="text-sm text-gray-500">{journal.university_name}</p>
@@ -61,6 +70,15 @@ export default function Home({ journals, conferences, symposiums }) {
                             {conferences.map(conf => (
                                 <Link key={conf.id} href={`/conference/${conf.id}`} className="group">
                                     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
+                                        <div className="aspect-[3/4] overflow-hidden bg-gray-100">
+                                            {conf.cover_image ? (
+                                                <img src={conf.cover_image} alt={conf.conference_title} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-gray-400 p-6 text-center italic font-serif">
+                                                    {conf.conference_title}
+                                                </div>
+                                            )}
+                                        </div>
                                         <div className="p-5">
                                             <h4 className="font-bold text-gray-900 group-hover:text-blue-700 transition-colors line-clamp-2 mb-1">{conf.conference_title}</h4>
                                             <p className="text-sm text-gray-500">{conf.university_name}</p>
@@ -82,6 +100,15 @@ export default function Home({ journals, conferences, symposiums }) {
                             {symposiums.map(symp => (
                                 <Link key={symp.id} href={`/symposium/${symp.id}`} className="group">
                                     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
+                                        <div className="aspect-[3/4] overflow-hidden bg-gray-100">
+                                            {symp.cover_image ? (
+                                                <img src={symp.cover_image} alt={symp.symposium_title} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-gray-400 p-6 text-center italic font-serif">
+                                                    {symp.symposium_title}
+                                                </div>
+                                            )}
+                                        </div>
                                         <div className="p-5">
                                             <h4 className="font-bold text-gray-900 group-hover:text-blue-700 transition-colors line-clamp-2 mb-1">{symp.symposium_title}</h4>
                                             <p className="text-sm text-gray-500">{symp.university_name}</p>

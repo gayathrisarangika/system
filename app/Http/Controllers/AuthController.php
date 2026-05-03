@@ -22,11 +22,16 @@ class AuthController extends Controller
         $journals = [];
         
         if ($type === 'journal') {
+            // If the user is already logged in (e.g. going back to selection),
+            // or if we just want to show all for the initial entry point.
+            // Usually, editors belong to a department, but they haven't logged in yet here.
+            // However, the user said "show only the journals that I added now... it should show all the journals that i added to department table".
+            // Since login happens AFTER selection, we show all journals.
             $journals = \App\Models\Journal::all();
         }
 
         return Inertia::render('Auth/DepartmentSelection', [
-            'departments' => Department::with('journals')->get(),
+            'departments' => Department::all(),
             'journals' => $journals,
             'type' => $type
         ]);

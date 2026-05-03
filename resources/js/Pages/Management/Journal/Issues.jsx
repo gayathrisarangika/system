@@ -8,6 +8,8 @@ export default function Issues({ journal, issues }) {
         year: '',
         published_date: '',
         is_current_issue: false,
+        cover_image: null,
+        pdf_link: null
     });
 
     const submit = (e) => {
@@ -42,6 +44,14 @@ export default function Issues({ journal, issues }) {
                     </div>
                 </div>
                 <div className="flex gap-4">
+                    <div>
+                        <label className="block text-sm mb-1">Cover Image</label>
+                        <input type="file" onChange={e => setData('cover_image', e.target.files[0])} />
+                    </div>
+                    <div>
+                        <label className="block text-sm mb-1">Full PDF</label>
+                        <input type="file" onChange={e => setData('pdf_link', e.target.files[0])} />
+                    </div>
                     <div className="flex items-center mt-6">
                         <input type="checkbox" id="current" checked={data.is_current_issue} onChange={e => setData('is_current_issue', e.target.checked)} />
                         <label htmlFor="current" className="ml-2">Current Issue</label>
@@ -52,7 +62,8 @@ export default function Issues({ journal, issues }) {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {issues.map(issue => (
-                    <div key={issue.id} className="bg-white rounded shadow p-4">
+                    <div key={issue.id} className="bg-white rounded shadow p-4 flex gap-4">
+                        <img src={issue.cover_image} className="w-24 h-32 object-cover rounded" />
                         <div>
                             <h3 className="font-bold">Vol. {issue.volume} No. {issue.issue}</h3>
                             <p className="text-sm text-gray-500">{issue.year}</p>

@@ -40,6 +40,7 @@ export default function Article({ article, journal }) {
                 <meta name="citation_journal_title" content={journal.journal_title} />
                 <meta name="citation_volume" content={article.issue.volume} />
                 <meta name="citation_issue" content={article.issue.issue} />
+                <meta name="citation_pdf_url" content={article.pdf?.startsWith('http') ? article.pdf : (article.pdf ? window.location.origin + article.pdf : '')} />
             </Head>
             
             {/* Header */}
@@ -107,6 +108,19 @@ export default function Article({ article, journal }) {
                             <p className="text-gray-700 italic">{article.keywords || "No keywords available."}</p>
                         </section>
 
+                        <div className="flex gap-4 mt-12">
+                            <a
+                                href={`/article/${article.id}/download`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="bg-blue-900 text-white px-8 py-3 rounded font-bold hover:bg-blue-800 transition flex items-center gap-2"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                                </svg>
+                                Download PDF
+                            </a>
+                        </div>
                     </div>
 
                     {/* Sidebar */}
@@ -127,6 +141,19 @@ export default function Article({ article, journal }) {
                             </button>
                         </div>
 
+                        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                            <h4 className="text-lg font-bold text-blue-900 mb-4 border-b pb-2">Article Metrics</h4>
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-gray-600 text-sm">Views</span>
+                                    <span className="font-bold text-blue-900">{article.views.toLocaleString()}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-gray-600 text-sm">PDF Downloads</span>
+                                    <span className="font-bold text-blue-900">{article.downloads.toLocaleString()}</span>
+                                </div>
+                            </div>
+                        </div>
 
                         <div className="bg-blue-900 text-white p-6 rounded-lg shadow-md">
                             <h4 className="text-lg font-bold mb-4 border-b border-blue-700 pb-2">Social Share</h4>
