@@ -10,12 +10,7 @@ export default function Form({ journal = null, pre_filled_title = '' }) {
         mission: journal?.mission || '',
         issn: journal?.issn || '',
         online_issn: journal?.online_issn || '',
-        for_authors: journal?.for_authors || '',
-        for_reviewers: journal?.for_reviewers || '',
-        editorial_policies: journal?.editorial_policies || '',
         contact_us: journal?.contact_us || '',
-        cover_image: null,
-        university_logo: null,
         _method: journal ? 'PUT' : 'POST'
     });
 
@@ -62,24 +57,6 @@ export default function Form({ journal = null, pre_filled_title = '' }) {
                     <textarea className="w-full border p-2 rounded" value={data.mission} onChange={e => setData('mission', e.target.value)} />
                 </div>
                 <div>
-                    <label className="block mb-1">For Authors (PDF)</label>
-                    <input type="file" className="w-full border p-2 rounded" onChange={e => setData('for_authors', e.target.files[0])} />
-                    {journal?.for_authors && <p className="text-sm text-gray-500 mt-1">Current: <a href={journal.for_authors} target="_blank" className="text-blue-600 hover:underline">View PDF</a></p>}
-                    {errors.for_authors && <div className="text-red-500 text-sm">{errors.for_authors}</div>}
-                </div>
-                <div>
-                    <label className="block mb-1">For Reviewers (PDF)</label>
-                    <input type="file" className="w-full border p-2 rounded" onChange={e => setData('for_reviewers', e.target.files[0])} />
-                    {journal?.for_reviewers && <p className="text-sm text-gray-500 mt-1">Current: <a href={journal.for_reviewers} target="_blank" className="text-blue-600 hover:underline">View PDF</a></p>}
-                    {errors.for_reviewers && <div className="text-red-500 text-sm">{errors.for_reviewers}</div>}
-                </div>
-                <div>
-                    <label className="block mb-1">Editorial Policies (PDF)</label>
-                    <input type="file" className="w-full border p-2 rounded" onChange={e => setData('editorial_policies', e.target.files[0])} />
-                    {journal?.editorial_policies && <p className="text-sm text-gray-500 mt-1">Current: <a href={journal.editorial_policies} target="_blank" className="text-blue-600 hover:underline">View PDF</a></p>}
-                    {errors.editorial_policies && <div className="text-red-500 text-sm">{errors.editorial_policies}</div>}
-                </div>
-                <div>
                     <label className="block mb-1">Contact Us</label>
                     <textarea className="w-full border p-2 rounded" rows="4" value={data.contact_us} onChange={e => setData('contact_us', e.target.value)} />
                 </div>
@@ -92,14 +69,6 @@ export default function Form({ journal = null, pre_filled_title = '' }) {
                         <label className="block mb-1">Online ISSN</label>
                         <input className="w-full border p-2 rounded" value={data.online_issn} onChange={e => setData('online_issn', e.target.value)} />
                     </div>
-                </div>
-                <div>
-                    <label className="block mb-1">Cover Image</label>
-                    <input type="file" onChange={e => setData('cover_image', e.target.files[0])} />
-                </div>
-                <div>
-                    <label className="block mb-1">University Logo</label>
-                    <input type="file" onChange={e => setData('university_logo', e.target.files[0])} />
                 </div>
                 <button className="bg-blue-600 text-white px-6 py-2 rounded" disabled={processing}>Save Journal</button>
             </form>

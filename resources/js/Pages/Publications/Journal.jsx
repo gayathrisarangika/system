@@ -13,11 +13,6 @@ export default function Journal({ journal }) {
                         <h1 className="text-3xl md:text-4xl font-serif font-bold text-blue-900 leading-tight">{journal.journal_title}</h1>
                         <p className="text-lg text-gray-600 mt-2 uppercase tracking-widest font-medium">{journal.university_name}</p>
                     </div>
-                    {journal.university_logo && (
-                        <div className="flex-shrink-0">
-                            <img src={journal.university_logo} alt="University Logo" className="h-20 object-contain" />
-                        </div>
-                    )}
                 </div>
             </header>
 
@@ -46,47 +41,6 @@ export default function Journal({ journal }) {
                             </div>
                         </section>
 
-                        {journal.for_authors && (
-                            <section className="mb-10" id="for-authors">
-                                <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-900 inline-block">For Authors</h2>
-                                <div className="mt-4">
-                                    <a href={journal.for_authors} target="_blank" className="inline-flex items-center gap-2 bg-blue-900 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition shadow-md">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                        Download Guidelines for Authors (PDF)
-                                    </a>
-                                </div>
-                            </section>
-                        )}
-
-                        {journal.for_reviewers && (
-                            <section className="mb-10" id="for-reviewers">
-                                <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-900 inline-block">For Reviewers</h2>
-                                <div className="mt-4">
-                                    <a href={journal.for_reviewers} target="_blank" className="inline-flex items-center gap-2 bg-blue-900 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition shadow-md">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                        Download Guidelines for Reviewers (PDF)
-                                    </a>
-                                </div>
-                            </section>
-                        )}
-
-                        {journal.editorial_policies && (
-                            <section className="mb-10" id="editorial-policies">
-                                <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-900 inline-block">Editorial Policies</h2>
-                                <div className="mt-4">
-                                    <a href={journal.editorial_policies} target="_blank" className="inline-flex items-center gap-2 bg-blue-900 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition shadow-md">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                        Download Editorial Policies (PDF)
-                                    </a>
-                                </div>
-                            </section>
-                        )}
 
                        
 
@@ -96,16 +50,7 @@ export default function Journal({ journal }) {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                                     {journal.issues.map(issue => (
                                         <Link key={issue.id} href={`/journal/${journal.id}/archive`} className="group flex flex-col items-center">
-                                            <div className="w-full aspect-[3/4] overflow-hidden rounded shadow-md transition-transform group-hover:scale-105 bg-gray-100">
-                                                {issue.cover_image ? (
-                                                    <img src={issue.cover_image} alt={`Vol ${issue.volume}`} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-gray-400 p-4 text-center font-serif">
-                                                        Vol. {issue.volume} No. {issue.issue}
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <p className="mt-3 text-center font-medium text-gray-700 group-hover:text-blue-700">
+                                            <p className="mt-3 text-center font-medium text-gray-700 group-hover:text-blue-700 p-4 border rounded-lg w-full bg-gray-50">
                                                 Vol. {issue.volume} No. {issue.issue} ({issue.year})
                                             </p>
                                         </Link>
@@ -117,12 +62,6 @@ export default function Journal({ journal }) {
 
                     {/* Sidebar */}
                     <aside className="lg:w-80 flex flex-col gap-8">
-                        {journal.cover_image && (
-                            <div className="bg-white p-2 rounded shadow-lg border border-gray-200">
-                                <img src={journal.cover_image} alt="Journal Cover" className="w-full h-auto" />
-                            </div>
-                        )}
-
                         <div className="bg-blue-900 text-white p-6 rounded-lg shadow-md">
                             <h3 className="text-xl font-bold mb-4 border-b border-blue-700 pb-2">Information</h3>
                             <div className="space-y-4">
@@ -135,9 +74,6 @@ export default function Journal({ journal }) {
                                     <p className="text-lg font-mono tracking-tight">{journal.online_issn || "N/A"}</p>
                                 </div>
                                 <ul className="space-y-3 text-blue-100 pt-2 border-t border-blue-800">
-                                    <li><a href="#for-authors" className="hover:text-white transition flex items-center gap-2">For Authors</a></li>
-                                    <li><a href="#for-reviewers" className="hover:text-white transition flex items-center gap-2">For Reviewers</a></li>
-                                    <li><a href="#editorial-policies" className="hover:text-white transition flex items-center gap-2">Editorial Policies</a></li>
                                     <li><Link href={`/journal/${journal.id}/contact`} className="hover:text-white transition flex items-center gap-2">Contact Us</Link></li>
                                 </ul>
                             </div>
