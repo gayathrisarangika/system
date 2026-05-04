@@ -11,6 +11,11 @@ export default function Form({ journal = null, pre_filled_title = '' }) {
         issn: journal?.issn || '',
         online_issn: journal?.online_issn || '',
         contact_us: journal?.contact_us || '',
+        cover_image: null,
+        university_logo: null,
+        for_authors: null,
+        for_reviewers: null,
+        editorial_policies: null,
         _method: journal ? 'PUT' : 'POST'
     });
 
@@ -70,7 +75,42 @@ export default function Form({ journal = null, pre_filled_title = '' }) {
                         <input className="w-full border p-2 rounded" value={data.online_issn} onChange={e => setData('online_issn', e.target.value)} />
                     </div>
                 </div>
-                <button className="bg-blue-600 text-white px-6 py-2 rounded" disabled={processing}>Save Journal</button>
+
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label className="block mb-1">Cover Image</label>
+                        <input type="file" className="w-full border p-2 rounded" onChange={e => setData('cover_image', e.target.files[0])} />
+                        {journal?.cover_image_url && <img src={journal.cover_image_url} alt="Current Cover" className="mt-2 h-20" />}
+                    </div>
+                    <div>
+                        <label className="block mb-1">University Logo</label>
+                        <input type="file" className="w-full border p-2 rounded" onChange={e => setData('university_logo', e.target.files[0])} />
+                        {journal?.university_logo_url && <img src={journal.university_logo_url} alt="Current Logo" className="mt-2 h-20" />}
+                    </div>
+                </div>
+
+                <div className="space-y-4 pt-4 border-t">
+                    <h3 className="font-bold">Guidelines & Policies (PDF)</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label className="block mb-1 text-sm">Author Guidelines</label>
+                            <input type="file" className="w-full border p-2 rounded text-sm" onChange={e => setData('for_authors', e.target.files[0])} />
+                            {journal?.for_authors && <p className="text-xs text-green-600 mt-1">Existing file uploaded</p>}
+                        </div>
+                        <div>
+                            <label className="block mb-1 text-sm">Reviewer Guidelines</label>
+                            <input type="file" className="w-full border p-2 rounded text-sm" onChange={e => setData('for_reviewers', e.target.files[0])} />
+                            {journal?.for_reviewers && <p className="text-xs text-green-600 mt-1">Existing file uploaded</p>}
+                        </div>
+                        <div>
+                            <label className="block mb-1 text-sm">Editorial Policies</label>
+                            <input type="file" className="w-full border p-2 rounded text-sm" onChange={e => setData('editorial_policies', e.target.files[0])} />
+                            {journal?.editorial_policies && <p className="text-xs text-green-600 mt-1">Existing file uploaded</p>}
+                        </div>
+                    </div>
+                </div>
+
+                <button className="bg-blue-600 text-white px-6 py-2 rounded mt-6" disabled={processing}>Save Journal</button>
             </form>
         </div>
     );

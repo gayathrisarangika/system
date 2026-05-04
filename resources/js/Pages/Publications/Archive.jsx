@@ -35,6 +35,12 @@ export default function Archive({ journal, is_current }) {
                             <div key={issue.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                                 <div className="bg-gray-50 px-8 py-4 border-b flex justify-between items-center">
                                     <h3 className="text-xl font-bold text-blue-900">Vol. {issue.volume} No. {issue.issue} ({issue.year})</h3>
+                                    {issue.pdf_url && (
+                                        <div className="flex gap-4">
+                                            <a href={issue.pdf_url} target="_blank" className="bg-white border border-blue-900 text-blue-900 px-4 py-1.5 rounded-md text-sm font-bold hover:bg-blue-50 transition">View Full Issue</a>
+                                            <a href={`/issue/${issue.id}/download`} className="bg-blue-900 text-white px-4 py-1.5 rounded-md text-sm font-bold hover:bg-blue-800 transition">Download Issue</a>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="p-8">
                                     <div className="space-y-8">

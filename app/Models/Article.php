@@ -11,8 +11,15 @@ class Article extends Model
 {
     protected $fillable = [
         'issue_id', 'title', 'author', 'abstract', 'keywords', 'year',
-        'doi', 'published_date', 'views', 'downloads', 'pages'
+        'doi', 'published_date', 'views', 'downloads', 'pages', 'pdf'
     ];
+
+    protected function pdfUrl(): Attribute
+    {
+        return Attribute::get(fn () => $this->pdf ? Storage::disk('public')->url($this->pdf) : null);
+    }
+
+    protected $appends = ['pdf_url'];
 
     public function issue(): BelongsTo { return $this->belongsTo(Issue::class); }
 }
