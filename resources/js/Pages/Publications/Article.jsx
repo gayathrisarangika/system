@@ -112,6 +112,43 @@ export default function Article({ article, journal }) {
                     {/* Sidebar */}
                     <aside className="lg:w-80 flex flex-col gap-8">
                         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                            <h4 className="text-lg font-bold text-blue-900 mb-4 border-b pb-2">Full Text</h4>
+                            <div className="flex flex-col gap-3">
+                                {article.pdf_url && (
+                                    <>
+                                        <a
+                                            href={article.pdf_url}
+                                            target="_blank"
+                                            className="w-full bg-white border-2 border-blue-900 text-blue-900 text-center py-2 rounded font-bold hover:bg-blue-50 transition"
+                                        >
+                                            View PDF
+                                        </a>
+                                        <a
+                                            href={`/article/${article.id}/download`}
+                                            className="w-full bg-blue-900 text-white text-center py-2 rounded font-bold hover:bg-blue-800 transition"
+                                        >
+                                            Download PDF
+                                        </a>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                            <h4 className="text-lg font-bold text-blue-900 mb-4 border-b pb-2">Metrics</h4>
+                            <div className="grid grid-cols-2 gap-4 text-center">
+                                <div className="p-3 bg-gray-50 rounded border">
+                                    <p className="text-2xl font-bold text-blue-900">{article.views || 0}</p>
+                                    <p className="text-xs text-gray-500 uppercase tracking-wider font-bold">Views</p>
+                                </div>
+                                <div className="p-3 bg-gray-50 rounded border">
+                                    <p className="text-2xl font-bold text-blue-900">{article.downloads || 0}</p>
+                                    <p className="text-xs text-gray-500 uppercase tracking-wider font-bold">Downloads</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                             <h4 className="text-lg font-bold text-blue-900 mb-4 border-b pb-2">How to Cite (IEEE)</h4>
                             <div className="text-sm text-gray-600 bg-gray-50 p-4 rounded border border-gray-100 font-serif break-words">
                                 {getIEEECitation()}

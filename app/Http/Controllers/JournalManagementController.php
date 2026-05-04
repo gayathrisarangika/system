@@ -14,7 +14,7 @@ class JournalManagementController extends Controller
 {
     public function index()
     {
-        $journals = Journal::where('department_id', Auth::user()->department_id)->get();
+        $journals = Journal::all();
         return Inertia::render('Management/Journal/List', [
             'journals' => $journals
         ]);
@@ -94,6 +94,8 @@ class JournalManagementController extends Controller
             'for_reviewers' => 'nullable|file|mimes:pdf',
             'editorial_policies' => 'nullable|file|mimes:pdf',
             'contact_us' => 'nullable',
+            'cover_image' => 'nullable|image',
+            'university_logo' => 'nullable|image',
         ]);
 
         if ($request->hasFile('cover_image')) {
