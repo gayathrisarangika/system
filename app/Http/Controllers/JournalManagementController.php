@@ -37,12 +37,35 @@ class JournalManagementController extends Controller
             'mission' => 'nullable',
             'issn' => 'nullable',
             'online_issn' => 'nullable',
+            'for_authors' => 'nullable|file|mimes:pdf',
+            'for_reviewers' => 'nullable|file|mimes:pdf',
+            'editorial_policies' => 'nullable|file|mimes:pdf',
             'contact_us' => 'nullable',
+            'cover_image' => 'nullable|image',
+            'university_logo' => 'nullable|image',
         ]);
 
         $data['editor_id'] = Auth::id();
         $data['department_id'] = Auth::user()->department_id;
         $data['status'] = 'pending';
+
+        if ($request->hasFile('cover_image')) {
+            $data['cover_image'] = $request->file('cover_image')->store('covers', 'public');
+        }
+
+        if ($request->hasFile('university_logo')) {
+            $data['university_logo'] = $request->file('university_logo')->store('logos', 'public');
+        }
+
+        if ($request->hasFile('for_authors')) {
+            $data['for_authors'] = $request->file('for_authors')->store('guidelines', 'public');
+        }
+        if ($request->hasFile('for_reviewers')) {
+            $data['for_reviewers'] = $request->file('for_reviewers')->store('guidelines', 'public');
+        }
+        if ($request->hasFile('editorial_policies')) {
+            $data['editorial_policies'] = $request->file('editorial_policies')->store('policies', 'public');
+        }
 
         Journal::create($data);
 
@@ -67,8 +90,29 @@ class JournalManagementController extends Controller
             'mission' => 'nullable',
             'issn' => 'nullable',
             'online_issn' => 'nullable',
+            'for_authors' => 'nullable|file|mimes:pdf',
+            'for_reviewers' => 'nullable|file|mimes:pdf',
+            'editorial_policies' => 'nullable|file|mimes:pdf',
             'contact_us' => 'nullable',
         ]);
+
+        if ($request->hasFile('cover_image')) {
+            $data['cover_image'] = $request->file('cover_image')->store('covers', 'public');
+        }
+
+        if ($request->hasFile('university_logo')) {
+            $data['university_logo'] = $request->file('university_logo')->store('logos', 'public');
+        }
+
+        if ($request->hasFile('for_authors')) {
+            $data['for_authors'] = $request->file('for_authors')->store('guidelines', 'public');
+        }
+        if ($request->hasFile('for_reviewers')) {
+            $data['for_reviewers'] = $request->file('for_reviewers')->store('guidelines', 'public');
+        }
+        if ($request->hasFile('editorial_policies')) {
+            $data['editorial_policies'] = $request->file('editorial_policies')->store('policies', 'public');
+        }
 
         $journal->update($data);
 
@@ -121,7 +165,17 @@ class JournalManagementController extends Controller
             'year' => 'required|integer',
             'published_date' => 'nullable|date',
             'is_current_issue' => 'boolean',
+            'cover_image' => 'nullable|image',
+            'pdf_link' => 'nullable|file|mimes:pdf',
         ]);
+
+        if ($request->hasFile('cover_image')) {
+            $data['cover_image'] = $request->file('cover_image')->store('issue_covers', 'public');
+        }
+
+        if ($request->hasFile('pdf_link')) {
+            $data['pdf_link'] = $request->file('pdf_link')->store('issue_pdfs', 'public');
+        }
 
         $journal->issues()->create($data);
         return back();
@@ -148,7 +202,12 @@ class JournalManagementController extends Controller
             'published_date' => 'nullable|date',
             'pages' => 'nullable',
             'year' => 'required|integer',
+            'pdf' => 'required|file|mimes:pdf',
         ]);
+
+        if ($request->hasFile('pdf')) {
+            $data['pdf'] = $request->file('pdf')->store('articles', 'public');
+        }
 
         $issue->articles()->create($data);
         return back();
@@ -166,7 +225,12 @@ class JournalManagementController extends Controller
             'published_date' => 'nullable|date',
             'pages' => 'nullable',
             'year' => 'required|integer',
+            'pdf' => 'nullable|file|mimes:pdf',
         ]);
+
+        if ($request->hasFile('pdf')) {
+            $data['pdf'] = $request->file('pdf')->store('articles', 'public');
+        }
 
         $article->update($data);
         return back();
