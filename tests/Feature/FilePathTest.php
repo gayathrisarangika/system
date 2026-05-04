@@ -18,15 +18,15 @@ class FilePathTest extends TestCase
         
         // Case 1: Relative path
         $journal->university_logo = 'logos/test.png';
-        $this->assertEquals('/storage/logos/test.png', $journal->university_logo);
+        $this->assertEquals('http://localhost/storage/logos/test.png', $journal->university_logo);
         
         // Case 2: Prefixed path (legacy with slash)
         $journal->university_logo = '/storage/logos/test.png';
-        $this->assertEquals('/storage/logos/test.png', $journal->university_logo);
+        $this->assertEquals('http://localhost/storage/logos/test.png', $journal->university_logo);
 
         // Case 2.1: Prefixed path (legacy without leading slash)
         $journal->university_logo = 'storage/logos/test.png';
-        $this->assertEquals('/storage/logos/test.png', $journal->university_logo);
+        $this->assertEquals('http://localhost/storage/logos/test.png', $journal->university_logo);
         
         // Case 3: Full URL
         $journal->university_logo = 'http://example.com/logo.png';
@@ -38,9 +38,9 @@ class FilePathTest extends TestCase
         $article = new Article();
         
         $article->pdf = 'articles/test.pdf';
-        $this->assertEquals('/storage/articles/test.pdf', $article->pdf);
+        $this->assertEquals('http://localhost/storage/articles/test.pdf', $article->pdf);
         
         $article->pdf = '/storage/articles/test.pdf';
-        $this->assertEquals('/storage/articles/test.pdf', $article->pdf);
+        $this->assertEquals('http://localhost/storage/articles/test.pdf', $article->pdf);
     }
 }
