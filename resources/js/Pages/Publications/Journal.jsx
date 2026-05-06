@@ -35,12 +35,6 @@ export default function Journal({ journal }) {
                     {/* Main Content */}
                     <div className="flex-1 flex flex-col gap-10">
                         <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
-                            {journal.cover_image_url && (
-                                <div className="mb-8 rounded-lg overflow-hidden border border-gray-100 shadow-lg max-w-sm mx-auto md:mx-0">
-                                    <img src={journal.cover_image_url} alt={journal.journal_title} className="w-full h-auto" />
-                                </div>
-                            )}
-
                             <section className="mb-10">
                                 <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-900 inline-block">About the Journal</h2>
                                 <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap font-serif text-lg">
@@ -76,6 +70,12 @@ export default function Journal({ journal }) {
 
                     {/* Sidebar */}
                     <aside className="lg:w-80 flex flex-col gap-8">
+                        {journal.cover_image_url && (
+                            <div className="rounded-lg overflow-hidden border border-gray-200 shadow-sm bg-white">
+                                <img src={journal.cover_image_url} alt={journal.journal_title} className="w-full h-auto" />
+                            </div>
+                        )}
+
                         <div className="bg-blue-900 text-white p-6 rounded-lg shadow-md">
                             <h3 className="text-xl font-bold mb-4 border-b border-blue-700 pb-2">Information</h3>
                             <div className="space-y-4">
@@ -88,16 +88,22 @@ export default function Journal({ journal }) {
                                     <p className="text-lg font-mono tracking-tight">{journal.online_issn || "N/A"}</p>
                                 </div>
                                 <ul className="space-y-3 text-blue-100 pt-2 border-t border-blue-800">
-                                    {journal.for_authors_url && (
-                                        <li><a href={journal.for_authors_url} target="_blank" className="hover:text-white transition flex items-center gap-2">Author Guidelines (PDF)</a></li>
+                                    {journal.for_authors_url ? (
+                                        <li><a href={journal.for_authors_url} target="_blank" className="hover:text-white transition flex items-center gap-2 font-bold">Author Guidelines (PDF)</a></li>
+                                    ) : (
+                                        <li className="opacity-50 flex items-center gap-2">Author Guidelines (Pending)</li>
                                     )}
-                                    {journal.for_reviewers_url && (
-                                        <li><a href={journal.for_reviewers_url} target="_blank" className="hover:text-white transition flex items-center gap-2">Reviewer Guidelines (PDF)</a></li>
+                                    {journal.for_reviewers_url ? (
+                                        <li><a href={journal.for_reviewers_url} target="_blank" className="hover:text-white transition flex items-center gap-2 font-bold">Reviewer Guidelines (PDF)</a></li>
+                                    ) : (
+                                        <li className="opacity-50 flex items-center gap-2">Reviewer Guidelines (Pending)</li>
                                     )}
-                                    {journal.editorial_policies_url && (
-                                        <li><a href={journal.editorial_policies_url} target="_blank" className="hover:text-white transition flex items-center gap-2">Editorial Policies (PDF)</a></li>
+                                    {journal.editorial_policies_url ? (
+                                        <li><a href={journal.editorial_policies_url} target="_blank" className="hover:text-white transition flex items-center gap-2 font-bold">Editorial Policies (PDF)</a></li>
+                                    ) : (
+                                        <li className="opacity-50 flex items-center gap-2">Editorial Policies (Pending)</li>
                                     )}
-                                    <li><Link href={`/journal/${journal.id}/contact`} className="hover:text-white transition flex items-center gap-2">Contact Us</Link></li>
+                                    <li><Link href={`/journal/${journal.id}/contact`} className="hover:text-white transition flex items-center gap-2 font-bold">Contact Us</Link></li>
                                 </ul>
                             </div>
                         </div>
