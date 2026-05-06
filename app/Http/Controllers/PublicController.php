@@ -112,6 +112,8 @@ class PublicController extends Controller
         $article->load('issue.journal');
         $this->authorizeView($article->issue->journal);
 
+        $article->increment('views');
+
         return Inertia::render('Publications/Article', [
             'article' => $article,
             'journal' => $article->issue->journal,
@@ -120,7 +122,15 @@ class PublicController extends Controller
 
     public function downloadArticle(Article $article)
     {
-        abort(404);
+        $this->authorizeView($article->issue->journal);
+        $article->increment('downloads');
+        return response()->download(storage_path('app/public/' . $article->pdf));
+    }
+
+    public function downloadIssue(\App\Models\Issue $issue)
+    {
+        $this->authorizeView($issue->journal);
+        return response()->download(storage_path('app/public/' . $issue->pdf_link));
     }
 
     private function authorizeView($model)
