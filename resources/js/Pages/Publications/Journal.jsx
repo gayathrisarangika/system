@@ -33,31 +33,45 @@ export default function Journal({ journal }) {
                 <div className="flex flex-col lg:flex-row gap-10">
                     
                     {/* Main Content */}
-                    <div className="flex-1 bg-white p-8 rounded-lg shadow-sm border border-gray-200">
-                        <section className="mb-10">
-                            <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-900 inline-block">About the Journal</h2>
-                            <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap font-serif text-lg">
-                                {journal.journal_details || "No description available."}
-                            </div>
-                        </section>
+                    <div className="flex-1 flex flex-col gap-10">
+                        <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
+                            {journal.cover_image_url && (
+                                <div className="mb-8 rounded-lg overflow-hidden border border-gray-100 shadow-lg max-w-sm mx-auto md:mx-0">
+                                    <img src={journal.cover_image_url} alt={journal.journal_title} className="w-full h-auto" />
+                                </div>
+                            )}
 
-
-                       
-
-                        {journal.issues && journal.issues.length > 0 && (
-                            <section>
-                                <h3 className="text-2xl font-bold text-blue-900 mb-6">Recent Issues</h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                                    {journal.issues.map(issue => (
-                                        <Link key={issue.id} href={`/journal/${journal.id}/archive`} className="group flex flex-col items-center">
-                                            <p className="mt-3 text-center font-medium text-gray-700 group-hover:text-blue-700 p-4 border rounded-lg w-full bg-gray-50">
-                                                Vol. {issue.volume} No. {issue.issue} ({issue.year})
-                                            </p>
-                                        </Link>
-                                    ))}
+                            <section className="mb-10">
+                                <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-900 inline-block">About the Journal</h2>
+                                <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap font-serif text-lg">
+                                    {journal.journal_details || "No description available."}
                                 </div>
                             </section>
-                        )}
+
+                            {journal.issues && journal.issues.length > 0 && (
+                                <section>
+                                    <h3 className="text-2xl font-bold text-blue-900 mb-6">Recent Issues</h3>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+                                        {journal.issues.map(issue => (
+                                            <Link key={issue.id} href={`/journal/${journal.id}/archive`} className="group flex flex-col">
+                                                <div className="aspect-[3/4] rounded-lg overflow-hidden border border-gray-200 shadow-sm bg-gray-100 mb-3 group-hover:shadow-md transition-shadow">
+                                                    {issue.cover_image_url ? (
+                                                        <img src={issue.cover_image_url} alt={`Vol ${issue.volume} No ${issue.issue}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center p-4 text-center bg-blue-50">
+                                                            <span className="text-blue-900 font-serif font-bold text-sm">Vol. {issue.volume} No. {issue.issue}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <p className="font-bold text-gray-800 group-hover:text-blue-900 transition-colors text-center">
+                                                    Vol. {issue.volume} No. {issue.issue} ({issue.year})
+                                                </p>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
+                        </div>
                     </div>
 
                     {/* Sidebar */}
@@ -74,6 +88,15 @@ export default function Journal({ journal }) {
                                     <p className="text-lg font-mono tracking-tight">{journal.online_issn || "N/A"}</p>
                                 </div>
                                 <ul className="space-y-3 text-blue-100 pt-2 border-t border-blue-800">
+                                    {journal.for_authors_url && (
+                                        <li><a href={journal.for_authors_url} target="_blank" className="hover:text-white transition flex items-center gap-2">Author Guidelines (PDF)</a></li>
+                                    )}
+                                    {journal.for_reviewers_url && (
+                                        <li><a href={journal.for_reviewers_url} target="_blank" className="hover:text-white transition flex items-center gap-2">Reviewer Guidelines (PDF)</a></li>
+                                    )}
+                                    {journal.editorial_policies_url && (
+                                        <li><a href={journal.editorial_policies_url} target="_blank" className="hover:text-white transition flex items-center gap-2">Editorial Policies (PDF)</a></li>
+                                    )}
                                     <li><Link href={`/journal/${journal.id}/contact`} className="hover:text-white transition flex items-center gap-2">Contact Us</Link></li>
                                 </ul>
                             </div>

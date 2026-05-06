@@ -28,6 +28,7 @@ Route::get('/journal/{journal}/archive', [PublicController::class, 'journalArchi
 Route::get('/journal/{journal}/contact', [PublicController::class, 'journalContact'])->name('journal.contact');
 Route::get('/article/{article}', [PublicController::class, 'article'])->name('article.view');
 Route::get('/article/{article}/download', [PublicController::class, 'downloadArticle'])->name('article.download');
+Route::get('/issue/{issue}/download', [PublicController::class, 'downloadIssue'])->name('issue.download');
 
 Route::get('/conference/{conference}', [PublicController::class, 'conference'])->name('conference.view');
 Route::get('/symposium/{symposium}', [PublicController::class, 'symposium'])->name('symposium.view');
