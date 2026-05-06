@@ -8,12 +8,15 @@ export default function Issues({ journal, issues }) {
         year: '',
         published_date: '',
         is_current_issue: false,
+        cover_image: null,
+        pdf_link: null,
     });
 
     const submit = (e) => {
         e.preventDefault();
         post(`/editor/journal/${journal.id}/issues`, {
-            onSuccess: () => reset()
+            onSuccess: () => reset(),
+            forceFormData: true,
         });
     };
 
@@ -41,13 +44,25 @@ export default function Issues({ journal, issues }) {
                         <input type="date" className="w-full border p-2 rounded" value={data.published_date} onChange={e => setData('published_date', e.target.value)} />
                     </div>
                 </div>
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm mb-1">Cover Image</label>
+                        <input type="file" className="w-full border p-2 rounded" onChange={e => setData('cover_image', e.target.files[0])} />
+                        {errors.cover_image && <div className="text-red-500 text-sm">{errors.cover_image}</div>}
+                    </div>
+                    <div>
+                        <label className="block text-sm mb-1">Full Issue PDF</label>
+                        <input type="file" className="w-full border p-2 rounded" onChange={e => setData('pdf_link', e.target.files[0])} />
+                        {errors.pdf_link && <div className="text-red-500 text-sm">{errors.pdf_link}</div>}
+                    </div>
+                </div>
                 <div className="flex gap-4">
-                    <div className="flex items-center mt-6">
+                    <div className="flex items-center mt-2">
                         <input type="checkbox" id="current" checked={data.is_current_issue} onChange={e => setData('is_current_issue', e.target.checked)} />
                         <label htmlFor="current" className="ml-2">Current Issue</label>
                     </div>
                 </div>
-                <button className="bg-blue-600 text-white px-4 py-2 rounded">Create Issue</button>
+                <button className="bg-blue-600 text-white px-4 py-2 rounded mt-4">Create Issue</button>
             </form>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
