@@ -178,54 +178,7 @@ export default function Admin({ pendingJournals, pendingConferences, pendingSymp
                                 />
                                 {errors.email && <div className="text-red-500 text-xs mt-1">{errors.email}</div>}
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
-                                <input 
-                                    className="w-full border rounded-lg p-2" 
-                                    value={data.username} 
-                                    onChange={e => setData('username', e.target.value)} 
-                                    required
-                                />
-                                {errors.username && <div className="text-red-500 text-xs mt-1">{errors.username}</div>}
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                                <input 
-                                    type="password"
-                                    className="w-full border rounded-lg p-2" 
-                                    value={data.password} 
-                                    onChange={e => setData('password', e.target.value)} 
-                                    required
-                                />
-                                {errors.password && <div className="text-red-500 text-xs mt-1">{errors.password}</div>}
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
-                                <select 
-                                    className="w-full border rounded-lg p-2"
-                                    value={data.department_id}
-                                    onChange={e => setData('department_id', e.target.value)}
-                                    required
-                                >
-                                    <option value="">Select Department</option>
-                                    {departments.map(dept => (
-                                        <option key={dept.id} value={dept.id}>{dept.name}</option>
-                                    ))}
-                                </select>
-                                {errors.department_id && <div className="text-red-500 text-xs mt-1">{errors.department_id}</div>}
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                                <select 
-                                    className="w-full border rounded-lg p-2"
-                                    value={data.role}
-                                    onChange={e => setData('role', e.target.value)}
-                                    required
-                                >
-                                    <option value="editor">Editor</option>
-                                    <option value="admin">Admin</option>
-                                </select>
-                            </div>
+
                             {data.role === 'editor' && (
                                 <>
                                     <div>
@@ -287,6 +240,40 @@ export default function Admin({ pendingJournals, pendingConferences, pendingSymp
                                     <input type="hidden" value={data.journal_title} />
                                 </>
                             )}
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                                <input
+                                    className="w-full border rounded-lg p-2"
+                                    value={data.username}
+                                    onChange={e => setData('username', e.target.value)}
+                                    required
+                                />
+                                {errors.username && <div className="text-red-500 text-xs mt-1">{errors.username}</div>}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                                <input
+                                    type="password"
+                                    className="w-full border rounded-lg p-2"
+                                    value={data.password}
+                                    onChange={e => setData('password', e.target.value)}
+                                    required
+                                />
+                                {errors.password && <div className="text-red-500 text-xs mt-1">{errors.password}</div>}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                                <select
+                                    className="w-full border rounded-lg p-2"
+                                    value={data.role}
+                                    onChange={e => setData('role', e.target.value)}
+                                    required
+                                >
+                                    <option value="editor">Editor</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
                             <button 
                                 type="submit" 
                                 className="w-full bg-[#1f3a5f] text-white py-2 rounded-lg font-bold hover:bg-blue-800 transition disabled:opacity-50"
