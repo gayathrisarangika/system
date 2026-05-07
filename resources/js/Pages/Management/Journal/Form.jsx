@@ -22,9 +22,13 @@ export default function Form({ journal = null, pre_filled_title = '' }) {
     const submit = (e) => {
         e.preventDefault();
         if (journal) {
-            post(`/editor/journal/${journal.id}`);
+            post(`/editor/journal/${journal.id}`, {
+                forceFormData: true,
+            });
         } else {
-            post('/editor/journal');
+            post('/editor/journal', {
+                forceFormData: true,
+            });
         }
     };
 
@@ -80,11 +84,13 @@ export default function Form({ journal = null, pre_filled_title = '' }) {
                     <div>
                         <label className="block mb-1">Cover Image</label>
                         <input type="file" className="w-full border p-2 rounded" onChange={e => setData('cover_image', e.target.files[0])} />
+                        {errors.cover_image && <div className="text-red-500 text-sm">{errors.cover_image}</div>}
                         {journal?.cover_image_url && <img src={journal.cover_image_url} alt="Current Cover" className="mt-2 h-20" />}
                     </div>
                     <div>
                         <label className="block mb-1">University Logo</label>
                         <input type="file" className="w-full border p-2 rounded" onChange={e => setData('university_logo', e.target.files[0])} />
+                        {errors.university_logo && <div className="text-red-500 text-sm">{errors.university_logo}</div>}
                         {journal?.university_logo_url && <img src={journal.university_logo_url} alt="Current Logo" className="mt-2 h-20" />}
                     </div>
                 </div>
@@ -95,16 +101,19 @@ export default function Form({ journal = null, pre_filled_title = '' }) {
                         <div>
                             <label className="block mb-1 text-sm">Author Guidelines</label>
                             <input type="file" className="w-full border p-2 rounded text-sm" onChange={e => setData('for_authors', e.target.files[0])} />
+                            {errors.for_authors && <div className="text-red-500 text-sm">{errors.for_authors}</div>}
                             {journal?.for_authors && <p className="text-xs text-green-600 mt-1">Existing file uploaded</p>}
                         </div>
                         <div>
                             <label className="block mb-1 text-sm">Reviewer Guidelines</label>
                             <input type="file" className="w-full border p-2 rounded text-sm" onChange={e => setData('for_reviewers', e.target.files[0])} />
+                            {errors.for_reviewers && <div className="text-red-500 text-sm">{errors.for_reviewers}</div>}
                             {journal?.for_reviewers && <p className="text-xs text-green-600 mt-1">Existing file uploaded</p>}
                         </div>
                         <div>
                             <label className="block mb-1 text-sm">Editorial Policies</label>
                             <input type="file" className="w-full border p-2 rounded text-sm" onChange={e => setData('editorial_policies', e.target.files[0])} />
+                            {errors.editorial_policies && <div className="text-red-500 text-sm">{errors.editorial_policies}</div>}
                             {journal?.editorial_policies && <p className="text-xs text-green-600 mt-1">Existing file uploaded</p>}
                         </div>
                     </div>

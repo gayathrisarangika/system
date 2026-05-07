@@ -98,22 +98,22 @@ class JournalManagementController extends Controller
             'university_logo' => 'nullable|image',
         ]);
 
-        if ($request->hasFile('cover_image')) {
-            $data['cover_image'] = $request->file('cover_image')->store('covers', 'public');
-        }
-
-        if ($request->hasFile('university_logo')) {
-            $data['university_logo'] = $request->file('university_logo')->store('logos', 'public');
-        }
-
-        if ($request->hasFile('for_authors')) {
-            $data['for_authors'] = $request->file('for_authors')->store('guidelines', 'public');
-        }
-        if ($request->hasFile('for_reviewers')) {
-            $data['for_reviewers'] = $request->file('for_reviewers')->store('guidelines', 'public');
-        }
-        if ($request->hasFile('editorial_policies')) {
-            $data['editorial_policies'] = $request->file('editorial_policies')->store('policies', 'public');
+        // Remove file fields from data if they are not uploaded as files, 
+        // to prevent overwriting existing paths with null.
+        $fileFields = ['cover_image', 'university_logo', 'for_authors', 'for_reviewers', 'editorial_policies'];
+        foreach ($fileFields as $field) {
+            if ($request->hasFile($field)) {
+                $folder = match($field) {
+                    'cover_image' => 'covers',
+                    'university_logo' => 'logos',
+                    'for_authors', 'for_reviewers' => 'guidelines',
+                    'editorial_policies' => 'policies',
+                    default => 'uploads'
+                };
+                $data[$field] = $request->file($field)->store($folder, 'public');
+            } else {
+                unset($data[$field]);
+            }
         }
 
         $journal->update($data);
@@ -232,6 +232,8 @@ class JournalManagementController extends Controller
 
         if ($request->hasFile('pdf')) {
             $data['pdf'] = $request->file('pdf')->store('articles', 'public');
+        } else {
+            unset($data['pdf']);
         }
 
         $article->update($data);
