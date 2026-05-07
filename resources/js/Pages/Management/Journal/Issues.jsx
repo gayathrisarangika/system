@@ -1,7 +1,11 @@
 import React from 'react';
 import { Head, useForm, Link } from '@inertiajs/react';
 
+import { router } from '@inertiajs/react';
+
 export default function Issues({ journal, issues }) {
+    const [editingIssue, setEditingIssue] = React.useState(null);
+
     const { data, setData, post, reset, errors } = useForm({
         volume: '',
         issue: '',
@@ -14,10 +18,44 @@ export default function Issues({ journal, issues }) {
 
     const submit = (e) => {
         e.preventDefault();
-        post(`/editor/journal/${journal.id}/issues`, {
-            onSuccess: () => reset(),
-            forceFormData: true,
+        if (editingIssue) {
+            post(`/editor/journal/issue/${editingIssue.id}`, {
+                onSuccess: () => {
+                    reset();
+                    setEditingIssue(null);
+                },
+                forceFormData: true,
+            });
+        } else {
+            post(`/editor/journal/${journal.id}/issues`, {
+                onSuccess: () => reset(),
+                forceFormData: true,
+            });
+        }
+    };
+
+    const handleEdit = (issue) => {
+        setEditingIssue(issue);
+        setData({
+            volume: issue.volume,
+            issue: issue.issue,
+            year: issue.year,
+            published_date: issue.published_date || '',
+            is_current_issue: issue.is_current_issue === 1 || issue.is_current_issue === true,
+            cover_image: null,
+            pdf_link: null,
         });
+    };
+
+    const handleCancel = () => {
+        setEditingIssue(null);
+        reset();
+    };
+
+    const handleDelete = (id) => {
+        if (confirm('Are you sure you want to delete this issue?')) {
+            router.delete(`/editor/journal/issue/${id}`);
+        }
     };
 
     return (
@@ -62,18 +100,30 @@ export default function Issues({ journal, issues }) {
                         <label htmlFor="current" className="ml-2">Current Issue</label>
                     </div>
                 </div>
-                <button className="bg-blue-600 text-white px-4 py-2 rounded mt-4">Create Issue</button>
+                <div className="flex gap-2">
+                    <button className="bg-blue-600 text-white px-4 py-2 rounded mt-4">
+                        {editingIssue ? 'Update Issue' : 'Create Issue'}
+                    </button>
+                    {editingIssue && (
+                        <button type="button" onClick={handleCancel} className="bg-gray-500 text-white px-4 py-2 rounded mt-4">
+                            Cancel
+                        </button>
+                    )}
+                </div>
             </form>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {issues.map(issue => (
-                    <div key={issue.id} className="bg-white rounded shadow p-4">
+                    <div key={issue.id} className="bg-white rounded shadow p-4 border-l-4 border-blue-600">
                         <div>
                             <h3 className="font-bold">Vol. {issue.volume} No. {issue.issue}</h3>
                             <p className="text-sm text-gray-500">{issue.year}</p>
                             <div className="mt-4 flex flex-col gap-2">
-                                <Link href={`/editor/journal/issue/${issue.id}/articles`} className="text-blue-600 text-sm">Manage Articles</Link>
-                                <button className="text-red-500 text-sm text-left">Delete Issue</button>
+                                <Link href={`/editor/journal/issue/${issue.id}/articles`} className="text-blue-600 text-sm font-medium hover:underline">Manage Articles</Link>
+                                <div className="flex gap-3 mt-2 border-t pt-2">
+                                    <button onClick={() => handleEdit(issue)} className="text-amber-600 text-xs font-bold uppercase">Edit</button>
+                                    <button onClick={() => handleDelete(issue.id)} className="text-red-500 text-xs font-bold uppercase">Delete</button>
+                                </div>
                             </div>
                         </div>
                     </div>
