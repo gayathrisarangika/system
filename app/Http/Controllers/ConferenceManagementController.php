@@ -63,13 +63,20 @@ class ConferenceManagementController extends Controller
             'conference_details' => 'nullable',
             'aim_scope' => 'nullable',
             'mission' => 'nullable',
+            'cover_image' => 'nullable|image',
+            'university_logo' => 'nullable|image',
         ]);
 
         if ($request->hasFile('cover_image')) {
             $data['cover_image'] = $request->file('cover_image')->store('covers', 'public');
+        } else {
+            unset($data['cover_image']);
         }
+
         if ($request->hasFile('university_logo')) {
             $data['university_logo'] = $request->file('university_logo')->store('logos', 'public');
+        } else {
+            unset($data['university_logo']);
         }
 
         $conference->update($data);
