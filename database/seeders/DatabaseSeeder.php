@@ -35,10 +35,26 @@ class DatabaseSeeder extends Seeder
             'editor_id' => $editor->id,
             'department_id' => $dept->id,
             'journal_title' => 'International Journal of AI Research',
-            'university_name' => 'Global Tech University',
+            'university_name' => 'Sabaragamuwa University of Sri Lanka',
             'journal_details' => 'Leading journal in Artificial Intelligence.',
             'aim_scope' => 'Covers all aspects of AI.',
             'mission' => 'To advance AI research.',
+            'status' => 'approved',
+        ]);
+
+        \App\Models\Conference::create([
+            'editor_id' => $admin->id,
+            'department_id' => $dept->id,
+            'conference_title' => 'International Conference on Social Sciences and Languages',
+            'university_name' => 'Sabaragamuwa University of Sri Lanka',
+            'status' => 'approved',
+        ]);
+
+        \App\Models\Symposium::create([
+            'editor_id' => $admin->id,
+            'department_id' => $dept->id,
+            'symposium_title' => "Sabaragamuwa Social Sciences & Languages Students' Annual Symposium",
+            'university_name' => 'Sabaragamuwa University of Sri Lanka',
             'status' => 'approved',
         ]);
 

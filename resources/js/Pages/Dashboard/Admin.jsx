@@ -1,7 +1,7 @@
 import React from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 
-export default function Admin({ pendingJournals, pendingConferences, pendingSymposiums, departments, users }) {
+export default function Admin({ pendingJournals, pendingConferences, pendingSymposiums, journals, conferences, symposiums, departments, users }) {
     const { data, setData, post, reset, errors, processing } = useForm({
         name: '',
         email: '',
@@ -9,6 +9,8 @@ export default function Admin({ pendingJournals, pendingConferences, pendingSymp
         password: '',
         department_id: '',
         role: 'editor',
+        type: 'journal',
+        publication_id: '',
         journal_title: '',
     });
 
@@ -225,15 +227,65 @@ export default function Admin({ pendingJournals, pendingConferences, pendingSymp
                                 </select>
                             </div>
                             {data.role === 'editor' && (
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Assigned Journal Title</label>
-                                    <input 
-                                        className="w-full border rounded-lg p-2" 
-                                        value={data.journal_title} 
-                                        onChange={e => setData('journal_title', e.target.value)}
-                                        placeholder="Enter the journal name for this editor"
-                                    />
-                                </div>
+                                <>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Publication Type</label>
+                                        <select 
+                                            className="w-full border rounded-lg p-2"
+                                            value={data.type}
+                                            onChange={e => {
+                                                setData(prev => ({
+                                                    ...prev,
+                                                    type: e.target.value,
+                                                    publication_id: '',
+                                                    journal_title: ''
+                                                }));
+                                            }}
+                                        >
+                                            <option value="journal">Journal</option>
+                                            <option value="conference">Conference</option>
+                                            <option value="symposium">Symposium</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Target Publication</label>
+                                        <select 
+                                            className="w-full border rounded-lg p-2"
+                                            value={data.publication_id}
+                                            onChange={e => {
+                                                const id = e.target.value;
+                                                let title = '';
+                                                if (data.type === 'journal') {
+                                                    title = journals.find(j => j.id == id)?.journal_title || '';
+                                                } else if (data.type === 'conference') {
+                                                    title = conferences.find(c => c.id == id)?.conference_title || '';
+                                                } else if (data.type === 'symposium') {
+                                                    title = symposiums.find(s => s.id == id)?.symposium_title || '';
+                                                }
+                                                setData(prev => ({
+                                                    ...prev,
+                                                    publication_id: id,
+                                                    journal_title: title
+                                                }));
+                                            }}
+                                            required
+                                        >
+                                            <option value="">Select Publication</option>
+                                            {data.type === 'journal' && journals.map(j => (
+                                                <option key={j.id} value={j.id}>{j.journal_title}</option>
+                                            ))}
+                                            {data.type === 'conference' && conferences.map(c => (
+                                                <option key={c.id} value={c.id}>{c.conference_title}</option>
+                                            ))}
+                                            {data.type === 'symposium' && symposiums.map(s => (
+                                                <option key={s.id} value={s.id}>{s.symposium_title}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    
+                                    <input type="hidden" value={data.journal_title} />
+                                </>
                             )}
                             <button 
                                 type="submit" 

@@ -22,6 +22,9 @@ class DashboardController extends Controller
             'pendingJournals' => Journal::where('status', 'pending')->with('department')->get(),
             'pendingConferences' => Conference::where('status', 'pending')->with('department')->get(),
             'pendingSymposiums' => Symposium::where('status', 'pending')->with('department')->get(),
+            'journals' => Journal::all(),
+            'conferences' => Conference::all(),
+            'symposiums' => Symposium::all(),
             'departments' => Department::all(),
             'users' => User::with('department')->get(),
         ]);
@@ -38,6 +41,8 @@ class DashboardController extends Controller
             'password' => 'required|min:6',
             'department_id' => 'required|exists:departments,id',
             'role' => 'required|in:admin,editor',
+            'type' => 'nullable|in:journal,conference,symposium',
+            'publication_id' => 'nullable|integer',
             'journal_title' => 'nullable|string',
         ]);
 
