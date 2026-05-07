@@ -183,6 +183,42 @@ class JournalManagementController extends Controller
         return back();
     }
 
+    public function updateIssue(Request $request, Issue $issue)
+    {
+        $this->authorizeEditor($issue->journal);
+        $data = $request->validate([
+            'volume' => 'required|integer',
+            'issue' => 'required|integer',
+            'year' => 'required|integer',
+            'published_date' => 'nullable|date',
+            'is_current_issue' => 'boolean',
+            'cover_image' => 'nullable|image',
+            'pdf_link' => 'nullable|file|mimes:pdf',
+        ]);
+
+        if ($request->hasFile('cover_image')) {
+            $data['cover_image'] = $request->file('cover_image')->store('issue_covers', 'public');
+        } else {
+            unset($data['cover_image']);
+        }
+
+        if ($request->hasFile('pdf_link')) {
+            $data['pdf_link'] = $request->file('pdf_link')->store('issue_pdfs', 'public');
+        } else {
+            unset($data['pdf_link']);
+        }
+
+        $issue->update($data);
+        return back();
+    }
+
+    public function deleteIssue(Issue $issue)
+    {
+        $this->authorizeEditor($issue->journal);
+        $issue->delete();
+        return back();
+    }
+
     public function manageArticles(Issue $issue)
     {
         $this->authorizeEditor($issue->journal);
