@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Conference;
 use App\Models\ConferenceProceeding;
 use App\Models\ConferenceCommittee;
+use App\Models\Article;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -13,7 +14,7 @@ class ConferenceManagementController extends Controller
 {
     public function index()
     {
-        $conferences = Conference::where('department_id', Auth::user()->department_id)->get();
+        $conferences = Conference::all();
         return Inertia::render('Management/Conference/List', ['conferences' => $conferences]);
     }
 
@@ -36,6 +37,7 @@ class ConferenceManagementController extends Controller
 
         $data['editor_id'] = Auth::id();
         $data['department_id'] = Auth::user()->department_id;
+        $data['status'] = 'pending';
 
         if ($request->hasFile('cover_image')) {
             $data['cover_image'] = $request->file('cover_image')->store('covers', 'public');
@@ -104,16 +106,16 @@ class ConferenceManagementController extends Controller
         return back();
     }
 
-    public function manageProceedings(Conference $conference)
+    public function manageAbstractBooks(Conference $conference)
     {
         $this->authorizeEditor($conference);
-        return Inertia::render('Management/Conference/Proceedings', [
+        return Inertia::render('Management/Conference/AbstractBooks', [
             'conference' => $conference,
-            'proceedings' => $conference->proceedings()->orderBy('year', 'desc')->get()
+            'abstractBooks' => $conference->proceedings()->orderBy('year', 'desc')->get()
         ]);
     }
 
-    public function storeProceeding(Request $request, Conference $conference)
+    public function storeAbstractBook(Request $request, Conference $conference)
     {
         $this->authorizeEditor($conference);
         $data = $request->validate([
@@ -134,11 +136,70 @@ class ConferenceManagementController extends Controller
         return back();
     }
 
+    public function deleteAbstractBook(ConferenceProceeding $proceeding)
+    {
+        $this->authorizeEditor($proceeding->conference);
+        $proceeding->delete();
+        return back();
+    }
+
+    public function manageArticles(ConferenceProceeding $proceeding)
+    {
+        $this->authorizeEditor($proceeding->conference);
+        return Inertia::render('Management/Conference/Articles', [
+            'abstractBook' => $proceeding,
+            'articles' => Article::where('conference_proceeding_id', $proceeding->id)->get()
+        ]);
+    }
+
+    public function storeArticle(Request $request, ConferenceProceeding $proceeding)
+    {
+        $this->authorizeEditor($proceeding->conference);
+        $data = $request->validate([
+            'title' => 'required',
+            'author' => 'required',
+            'abstract' => 'required',
+            'keywords' => 'nullable',
+            'year' => 'required|integer',
+            'pdf' => 'required|file|mimes:pdf',
+        ]);
+
+        if ($request->hasFile('pdf')) {
+            $data['pdf'] = $request->file('pdf')->store('articles', 'public');
+        }
+
+        $data['conference_proceeding_id'] = $proceeding->id;
+        Article::create($data);
+        return back();
+    }
+
+    public function updateArticle(Request $request, Article $article)
+    {
+        $this->authorizeEditor($article->conferenceProceeding->conference);
+        $data = $request->validate([
+            'title' => 'required',
+            'author' => 'required',
+            'abstract' => 'required',
+            'keywords' => 'nullable',
+            'year' => 'required|integer',
+            'pdf' => 'nullable|file|mimes:pdf',
+        ]);
+
+        if ($request->hasFile('pdf')) {
+            $data['pdf'] = $request->file('pdf')->store('articles', 'public');
+        } else {
+            unset($data['pdf']);
+        }
+
+        $article->update($data);
+        return back();
+    }
+
     private function authorizeEditor(Conference $conference)
     {
         if (Auth::user()->role === 'admin') return;
 
-        if ($conference->department_id !== Auth::user()->department_id) {
+        if ($conference->id != Auth::user()->publication_id || Auth::user()->type !== 'conference') {
             abort(403);
         }
     }

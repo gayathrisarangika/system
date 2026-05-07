@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Symposium;
 use App\Models\SymposiumProceeding;
 use App\Models\SymposiumCommittee;
+use App\Models\Article;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -13,7 +14,7 @@ class SymposiumManagementController extends Controller
 {
     public function index()
     {
-        $symposiums = Symposium::where('department_id', Auth::user()->department_id)->get();
+        $symposiums = Symposium::all();
         return Inertia::render('Management/Symposium/List', ['symposiums' => $symposiums]);
     }
 
@@ -36,6 +37,7 @@ class SymposiumManagementController extends Controller
 
         $data['editor_id'] = Auth::id();
         $data['department_id'] = Auth::user()->department_id;
+        $data['status'] = 'pending';
 
         if ($request->hasFile('cover_image')) {
             $data['cover_image'] = $request->file('cover_image')->store('covers', 'public');
@@ -104,16 +106,16 @@ class SymposiumManagementController extends Controller
         return back();
     }
 
-    public function manageProceedings(Symposium $symposium)
+    public function manageAbstractBooks(Symposium $symposium)
     {
         $this->authorizeEditor($symposium);
-        return Inertia::render('Management/Symposium/Proceedings', [
+        return Inertia::render('Management/Symposium/AbstractBooks', [
             'symposium' => $symposium,
-            'proceedings' => $symposium->proceedings()->orderBy('year', 'desc')->get()
+            'abstractBooks' => $symposium->proceedings()->orderBy('year', 'desc')->get()
         ]);
     }
 
-    public function storeProceeding(Request $request, Symposium $symposium)
+    public function storeAbstractBook(Request $request, Symposium $symposium)
     {
         $this->authorizeEditor($symposium);
         $data = $request->validate([
@@ -134,11 +136,70 @@ class SymposiumManagementController extends Controller
         return back();
     }
 
+    public function deleteAbstractBook(SymposiumProceeding $proceeding)
+    {
+        $this->authorizeEditor($proceeding->symposium);
+        $proceeding->delete();
+        return back();
+    }
+
+    public function manageArticles(SymposiumProceeding $proceeding)
+    {
+        $this->authorizeEditor($proceeding->symposium);
+        return Inertia::render('Management/Symposium/Articles', [
+            'abstractBook' => $proceeding,
+            'articles' => Article::where('symposium_proceeding_id', $proceeding->id)->get()
+        ]);
+    }
+
+    public function storeArticle(Request $request, SymposiumProceeding $proceeding)
+    {
+        $this->authorizeEditor($proceeding->symposium);
+        $data = $request->validate([
+            'title' => 'required',
+            'author' => 'required',
+            'abstract' => 'required',
+            'keywords' => 'nullable',
+            'year' => 'required|integer',
+            'pdf' => 'required|file|mimes:pdf',
+        ]);
+
+        if ($request->hasFile('pdf')) {
+            $data['pdf'] = $request->file('pdf')->store('articles', 'public');
+        }
+
+        $data['symposium_proceeding_id'] = $proceeding->id;
+        Article::create($data);
+        return back();
+    }
+
+    public function updateArticle(Request $request, Article $article)
+    {
+        $this->authorizeEditor($article->symposiumProceeding->symposium);
+        $data = $request->validate([
+            'title' => 'required',
+            'author' => 'required',
+            'abstract' => 'required',
+            'keywords' => 'nullable',
+            'year' => 'required|integer',
+            'pdf' => 'nullable|file|mimes:pdf',
+        ]);
+
+        if ($request->hasFile('pdf')) {
+            $data['pdf'] = $request->file('pdf')->store('articles', 'public');
+        } else {
+            unset($data['pdf']);
+        }
+
+        $article->update($data);
+        return back();
+    }
+
     private function authorizeEditor(Symposium $symposium)
     {
         if (Auth::user()->role === 'admin') return;
 
-        if ($symposium->department_id !== Auth::user()->department_id) {
+        if ($symposium->id != Auth::user()->publication_id || Auth::user()->type !== 'symposium') {
             abort(403);
         }
     }
