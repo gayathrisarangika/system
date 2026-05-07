@@ -28,8 +28,8 @@ export default function DepartmentSelection({ departments, journals, type }) {
                                             className="flex flex-col h-full bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md hover:border-blue-200 transition-all group"
                                         >
                                             <div className="aspect-[3/4] bg-gray-50 rounded-t-xl overflow-hidden border-b">
-                                                {journal.cover_image ? (
-                                                    <img src={journal.cover_image} alt={journal.journal_title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                                {journal.cover_image_url ? (
+                                                    <img src={journal.cover_image_url} alt={journal.journal_title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                                                 ) : (
                                                     <div className="w-full h-full flex items-center justify-center text-gray-400 p-4 text-center text-xs italic">
                                                         {journal.journal_title}

@@ -13,6 +13,7 @@ export default function Articles({ issue, articles }) {
         published_date: '',
         pages: '',
         year: issue.year,
+        pdf: null,
     });
 
     const { data: editData, setData: setEditData, post: postEdit, errors: editErrors, reset: resetEdit } = useForm({
@@ -24,13 +25,15 @@ export default function Articles({ issue, articles }) {
         published_date: '',
         pages: '',
         year: issue.year,
+        pdf: null,
         _method: 'POST'
     });
 
     const submit = (e) => {
         e.preventDefault();
         post(`/editor/journal/issue/${issue.id}/articles`, {
-            onSuccess: () => reset()
+            onSuccess: () => reset(),
+            forceFormData: true,
         });
     };
 
@@ -45,6 +48,7 @@ export default function Articles({ issue, articles }) {
             published_date: article.published_date || '',
             pages: article.pages || '',
             year: article.year || issue.year,
+            pdf: null,
         });
     };
 
@@ -54,7 +58,8 @@ export default function Articles({ issue, articles }) {
             onSuccess: () => {
                 setEditingArticle(null);
                 resetEdit();
-            }
+            },
+            forceFormData: true,
         });
     };
 
@@ -106,6 +111,11 @@ export default function Articles({ issue, articles }) {
                                 <label className="block text-sm mb-1">Published Date</label>
                                 <input type="date" className="w-full border p-2 rounded" value={editData.published_date} onChange={e => setEditData('published_date', e.target.value)} />
                             </div>
+                            <div>
+                                <label className="block text-sm mb-1">Article PDF</label>
+                                <input type="file" className="w-full border p-2 rounded" onChange={e => setEditData('pdf', e.target.files[0])} />
+                                {editErrors.pdf && <div className="text-red-500 text-sm">{editErrors.pdf}</div>}
+                            </div>
                         </div>
                         <button className="bg-blue-600 text-white px-4 py-2 rounded">Update Article</button>
                     </form>
@@ -148,6 +158,11 @@ export default function Articles({ issue, articles }) {
                         <div>
                             <label className="block text-sm mb-1">Published Date</label>
                             <input type="date" className="w-full border p-2 rounded" value={data.published_date} onChange={e => setData('published_date', e.target.value)} />
+                        </div>
+                        <div>
+                            <label className="block text-sm mb-1">Article PDF</label>
+                            <input type="file" className="w-full border p-2 rounded" onChange={e => setData('pdf', e.target.files[0])} />
+                            {errors.pdf && <div className="text-red-500 text-sm">{errors.pdf}</div>}
                         </div>
                     </div>
                     <button className="bg-blue-600 text-white px-4 py-2 rounded">Add Article</button>

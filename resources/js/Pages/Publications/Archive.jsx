@@ -19,7 +19,8 @@ export default function Archive({ journal, is_current }) {
                         <Link href={`/journal/${journal.id}`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Home</Link>
                         <Link href={`/journal/${journal.id}/editorial-board`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Editorial Board</Link>
                         <Link href={`/journal/${journal.id}/current`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Current</Link>
-                        <Link href={`/journal/${journal.id}/archive`} className="px-6 py-4 hover:bg-blue-800 transition font-medium">Archive</Link>
+                        <Link href={`/journal/${journal.id}/archive`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Archive</Link>
+                        <Link href={`/journal/${journal.id}/contact`} className="px-6 py-4 hover:bg-blue-800 transition font-medium">Contact Us</Link>
                     </div>
                 </div>
             </nav>
