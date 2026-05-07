@@ -1,11 +1,11 @@
 import React from 'react';
 import { useForm, Head, Link } from '@inertiajs/react';
 
-export default function Login({ dept_id, type }) {
+export default function Login({ pub_id, type }) {
     const { data, setData, post, processing, errors } = useForm({
         username: '',
         password: '',
-        dept_id: dept_id || '',
+        pub_id: pub_id || '',
         type: type || 'journal',
     });
 

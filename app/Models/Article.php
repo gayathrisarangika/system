@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Storage;
 class Article extends Model
 {
     protected $fillable = [
-        'issue_id', 'title', 'author', 'abstract', 'keywords', 'year',
+        'issue_id', 'conference_proceeding_id', 'symposium_proceeding_id',
+        'title', 'author', 'abstract', 'keywords', 'year',
         'doi', 'published_date', 'views', 'downloads', 'pages', 'pdf'
     ];
 
@@ -22,4 +23,6 @@ class Article extends Model
     protected $appends = ['pdf_url'];
 
     public function issue(): BelongsTo { return $this->belongsTo(Issue::class); }
+    public function conferenceProceeding(): BelongsTo { return $this->belongsTo(ConferenceProceeding::class, 'conference_proceeding_id'); }
+    public function symposiumProceeding(): BelongsTo { return $this->belongsTo(SymposiumProceeding::class, 'symposium_proceeding_id'); }
 }

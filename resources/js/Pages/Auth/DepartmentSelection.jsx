@@ -1,14 +1,23 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 
-export default function DepartmentSelection({ departments, journals, type }) {
+export default function DepartmentSelection({ departments, journals, conferences, symposiums, type }) {
+    const getList = () => {
+        if (type === 'journal') return journals.map(j => ({ id: j.id, name: j.journal_title }));
+        if (type === 'conference') return conferences.map(c => ({ id: c.id, name: c.conference_title }));
+        if (type === 'symposium') return symposiums.map(s => ({ id: s.id, name: s.symposium_title }));
+        return [];
+    };
+
+    const list = getList();
+
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
-            <Head title={`Select ${type === 'journal' ? 'Journal' : 'Department'}`} />
+            <Head title={`Select ${type.charAt(0).toUpperCase() + type.slice(1)}`} />
             
             <header className="bg-[#1f3a5f] text-white text-center py-8 px-4 shadow-md">
                 <h1 className="text-3xl font-bold uppercase tracking-wide">
-                    {type === 'journal' ? 'Select Journal' : 'Select Department'}
+                    Select {type.charAt(0).toUpperCase() + type.slice(1)}
                 </h1>
                 <p className="mt-2 opacity-90 text-sm italic">For {type.charAt(0).toUpperCase() + type.slice(1)} Management</p>
             </header>
@@ -17,17 +26,20 @@ export default function DepartmentSelection({ departments, journals, type }) {
                 <div className="bg-white p-10 rounded-xl shadow-xl w-full max-w-4xl">
                     
                     <div className="space-y-8">
-                        <h2 className="text-2xl font-bold mb-8 text-gray-800 text-center border-b pb-4">Available Departments</h2>
+                        <h2 className="text-2xl font-bold mb-8 text-gray-800 text-center border-b pb-4">Available {type.charAt(0).toUpperCase() + type.slice(1)}s</h2>
                         <div className="grid sm:grid-cols-2 gap-4">
-                            {departments.map(dept => (
+                            {list.map(item => (
                                 <Link 
-                                    key={dept.id}
-                                    href={`/department?id=${dept.id}&type=${type}`}
+                                    key={item.id}
+                                    href={`/login?pub_id=${item.id}&type=${type}`}
                                     className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-[#1f3a5f] font-semibold hover:bg-[#1f3a5f] hover:text-white transition shadow-sm flex items-center justify-center text-center"
                                 >
-                                    {dept.name}
+                                    {item.name}
                                 </Link>
                             ))}
+                            {list.length === 0 && (
+                                <p className="col-span-2 text-center text-gray-500 italic">No {type}s available.</p>
+                            )}
                         </div>
                     </div>
 
