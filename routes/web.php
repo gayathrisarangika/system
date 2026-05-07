@@ -77,8 +77,12 @@ Route::middleware('auth')->group(function () {
         Route::put('/conference/{conference}', [ConferenceManagementController::class, 'update']);
         Route::get('/conference/{conference}/committee', [ConferenceManagementController::class, 'manageCommittee']);
         Route::post('/conference/{conference}/committee', [ConferenceManagementController::class, 'storeCommitteeMember']);
-        Route::get('/conference/{conference}/proceedings', [ConferenceManagementController::class, 'manageProceedings']);
-        Route::post('/conference/{conference}/proceedings', [ConferenceManagementController::class, 'storeProceeding']);
+        Route::get('/conference/{conference}/abstract-books', [ConferenceManagementController::class, 'manageAbstractBooks'])->name('conference.abstract_books');
+        Route::post('/conference/{conference}/abstract-books', [ConferenceManagementController::class, 'storeAbstractBook']);
+        Route::delete('/conference/abstract-book/{proceeding}', [ConferenceManagementController::class, 'deleteAbstractBook']);
+        Route::get('/conference/abstract-book/{proceeding}/articles', [ConferenceManagementController::class, 'manageArticles'])->name('conference.articles');
+        Route::post('/conference/abstract-book/{proceeding}/articles', [ConferenceManagementController::class, 'storeArticle']);
+        Route::post('/conference/article/{article}', [ConferenceManagementController::class, 'updateArticle']);
 
         // Symposium
         Route::get('/symposium', [SymposiumManagementController::class, 'index'])->name('symposium.index');
@@ -88,7 +92,11 @@ Route::middleware('auth')->group(function () {
         Route::put('/symposium/{symposium}', [SymposiumManagementController::class, 'update']);
         Route::get('/symposium/{symposium}/committee', [SymposiumManagementController::class, 'manageCommittee']);
         Route::post('/symposium/{symposium}/committee', [SymposiumManagementController::class, 'storeCommitteeMember']);
-        Route::get('/symposium/{symposium}/proceedings', [SymposiumManagementController::class, 'manageProceedings']);
-        Route::post('/symposium/{symposium}/proceedings', [SymposiumManagementController::class, 'storeProceeding']);
+        Route::get('/symposium/{symposium}/abstract-books', [SymposiumManagementController::class, 'manageAbstractBooks'])->name('symposium.abstract_books');
+        Route::post('/symposium/{symposium}/abstract-books', [SymposiumManagementController::class, 'storeAbstractBook']);
+        Route::delete('/symposium/abstract-book/{proceeding}', [SymposiumManagementController::class, 'deleteAbstractBook']);
+        Route::get('/symposium/abstract-book/{proceeding}/articles', [SymposiumManagementController::class, 'manageArticles'])->name('symposium.articles');
+        Route::post('/symposium/abstract-book/{proceeding}/articles', [SymposiumManagementController::class, 'storeArticle']);
+        Route::post('/symposium/article/{article}', [SymposiumManagementController::class, 'updateArticle']);
     });
 });

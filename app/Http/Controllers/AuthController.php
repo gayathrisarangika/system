@@ -19,15 +19,12 @@ class AuthController extends Controller
     public function showDepartmentSelection(Request $request)
     {
         $type = $request->query('type', 'journal');
-        $journals = [];
         
-        if ($type === 'journal') {
-            $journals = \App\Models\Journal::all();
-        }
-
         return Inertia::render('Auth/DepartmentSelection', [
             'departments' => Department::all(),
-            'journals' => $journals,
+            'journals' => \App\Models\Journal::where('status', 'approved')->get(),
+            'conferences' => \App\Models\Conference::where('status', 'approved')->get(),
+            'symposiums' => \App\Models\Symposium::where('status', 'approved')->get(),
             'type' => $type
         ]);
     }
@@ -35,7 +32,7 @@ class AuthController extends Controller
     public function showLogin(Request $request)
     {
         return Inertia::render('Auth/Login', [
-            'dept_id' => $request->query('id'),
+            'pub_id' => $request->query('pub_id'),
             'type' => $request->query('type'),
         ]);
     }
@@ -47,13 +44,17 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        $dept_id = $request->input('dept_id');
+        $pub_id = $request->input('pub_id'); // Previously dept_id/id
         $type = $request->input('type', 'journal');
 
         $user = User::where('username', $credentials['username'])->first();
 
         if ($user && Hash::check($credentials['password'], $user['password'])) {
-            if ($user->role === 'admin' || $user->department_id == $dept_id) {
+            // Check if user has access to this specific publication and type
+            $hasAccess = ($user->role === 'admin') ||
+                         ($user->type === $type && $user->publication_id == $pub_id);
+
+            if ($hasAccess) {
                 Auth::login($user);
                 $request->session()->regenerate();
 
