@@ -39,12 +39,34 @@ class DashboardController extends Controller
             'email' => 'nullable|email|unique:users',
             'username' => 'required|unique:users',
             'password' => 'required|min:6',
-            'department_id' => 'required|exists:departments,id',
+            'department_id' => 'nullable|exists:departments,id',
             'role' => 'required|in:admin,editor',
             'type' => 'nullable|in:journal,conference,symposium',
             'publication_id' => 'nullable|integer',
             'journal_title' => 'nullable|string',
         ]);
+
+        if ($data['role'] === 'editor' && $data['publication_id']) {
+            if ($data['type'] === 'journal') {
+                $pub = Journal::find($data['publication_id']);
+                if ($pub) {
+                    $data['department_id'] = $pub->department_id;
+                    $data['journal_title'] = $pub->journal_title;
+                }
+            } elseif ($data['type'] === 'conference') {
+                $pub = Conference::find($data['publication_id']);
+                if ($pub) {
+                    $data['department_id'] = $pub->department_id;
+                    $data['journal_title'] = $pub->conference_title;
+                }
+            } elseif ($data['type'] === 'symposium') {
+                $pub = Symposium::find($data['publication_id']);
+                if ($pub) {
+                    $data['department_id'] = $pub->department_id;
+                    $data['journal_title'] = $pub->symposium_title;
+                }
+            }
+        }
 
         $data['password'] = Hash::make($data['password']);
 
