@@ -7,6 +7,8 @@ use App\Models\Conference;
 use App\Models\Symposium;
 use App\Models\User;
 use App\Models\Department;
+use App\Models\ConferenceName;
+use App\Models\SymposiumName;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -26,6 +28,8 @@ class DashboardController extends Controller
             'conferences' => Conference::all(),
             'symposiums' => Symposium::all(),
             'departments' => Department::all(),
+            'conferenceNames' => ConferenceName::all(),
+            'symposiumNames' => SymposiumName::all(),
             'users' => User::with('department')->get(),
         ]);
     }
@@ -44,26 +48,32 @@ class DashboardController extends Controller
             'type' => 'nullable|in:journal,conference,symposium',
             'publication_id' => 'nullable|integer',
             'journal_title' => 'nullable|string',
+            'conference_title' => 'nullable|string',
+            'symposium_title' => 'nullable|string',
         ]);
 
         if ($data['role'] === 'editor' && $data['publication_id']) {
             if ($data['type'] === 'journal') {
-                $pub = Journal::find($data['publication_id']);
+                $pub = Department::find($data['publication_id']);
                 if ($pub) {
-                    $data['department_id'] = $pub->department_id;
-                    $data['journal_title'] = $pub->journal_title;
+                    $data['department_id'] = $pub->id;
+                    if (empty($data['journal_title'])) {
+                        $data['journal_title'] = $pub->name;
+                    }
                 }
             } elseif ($data['type'] === 'conference') {
-                $pub = Conference::find($data['publication_id']);
+                $pub = ConferenceName::find($data['publication_id']);
                 if ($pub) {
-                    $data['department_id'] = $pub->department_id;
-                    $data['journal_title'] = $pub->conference_title;
+                    if (empty($data['conference_title'])) {
+                        $data['conference_title'] = $pub->name;
+                    }
                 }
             } elseif ($data['type'] === 'symposium') {
-                $pub = Symposium::find($data['publication_id']);
+                $pub = SymposiumName::find($data['publication_id']);
                 if ($pub) {
-                    $data['department_id'] = $pub->department_id;
-                    $data['journal_title'] = $pub->symposium_title;
+                    if (empty($data['symposium_title'])) {
+                        $data['symposium_title'] = $pub->name;
+                    }
                 }
             }
         }

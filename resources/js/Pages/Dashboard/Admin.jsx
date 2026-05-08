@@ -1,7 +1,7 @@
 import React from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 
-export default function Admin({ pendingJournals, pendingConferences, pendingSymposiums, journals, conferences, symposiums, departments, users }) {
+export default function Admin({ pendingJournals, pendingConferences, pendingSymposiums, journals, conferences, symposiums, departments, conferenceNames, symposiumNames, users }) {
     const { data, setData, post, reset, errors, processing } = useForm({
         name: '',
         email: '',
@@ -12,6 +12,8 @@ export default function Admin({ pendingJournals, pendingConferences, pendingSymp
         type: 'journal',
         publication_id: '',
         journal_title: '',
+        conference_title: '',
+        symposium_title: '',
     });
 
     const submitUser = (e) => {
@@ -191,7 +193,9 @@ export default function Admin({ pendingJournals, pendingConferences, pendingSymp
                                                     ...prev,
                                                     type: e.target.value,
                                                     publication_id: '',
-                                                    journal_title: ''
+                                                    journal_title: '',
+                                                    conference_title: '',
+                                                    symposium_title: ''
                                                 }));
                                             }}
                                         >
@@ -210,34 +214,30 @@ export default function Admin({ pendingJournals, pendingConferences, pendingSymp
                                                 const id = e.target.value;
                                                 let title = '';
                                                 if (data.type === 'journal') {
-                                                    title = journals.find(j => j.id == id)?.journal_title || '';
+                                                    title = departments.find(d => d.id == id)?.name || '';
+                                                    setData(prev => ({ ...prev, publication_id: id, journal_title: title }));
                                                 } else if (data.type === 'conference') {
-                                                    title = conferences.find(c => c.id == id)?.conference_title || '';
+                                                    title = conferenceNames.find(c => c.id == id)?.name || '';
+                                                    setData(prev => ({ ...prev, publication_id: id, conference_title: title }));
                                                 } else if (data.type === 'symposium') {
-                                                    title = symposiums.find(s => s.id == id)?.symposium_title || '';
+                                                    title = symposiumNames.find(s => s.id == id)?.name || '';
+                                                    setData(prev => ({ ...prev, publication_id: id, symposium_title: title }));
                                                 }
-                                                setData(prev => ({
-                                                    ...prev,
-                                                    publication_id: id,
-                                                    journal_title: title
-                                                }));
                                             }}
                                             required
                                         >
                                             <option value="">Select Publication</option>
-                                            {data.type === 'journal' && journals.map(j => (
-                                                <option key={j.id} value={j.id}>{j.journal_title}</option>
+                                            {data.type === 'journal' && departments.map(d => (
+                                                <option key={d.id} value={d.id}>{d.name}</option>
                                             ))}
-                                            {data.type === 'conference' && conferences.map(c => (
-                                                <option key={c.id} value={c.id}>{c.conference_title}</option>
+                                            {data.type === 'conference' && conferenceNames.map(c => (
+                                                <option key={c.id} value={c.id}>{c.name}</option>
                                             ))}
-                                            {data.type === 'symposium' && symposiums.map(s => (
-                                                <option key={s.id} value={s.id}>{s.symposium_title}</option>
+                                            {data.type === 'symposium' && symposiumNames.map(s => (
+                                                <option key={s.id} value={s.id}>{s.name}</option>
                                             ))}
                                         </select>
                                     </div>
-                                    
-                                    <input type="hidden" value={data.journal_title} />
                                 </>
                             )}
 
@@ -274,6 +274,27 @@ export default function Admin({ pendingJournals, pendingConferences, pendingSymp
                                     <option value="admin">Admin</option>
                                 </select>
                             </div>
+
+                            {data.role === 'editor' && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Publication Title</label>
+                                    <textarea
+                                        className="w-full border rounded-lg p-2"
+                                        rows="2"
+                                        value={
+                                            data.type === 'journal' ? data.journal_title :
+                                            data.type === 'conference' ? data.conference_title :
+                                            data.type === 'symposium' ? data.symposium_title : ''
+                                        }
+                                        onChange={e => {
+                                            const val = e.target.value;
+                                            if (data.type === 'journal') setData('journal_title', val);
+                                            else if (data.type === 'conference') setData('conference_title', val);
+                                            else if (data.type === 'symposium') setData('symposium_title', val);
+                                        }}
+                                    ></textarea>
+                                </div>
+                            )}
                             <button 
                                 type="submit" 
                                 className="w-full bg-[#1f3a5f] text-white py-2 rounded-lg font-bold hover:bg-blue-800 transition disabled:opacity-50"
@@ -292,7 +313,9 @@ export default function Admin({ pendingJournals, pendingConferences, pendingSymp
                                 {users.map(user => (
                                     <li key={user.id} className="p-4">
                                         <div className="font-bold text-sm">{user.username}</div>
-                                        <div className="text-xs text-gray-500">{user.role} - {user.department?.name || 'All'}</div>
+                                        <div className="text-xs text-gray-500">
+                                            {user.role} - {user.journal_title || user.conference_title || user.symposium_title || user.department?.name || 'All'}
+                                        </div>
                                     </li>
                                 ))}
                             </ul>
