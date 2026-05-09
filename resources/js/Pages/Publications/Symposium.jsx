@@ -13,6 +13,11 @@ export default function Symposium({ symposium }) {
                         <h1 className="text-3xl md:text-4xl font-serif font-bold text-blue-900 leading-tight">{symposium.symposium_title}</h1>
                         <p className="text-lg text-gray-600 mt-2 uppercase tracking-widest font-medium">{symposium.university_name}</p>
                     </div>
+                    {symposium.university_logo_url && (
+                        <div className="flex-shrink-0">
+                            <img src={symposium.university_logo_url} alt="University Logo" className="h-20 object-contain" />
+                        </div>
+                    )}
                 </div>
             </header>
 

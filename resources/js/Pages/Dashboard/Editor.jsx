@@ -37,7 +37,7 @@ export default function Editor({ type, user }) {
                     <h1 className="text-3xl font-bold text-gray-800">{dashboardTitle}</h1>
                     <div className="text-right">
                         <p className="font-medium text-gray-900">{user.username}</p>
-                        <p className="text-sm text-gray-500">{user.department.name}</p>
+                        <p className="text-sm text-gray-500">{user.department?.name}</p>
                     </div>
                 </header>
 

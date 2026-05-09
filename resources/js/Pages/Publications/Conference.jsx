@@ -13,6 +13,11 @@ export default function Conference({ conference }) {
                         <h1 className="text-3xl md:text-4xl font-serif font-bold text-blue-900 leading-tight">{conference.conference_title}</h1>
                         <p className="text-lg text-gray-600 mt-2 uppercase tracking-widest font-medium">{conference.university_name}</p>
                     </div>
+                    {conference.university_logo_url && (
+                        <div className="flex-shrink-0">
+                            <img src={conference.university_logo_url} alt="University Logo" className="h-20 object-contain" />
+                        </div>
+                    )}
                 </div>
             </header>
 
