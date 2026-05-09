@@ -22,9 +22,8 @@ class AuthController extends Controller
         
         return Inertia::render('Auth/DepartmentSelection', [
             'departments' => Department::all(),
-            'journals' => \App\Models\Journal::where('status', 'approved')->get(),
-            'conferences' => \App\Models\Conference::where('status', 'approved')->get(),
-            'symposiums' => \App\Models\Symposium::where('status', 'approved')->get(),
+            'conferenceNames' => \App\Models\ConferenceName::all(),
+            'symposiumNames' => \App\Models\SymposiumName::all(),
             'type' => $type
         ]);
     }
