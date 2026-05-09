@@ -2,6 +2,11 @@ import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 
 export default function Article({ article, journal }) {
+    // journal prop here can be a Journal, Conference or Symposium model
+    const publication = journal;
+    const type = article.issue_id ? 'journal' : (article.conference_proceeding_id ? 'conference' : 'symposium');
+    const pubTitle = publication.journal_title || publication.conference_title || publication.symposium_title;
+    
     const formatAuthors = (authorStr) => {
         return authorStr.split(',').map((author, index) => {
             const parts = author.trim().split(/(\d+|\*)/);
@@ -19,10 +24,24 @@ export default function Article({ article, journal }) {
     const getIEEECitation = () => {
         const authors = article.author.split(',').map(a => a.trim().replace(/[\d*]/g, ''));
         const authorList = authors.length > 3 ? `${authors[0]} et al.` : authors.join(', ');
-        return `${authorList}, "${article.title}," ${journal.journal_title}, vol. ${article.issue.volume}, no. ${article.issue.issue}, pp. ${article.pages || 'n/a'}, ${article.year}.`;
+        
+        let sourceInfo = "";
+        if (article.issue) {
+            sourceInfo = `${pubTitle}, vol. ${article.issue.volume}, no. ${article.issue.issue}, pp. ${article.pages || 'n/a'}`;
+        } else if (article.conference_proceeding) {
+            sourceInfo = `${pubTitle}, ${article.conference_proceeding.version}`;
+        } else if (article.symposium_proceeding) {
+            sourceInfo = `${pubTitle}, ${article.symposium_proceeding.version}`;
+        }
+
+        return `${authorList}, "${article.title}," ${sourceInfo}, ${article.year}.`;
     };
 
     const shareUrl = window.location.href;
+
+    const issueInfo = article.issue 
+        ? `Vol. ${article.issue.volume} No. ${article.issue.issue}`
+        : (article.conference_proceeding?.version || article.symposium_proceeding?.version || "");
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -37,17 +56,21 @@ export default function Article({ article, journal }) {
                 <meta name="citation_title" content={article.title} />
                 <meta name="citation_author" content={article.author} />
                 <meta name="citation_publication_date" content={article.published_date || article.created_at} />
-                <meta name="citation_journal_title" content={journal.journal_title} />
-                <meta name="citation_volume" content={article.issue.volume} />
-                <meta name="citation_issue" content={article.issue.issue} />
+                <meta name="citation_journal_title" content={pubTitle} />
+                {article.issue && (
+                    <>
+                        <meta name="citation_volume" content={article.issue.volume} />
+                        <meta name="citation_issue" content={article.issue.issue} />
+                    </>
+                )}
             </Head>
             
             {/* Header */}
             <header className="bg-white border-b py-8 shadow-sm">
                 <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
                     <div className="flex-1 text-center md:text-left">
-                        <h1 className="text-3xl md:text-4xl font-serif font-bold text-blue-900 leading-tight">{journal.journal_title}</h1>
-                        <p className="text-lg text-gray-600 mt-2 uppercase tracking-widest font-medium">{journal.university_name}</p>
+                        <h1 className="text-3xl md:text-4xl font-serif font-bold text-blue-900 leading-tight">{pubTitle}</h1>
+                        <p className="text-lg text-gray-600 mt-2 uppercase tracking-widest font-medium">{publication.university_name}</p>
                     </div>
                 </div>
             </header>
@@ -56,11 +79,11 @@ export default function Article({ article, journal }) {
             <nav className="bg-blue-900 text-white sticky top-0 z-50 shadow-md">
                 <div className="container mx-auto px-6">
                     <div className="flex flex-wrap justify-center md:justify-start">
-                        <Link href={`/journal/${journal.id}`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Home</Link>
-                        <Link href={`/journal/${journal.id}/editorial-board`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Editorial Board</Link>
-                        <Link href={`/journal/${journal.id}/archive`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Current</Link>
-                        <Link href={`/journal/${journal.id}/archive`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Archive</Link>
-                        <Link href={`/journal/${journal.id}/contact`} className="px-6 py-4 hover:bg-blue-800 transition font-medium">Contact Us</Link>
+                        <Link href={`/${type}/${publication.id}`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Home</Link>
+                        <Link href={`/${type}/${publication.id}/committee`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Committee</Link>
+                        <Link href={`/${type}/${publication.id}/current`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Current</Link>
+                        <Link href={`/${type}/${publication.id}/archive`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Archive</Link>
+                        <Link href={`/${type}/${publication.id}/contact`} className="px-6 py-4 hover:bg-blue-800 transition font-medium">Contact Us</Link>
                     </div>
                 </div>
             </nav>
@@ -70,16 +93,16 @@ export default function Article({ article, journal }) {
                     
                     {/* Main Content */}
                     <div className="flex-1 bg-white p-8 rounded-lg shadow-sm border border-gray-200">
-                        <nav className="text-sm text-gray-500 mb-8 flex gap-2 items-center overflow-x-auto whitespace-nowrap">
+                        <nav className="text-sm text-gray-500 mb-8 flex gap-2 items-center overflow-x-auto whitespace-nowrap border-b pb-4">
                             <Link href="/" className="hover:text-blue-900">Home</Link>
                             <span>/</span>
-                            <Link href={`/journal/${journal.id}`} className="hover:text-blue-900">{journal.journal_title}</Link>
+                            <Link href={`/${type}/${publication.id}`} className="hover:text-blue-900">{pubTitle}</Link>
                             <span>/</span>
-                            <Link href={`/journal/${journal.id}/archive`} className="hover:text-blue-900">Vol. {article.issue.volume} No. {article.issue.issue}</Link>
+                            <Link href={`/${type}/${publication.id}/archive`} className="hover:text-blue-900">{issueInfo}</Link>
                         </nav>
 
                         <header className="mb-10">
-                            <p className="text-blue-900 font-bold mb-2">Original Research Article</p>
+                            <p className="text-blue-900 font-bold mb-2 uppercase tracking-wide text-sm">Original Research Article</p>
                             <h2 className="text-3xl font-serif font-bold text-gray-900 leading-tight mb-4">{article.title}</h2>
                             <div className="flex flex-wrap gap-2 text-lg text-blue-700 font-medium mb-6">
                                 {formatAuthors(article.author)}
@@ -87,11 +110,12 @@ export default function Article({ article, journal }) {
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-6 border-y border-gray-100 text-sm text-gray-600">
                                 <div>
-                                    <p><span className="font-bold">DOI:</span> {article.doi || `10.18535/ijsrm/v${article.issue.volume}i${article.issue.issue}.${article.id}`}</p>
+                                    {article.doi && <p><span className="font-bold">DOI:</span> {article.doi}</p>}
+                                    <p><span className="font-bold">Published:</span> {new Date(article.published_date || article.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                                 </div>
                                 <div>
-                                    <p><span className="font-bold">Published:</span> {new Date(article.published_date || article.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                                    <p><span className="font-bold">Issue:</span> Vol {article.issue.volume} No {article.issue.issue} ({article.year})</p>
+                                    <p><span className="font-bold">{article.issue_id ? 'Issue:' : 'Proceeding:'}</span> {issueInfo} ({article.year})</p>
+                                    {article.pages && <p><span className="font-bold">Pages:</span> {article.pages}</p>}
                                 </div>
                             </div>
                         </header>
@@ -169,9 +193,9 @@ export default function Article({ article, journal }) {
                         <div className="bg-blue-900 text-white p-6 rounded-lg shadow-md">
                             <h4 className="text-lg font-bold mb-4 border-b border-blue-700 pb-2">Social Share</h4>
                             <div className="flex gap-4">
-                                <a href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`} target="_blank" className="w-10 h-10 bg-blue-800 rounded-full flex items-center justify-center hover:bg-blue-700 cursor-pointer transition">F</a>
-                                <a href={`https://twitter.com/intent/tweet?url=${shareUrl}&text=${article.title}`} target="_blank" className="w-10 h-10 bg-blue-800 rounded-full flex items-center justify-center hover:bg-blue-700 cursor-pointer transition">X</a>
-                                <a href={`https://www.linkedin.com/shareArticle?mini=true&url=${shareUrl}`} target="_blank" className="w-10 h-10 bg-blue-800 rounded-full flex items-center justify-center hover:bg-blue-700 cursor-pointer transition">L</a>
+                                <a href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`} target="_blank" className="w-10 h-10 bg-blue-800 rounded-full flex items-center justify-center hover:bg-blue-700 cursor-pointer transition flex items-center justify-center font-bold">f</a>
+                                <a href={`https://twitter.com/intent/tweet?url=${shareUrl}&text=${article.title}`} target="_blank" className="w-10 h-10 bg-blue-800 rounded-full flex items-center justify-center hover:bg-blue-700 cursor-pointer transition flex items-center justify-center font-bold text-sm">X</a>
+                                <a href={`https://www.linkedin.com/shareArticle?mini=true&url=${shareUrl}`} target="_blank" className="w-10 h-10 bg-blue-800 rounded-full flex items-center justify-center hover:bg-blue-700 cursor-pointer transition flex items-center justify-center font-bold">in</a>
                             </div>
                         </div>
                     </aside>
@@ -181,7 +205,7 @@ export default function Article({ article, journal }) {
             {/* Footer */}
             <footer className="bg-gray-800 text-white py-8 mt-10">
                 <div className="container mx-auto px-6 text-center text-gray-400 text-sm">
-                    <p>&copy; {new Date().getFullYear()} {journal.university_name}. All Rights Reserved.</p>
+                    <p>&copy; {new Date().getFullYear()} {publication.university_name}. All Rights Reserved.</p>
                 </div>
             </footer>
         </div>
