@@ -73,8 +73,21 @@ export default function Home({ journals, conferences, symposiums }) {
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                             {conferences.map(conf => (
                                 <Link key={conf.id} href={`/conference/${conf.id}`} className="group">
-                                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
-                                        <div className="p-5">
+                                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1 h-full flex flex-col">
+                                        {conf.cover_image_url ? (
+                                            <div className="aspect-[3/4] overflow-hidden bg-gray-100">
+                                                <img
+                                                    src={conf.cover_image_url}
+                                                    alt={conf.conference_title}
+                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="aspect-[3/4] bg-blue-900 flex items-center justify-center p-6 text-center">
+                                                <span className="text-white font-serif font-bold text-lg leading-tight">{conf.conference_title}</span>
+                                            </div>
+                                        )}
+                                        <div className="p-5 flex-1 flex flex-col justify-between">
                                             <h4 className="font-bold text-gray-900 group-hover:text-blue-700 transition-colors line-clamp-2 mb-1">{conf.conference_title}</h4>
                                             <p className="text-sm text-gray-500">{conf.university_name}</p>
                                         </div>
@@ -94,8 +107,21 @@ export default function Home({ journals, conferences, symposiums }) {
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                             {symposiums.map(symp => (
                                 <Link key={symp.id} href={`/symposium/${symp.id}`} className="group">
-                                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
-                                        <div className="p-5">
+                                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1 h-full flex flex-col">
+                                        {symp.cover_image_url ? (
+                                            <div className="aspect-[3/4] overflow-hidden bg-gray-100">
+                                                <img
+                                                    src={symp.cover_image_url}
+                                                    alt={symp.symposium_title}
+                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="aspect-[3/4] bg-blue-900 flex items-center justify-center p-6 text-center">
+                                                <span className="text-white font-serif font-bold text-lg leading-tight">{symp.symposium_title}</span>
+                                            </div>
+                                        )}
+                                        <div className="p-5 flex-1 flex flex-col justify-between">
                                             <h4 className="font-bold text-gray-900 group-hover:text-blue-700 transition-colors line-clamp-2 mb-1">{symp.symposium_title}</h4>
                                             <p className="text-sm text-gray-500">{symp.university_name}</p>
                                         </div>

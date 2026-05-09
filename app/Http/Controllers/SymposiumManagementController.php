@@ -132,6 +132,13 @@ class SymposiumManagementController extends Controller
         return back();
     }
 
+    public function deleteCommitteeMember(SymposiumCommittee $member)
+    {
+        $this->authorizeEditor($member->symposium);
+        $member->delete();
+        return back();
+    }
+
     public function manageAbstractBooks(Symposium $symposium)
     {
         $this->authorizeEditor($symposium);
