@@ -25,7 +25,12 @@ class Issue extends Model
         return Attribute::get(fn () => $this->pdf_link ? Storage::disk('public')->url($this->pdf_link) : null);
     }
 
-    protected $appends = ['cover_image_url', 'pdf_url'];
+    protected function pdfLinkUrl(): Attribute
+    {
+        return Attribute::get(fn () => $this->pdf_link ? Storage::disk('public')->url($this->pdf_link) : null);
+    }
+
+    protected $appends = ['cover_image_url', 'pdf_url', 'pdf_link_url'];
 
     public function journal(): BelongsTo { return $this->belongsTo(Journal::class); }
     public function articles(): HasMany { return $this->hasMany(Article::class); }

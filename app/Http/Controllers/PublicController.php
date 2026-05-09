@@ -7,6 +7,9 @@ use App\Models\Journal;
 use App\Models\Conference;
 use App\Models\Symposium;
 use App\Models\Article;
+use App\Models\Issue;
+use App\Models\ConferenceProceeding;
+use App\Models\SymposiumProceeding;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -70,6 +73,22 @@ class PublicController extends Controller
         ]);
     }
 
+    public function conferenceCommittee(Conference $conference)
+    {
+        $this->authorizeView($conference);
+        return Inertia::render('Publications/EditorialBoard', [
+            'conference' => $conference->load('committee'),
+        ]);
+    }
+
+    public function symposiumCommittee(Symposium $symposium)
+    {
+        $this->authorizeView($symposium);
+        return Inertia::render('Publications/EditorialBoard', [
+            'symposium' => $symposium->load('committee'),
+        ]);
+    }
+
     public function journalCurrent(Journal $journal)
     {
         $this->authorizeView($journal);
@@ -88,12 +107,64 @@ class PublicController extends Controller
         ]);
     }
 
+    public function conferenceCurrent(Conference $conference)
+    {
+        $this->authorizeView($conference);
+        $latestProceeding = $conference->proceedings()->orderBy('year', 'desc')->first();
+
+        return Inertia::render('Publications/Archive', [
+            'conference' => $conference->load(['proceedings' => function($q) use ($latestProceeding) {
+                if ($latestProceeding) {
+                    $q->where('id', $latestProceeding->id)->with('articles');
+                } else {
+                    $q->with('articles');
+                }
+            }]),
+            'is_current' => true,
+        ]);
+    }
+
+    public function symposiumCurrent(Symposium $symposium)
+    {
+        $this->authorizeView($symposium);
+        $latestProceeding = $symposium->proceedings()->orderBy('year', 'desc')->first();
+
+        return Inertia::render('Publications/Archive', [
+            'symposium' => $symposium->load(['proceedings' => function($q) use ($latestProceeding) {
+                if ($latestProceeding) {
+                    $q->where('id', $latestProceeding->id)->with('articles');
+                } else {
+                    $q->with('articles');
+                }
+            }]),
+            'is_current' => true,
+        ]);
+    }
+
     public function journalArchive(Journal $journal)
     {
         $this->authorizeView($journal);
 
         return Inertia::render('Publications/Archive', [
             'journal' => $journal->load('issues.articles'),
+            'is_current' => false,
+        ]);
+    }
+
+    public function conferenceArchive(Conference $conference)
+    {
+        $this->authorizeView($conference);
+        return Inertia::render('Publications/Archive', [
+            'conference' => $conference->load('proceedings.articles'),
+            'is_current' => false,
+        ]);
+    }
+
+    public function symposiumArchive(Symposium $symposium)
+    {
+        $this->authorizeView($symposium);
+        return Inertia::render('Publications/Archive', [
+            'symposium' => $symposium->load('proceedings.articles'),
             'is_current' => false,
         ]);
     }
@@ -107,27 +178,68 @@ class PublicController extends Controller
         ]);
     }
 
+    public function conferenceContact(Conference $conference)
+    {
+        $this->authorizeView($conference);
+        return Inertia::render('Publications/ContactUs', [
+            'conference' => $conference,
+        ]);
+    }
+
+    public function symposiumContact(Symposium $symposium)
+    {
+        $this->authorizeView($symposium);
+        return Inertia::render('Publications/ContactUs', [
+            'symposium' => $symposium,
+        ]);
+    }
+
     public function article(Article $article)
     {
-        $article->load('issue.journal');
-        $this->authorizeView($article->issue->journal);
+        $publication = null;
+        if ($article->issue_id) {
+            $article->load('issue.journal');
+            $publication = $article->issue->journal;
+        } elseif ($article->conference_proceeding_id) {
+            $article->load('conferenceProceeding.conference');
+            $publication = $article->conferenceProceeding->conference;
+        } elseif ($article->symposium_proceeding_id) {
+            $article->load('symposiumProceeding.symposium');
+            $publication = $article->symposiumProceeding->symposium;
+        }
+
+        if ($publication) {
+            $this->authorizeView($publication);
+        }
 
         $article->increment('views');
 
         return Inertia::render('Publications/Article', [
             'article' => $article,
-            'journal' => $article->issue->journal,
+            'journal' => $publication, // Keeping the prop name 'journal' for frontend compatibility or rename if possible
         ]);
     }
 
     public function downloadArticle(Article $article)
     {
-        $this->authorizeView($article->issue->journal);
+        $publication = null;
+        if ($article->issue_id) {
+            $publication = $article->issue->journal;
+        } elseif ($article->conference_proceeding_id) {
+            $publication = $article->conferenceProceeding->conference;
+        } elseif ($article->symposium_proceeding_id) {
+            $publication = $article->symposiumProceeding->symposium;
+        }
+
+        if ($publication) {
+            $this->authorizeView($publication);
+        }
+
         $article->increment('downloads');
         return response()->download(storage_path('app/public/' . $article->pdf));
     }
 
-    public function downloadIssue(\App\Models\Issue $issue)
+    public function downloadIssue(Issue $issue)
     {
         $this->authorizeView($issue->journal);
         return response()->download(storage_path('app/public/' . $issue->pdf_link));

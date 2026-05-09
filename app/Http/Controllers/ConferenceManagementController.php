@@ -20,7 +20,9 @@ class ConferenceManagementController extends Controller
 
     public function create()
     {
-        return Inertia::render('Management/Conference/Form');
+        return Inertia::render('Management/Conference/Form', [
+            'pre_filled_title' => Auth::user()->conference_title
+        ]);
     }
 
     public function store(Request $request)
@@ -31,6 +33,12 @@ class ConferenceManagementController extends Controller
             'conference_details' => 'nullable',
             'aim_scope' => 'nullable',
             'mission' => 'nullable',
+            'issn' => 'nullable',
+            'online_issn' => 'nullable',
+            'for_authors' => 'nullable|file|mimes:pdf',
+            'for_reviewers' => 'nullable|file|mimes:pdf',
+            'editorial_policies' => 'nullable|file|mimes:pdf',
+            'contact_us' => 'nullable',
             'cover_image' => 'nullable|image',
             'university_logo' => 'nullable|image',
         ]);
@@ -44,6 +52,15 @@ class ConferenceManagementController extends Controller
         }
         if ($request->hasFile('university_logo')) {
             $data['university_logo'] = $request->file('university_logo')->store('logos', 'public');
+        }
+        if ($request->hasFile('for_authors')) {
+            $data['for_authors'] = $request->file('for_authors')->store('guidelines', 'public');
+        }
+        if ($request->hasFile('for_reviewers')) {
+            $data['for_reviewers'] = $request->file('for_reviewers')->store('guidelines', 'public');
+        }
+        if ($request->hasFile('editorial_policies')) {
+            $data['editorial_policies'] = $request->file('editorial_policies')->store('policies', 'public');
         }
 
         Conference::create($data);
@@ -65,20 +82,30 @@ class ConferenceManagementController extends Controller
             'conference_details' => 'nullable',
             'aim_scope' => 'nullable',
             'mission' => 'nullable',
+            'issn' => 'nullable',
+            'online_issn' => 'nullable',
+            'for_authors' => 'nullable|file|mimes:pdf',
+            'for_reviewers' => 'nullable|file|mimes:pdf',
+            'editorial_policies' => 'nullable|file|mimes:pdf',
+            'contact_us' => 'nullable',
             'cover_image' => 'nullable|image',
             'university_logo' => 'nullable|image',
         ]);
 
-        if ($request->hasFile('cover_image')) {
-            $data['cover_image'] = $request->file('cover_image')->store('covers', 'public');
-        } else {
-            unset($data['cover_image']);
-        }
-
-        if ($request->hasFile('university_logo')) {
-            $data['university_logo'] = $request->file('university_logo')->store('logos', 'public');
-        } else {
-            unset($data['university_logo']);
+        $fileFields = ['cover_image', 'university_logo', 'for_authors', 'for_reviewers', 'editorial_policies'];
+        foreach ($fileFields as $field) {
+            if ($request->hasFile($field)) {
+                $folder = match($field) {
+                    'cover_image' => 'covers',
+                    'university_logo' => 'logos',
+                    'for_authors', 'for_reviewers' => 'guidelines',
+                    'editorial_policies' => 'policies',
+                    default => 'uploads'
+                };
+                $data[$field] = $request->file($field)->store($folder, 'public');
+            } else {
+                unset($data[$field]);
+            }
         }
 
         $conference->update($data);

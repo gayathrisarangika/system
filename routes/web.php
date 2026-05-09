@@ -31,7 +31,16 @@ Route::get('/article/{article}/download', [PublicController::class, 'downloadArt
 Route::get('/issue/{issue}/download', [PublicController::class, 'downloadIssue'])->name('issue.download');
 
 Route::get('/conference/{conference}', [PublicController::class, 'conference'])->name('conference.view');
+Route::get('/conference/{conference}/committee', [PublicController::class, 'conferenceCommittee'])->name('conference.committee');
+Route::get('/conference/{conference}/current', [PublicController::class, 'conferenceCurrent'])->name('conference.current');
+Route::get('/conference/{conference}/archive', [PublicController::class, 'conferenceArchive'])->name('conference.archive');
+Route::get('/conference/{conference}/contact', [PublicController::class, 'conferenceContact'])->name('conference.contact');
+
 Route::get('/symposium/{symposium}', [PublicController::class, 'symposium'])->name('symposium.view');
+Route::get('/symposium/{symposium}/committee', [PublicController::class, 'symposiumCommittee'])->name('symposium.committee');
+Route::get('/symposium/{symposium}/current', [PublicController::class, 'symposiumCurrent'])->name('symposium.current');
+Route::get('/symposium/{symposium}/archive', [PublicController::class, 'symposiumArchive'])->name('symposium.archive');
+Route::get('/symposium/{symposium}/contact', [PublicController::class, 'symposiumContact'])->name('symposium.contact');
 
 Route::middleware('auth')->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
