@@ -1,11 +1,11 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 
-export default function DepartmentSelection({ departments, journals, conferences, symposiums, type }) {
+export default function DepartmentSelection({ departments, conferenceNames, symposiumNames, type }) {
     const getList = () => {
-        if (type === 'journal') return journals.map(j => ({ id: j.id, name: j.journal_title }));
-        if (type === 'conference') return conferences.map(c => ({ id: c.id, name: c.conference_title }));
-        if (type === 'symposium') return symposiums.map(s => ({ id: s.id, name: s.symposium_title }));
+        if (type === 'journal') return departments.map(d => ({ id: d.id, name: d.name }));
+        if (type === 'conference') return conferenceNames.map(c => ({ id: c.id, name: c.name }));
+        if (type === 'symposium') return symposiumNames.map(s => ({ id: s.id, name: s.name }));
         return [];
     };
 
