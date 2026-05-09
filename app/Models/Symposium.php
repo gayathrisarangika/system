@@ -47,7 +47,7 @@ class Symposium extends Model
     protected $appends = ['cover_image_url', 'university_logo_url', 'for_authors_url', 'for_reviewers_url', 'editorial_policies_url'];
 
     public function editor(): BelongsTo { return $this->belongsTo(User::class, 'editor_id'); }
-    public function department(): BelongsTo { return $this->belongsTo(Department::class); }
+    public function department(): BelongsTo { return $this->belongsTo(Department::class)->withDefault(); }
     public function proceedings(): HasMany { return $this->hasMany(SymposiumProceeding::class); }
     public function committee(): HasMany { return $this->hasMany(SymposiumCommittee::class); }
 }

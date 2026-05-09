@@ -44,7 +44,6 @@ class SymposiumManagementController extends Controller
         ]);
 
         $data['editor_id'] = Auth::id();
-        $data['department_id'] = Auth::user()->department_id;
         $data['status'] = 'pending';
 
         if ($request->hasFile('cover_image')) {
