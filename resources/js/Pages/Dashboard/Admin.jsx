@@ -92,7 +92,6 @@ export default function Admin({ pendingJournals, pendingConferences, pendingSymp
                                 <thead className="bg-gray-50 border-b border-gray-100">
                                     <tr>
                                         <th className="p-4 font-bold text-gray-600 uppercase text-xs tracking-wider">Title</th>
-                                        <th className="p-4 font-bold text-gray-600 uppercase text-xs tracking-wider">Department</th>
                                         <th className="p-4 font-bold text-gray-600 uppercase text-xs tracking-wider text-right">Actions</th>
                                     </tr>
                                 </thead>
@@ -100,7 +99,6 @@ export default function Admin({ pendingJournals, pendingConferences, pendingSymp
                                     {pendingConferences.length > 0 ? pendingConferences.map(c => (
                                         <tr key={c.id} className="hover:bg-gray-50 transition">
                                             <td className="p-4 font-bold text-gray-900">{c.conference_title}</td>
-                                            <td className="p-4 text-gray-600">{c.department.name}</td>
                                             <td className="p-4 text-right">
                                                 <div className="flex justify-end gap-2">
                                                     <Link href={`/conference/${c.id}`} className="bg-gray-100 text-gray-700 px-4 py-1.5 rounded text-sm font-bold hover:bg-gray-200 transition">Preview</Link>
@@ -110,7 +108,7 @@ export default function Admin({ pendingJournals, pendingConferences, pendingSymp
                                             </td>
                                         </tr>
                                     )) : (
-                                        <tr><td colSpan="3" className="p-10 text-center text-gray-400 italic">No pending conferences.</td></tr>
+                                        <tr><td colSpan="2" className="p-10 text-center text-gray-400 italic">No pending conferences.</td></tr>
                                     )}
                                 </tbody>
                             </table>
@@ -130,7 +128,6 @@ export default function Admin({ pendingJournals, pendingConferences, pendingSymp
                                 <thead className="bg-gray-50 border-b border-gray-100">
                                     <tr>
                                         <th className="p-4 font-bold text-gray-600 uppercase text-xs tracking-wider">Title</th>
-                                        <th className="p-4 font-bold text-gray-600 uppercase text-xs tracking-wider">Department</th>
                                         <th className="p-4 font-bold text-gray-600 uppercase text-xs tracking-wider text-right">Actions</th>
                                     </tr>
                                 </thead>
@@ -138,7 +135,6 @@ export default function Admin({ pendingJournals, pendingConferences, pendingSymp
                                     {pendingSymposiums.length > 0 ? pendingSymposiums.map(s => (
                                         <tr key={s.id} className="hover:bg-gray-50 transition">
                                             <td className="p-4 font-bold text-gray-900">{s.symposium_title}</td>
-                                            <td className="p-4 text-gray-600">{s.department.name}</td>
                                             <td className="p-4 text-right">
                                                 <div className="flex justify-end gap-2">
                                                     <Link href={`/symposium/${s.id}`} className="bg-gray-100 text-gray-700 px-4 py-1.5 rounded text-sm font-bold hover:bg-gray-200 transition">Preview</Link>
@@ -148,7 +144,7 @@ export default function Admin({ pendingJournals, pendingConferences, pendingSymp
                                             </td>
                                         </tr>
                                     )) : (
-                                        <tr><td colSpan="3" className="p-10 text-center text-gray-400 italic">No pending symposiums.</td></tr>
+                                        <tr><td colSpan="2" className="p-10 text-center text-gray-400 italic">No pending symposiums.</td></tr>
                                     )}
                                 </tbody>
                             </table>

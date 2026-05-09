@@ -22,8 +22,8 @@ class DashboardController extends Controller
 
         return Inertia::render('Dashboard/Admin', [
             'pendingJournals' => Journal::where('status', 'pending')->with('department')->get(),
-            'pendingConferences' => Conference::where('status', 'pending')->with('department')->get(),
-            'pendingSymposiums' => Symposium::where('status', 'pending')->with('department')->get(),
+            'pendingConferences' => Conference::where('status', 'pending')->get(),
+            'pendingSymposiums' => Symposium::where('status', 'pending')->get(),
             'journals' => Journal::all(),
             'conferences' => Conference::all(),
             'symposiums' => Symposium::all(),
@@ -61,7 +61,12 @@ class DashboardController extends Controller
                         $data['journal_title'] = $pub->name;
                     }
                 }
-            } elseif ($data['type'] === 'conference') {
+            } else {
+                // Ensure department_id is null for non-journal types
+                $data['department_id'] = null;
+            }
+
+            if ($data['type'] === 'conference') {
                 $pub = ConferenceName::find($data['publication_id']);
                 if ($pub) {
                     if (empty($data['conference_title'])) {
