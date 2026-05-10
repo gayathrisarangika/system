@@ -132,6 +132,13 @@ class ConferenceManagementController extends Controller
         return back();
     }
 
+    public function deleteCommitteeMember(ConferenceCommittee $member)
+    {
+        $this->authorizeEditor($member->conference);
+        $member->delete();
+        return back();
+    }
+
     public function manageAbstractBooks(Conference $conference)
     {
         $this->authorizeEditor($conference);
