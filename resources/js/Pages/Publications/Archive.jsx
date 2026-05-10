@@ -21,7 +21,7 @@ export default function Archive({ journal, conference, symposium, is_current = f
                     </div>
                     {publication.university_logo_url && (
                         <div className="flex-shrink-0">
-                            <img src={publication.university_logo_url} alt="University Logo" className="h-20 object-contain" />
+                            <img src={publication.university_logo_url} alt="University Logo" className="h-28 object-contain" />
                         </div>
                     )}
                 </div>
@@ -32,7 +32,12 @@ export default function Archive({ journal, conference, symposium, is_current = f
                 <div className="container mx-auto px-6">
                     <div className="flex flex-wrap justify-center md:justify-start">
                         <Link href={`/${type}/${publication.id}`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Home</Link>
-                        <Link href={`/${type}/${publication.id}/committee`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Committee</Link>
+                        <Link
+                            href={`/${type}/${publication.id}/${journal ? 'editorial-board' : 'committee'}`}
+                            className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800"
+                        >
+                            {journal ? 'Editorial' : 'Committee'}
+                        </Link>
                         <Link href={`/${type}/${publication.id}/current`} className={`px-6 py-4 transition font-medium border-r border-blue-800 ${is_current ? 'bg-blue-800' : 'hover:bg-blue-800'}`}>Current</Link>
                         <Link href={`/${type}/${publication.id}/archive`} className={`px-6 py-4 transition font-medium ${!is_current ? 'bg-blue-800' : 'hover:bg-blue-800'}`}>Archive</Link>
                     </div>
