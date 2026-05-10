@@ -15,7 +15,7 @@ export default function Conference({ conference }) {
                     </div>
                     {conference.university_logo_url && (
                         <div className="flex-shrink-0">
-                            <img src={conference.university_logo_url} alt="University Logo" className="h-20 object-contain" />
+                            <img src={conference.university_logo_url} alt="University Logo" className="h-28 object-contain" />
                         </div>
                     )}
                 </div>

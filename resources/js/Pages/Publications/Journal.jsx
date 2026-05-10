@@ -15,7 +15,7 @@ export default function Journal({ journal }) {
                     </div>
                     {journal.university_logo_url && (
                         <div className="flex-shrink-0">
-                            <img src={journal.university_logo_url} alt="University Logo" className="h-20 object-contain" />
+                            <img src={journal.university_logo_url} alt="University Logo" className="h-28 object-contain" />
                         </div>
                     )}
                 </div>

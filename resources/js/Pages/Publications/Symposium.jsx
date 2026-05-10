@@ -15,7 +15,7 @@ export default function Symposium({ symposium }) {
                     </div>
                     {symposium.university_logo_url && (
                         <div className="flex-shrink-0">
-                            <img src={symposium.university_logo_url} alt="University Logo" className="h-20 object-contain" />
+                            <img src={symposium.university_logo_url} alt="University Logo" className="h-28 object-contain" />
                         </div>
                     )}
                 </div>
