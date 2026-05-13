@@ -1,5 +1,6 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
+import RecentPublicationsCarousel from '@/Components/RecentPublicationsCarousel';
 
 export default function Journal({ journal }) {
     return (
@@ -48,27 +49,10 @@ export default function Journal({ journal }) {
                             </section>
 
                             {journal.issues && journal.issues.length > 0 && (
-                                <section>
-                                    <h3 className="text-2xl font-bold text-blue-900 mb-6">Recent Issues</h3>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-                                        {journal.issues.map(issue => (
-                                            <Link key={issue.id} href={`/journal/${journal.id}/archive`} className="group flex flex-col">
-                                                <div className="aspect-[3/4] rounded-lg overflow-hidden border border-gray-200 shadow-sm bg-gray-100 mb-3 group-hover:shadow-md transition-shadow">
-                                                    {issue.cover_image_url ? (
-                                                        <img src={issue.cover_image_url} alt={`Vol ${issue.volume} No ${issue.issue}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                                                    ) : (
-                                                        <div className="w-full h-full flex items-center justify-center p-4 text-center bg-blue-50">
-                                                            <span className="text-blue-900 font-serif font-bold text-sm">Vol. {issue.volume} No. {issue.issue}</span>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <p className="font-bold text-gray-800 group-hover:text-blue-900 transition-colors text-center">
-                                                    Vol. {issue.volume} No. {issue.issue} ({issue.year})
-                                                </p>
-                                            </Link>
-                                        ))}
-                                    </div>
-                                </section>
+                                <RecentPublicationsCarousel
+                                    title="Recent Issues"
+                                    items={journal.issues.map(i => ({ ...i, type: 'issue' }))}
+                                />
                             )}
                         </div>
                     </div>
