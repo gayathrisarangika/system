@@ -1,59 +1,41 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
+import BackendLayout from '@/Layouts/BackendLayout';
 
 export default function Editor({ type, user }) {
     const dashboardTitle = type.charAt(0).toUpperCase() + type.slice(1) + " Editor Dashboard";
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
+        <BackendLayout title={dashboardTitle}>
             <Head title={dashboardTitle} />
             
-            {/* Sidebar */}
-            <aside className="w-64 bg-blue-900 text-white">
-                <div className="p-6 border-b border-blue-800">
-                    <h2 className="text-xl font-bold">PMS Editor</h2>
+            <div className="bg-white rounded-2xl shadow-sm p-10 border border-slate-200/60 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-8 opacity-10">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-32 w-32" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
                 </div>
-                <nav className="p-4 space-y-2">
-                    <Link 
-                        href={`/editor/${type}`}
-                        className="block py-2.5 px-4 rounded transition hover:bg-blue-800"
-                    >
-                        Manage {type}s
-                    </Link>
-                    <Link 
-                        href="/logout" 
-                        method="post" 
-                        as="button" 
-                        className="w-full text-left py-2.5 px-4 rounded transition hover:bg-red-800 text-red-300"
-                    >
-                        Logout
-                    </Link>
-                </nav>
-            </aside>
-
-            {/* Main Content */}
-            <main className="flex-1 p-10">
-                <header className="flex justify-between items-center mb-10">
-                    <h1 className="text-3xl font-bold text-gray-800">{dashboardTitle}</h1>
-                    <div className="text-right">
-                        <p className="font-medium text-gray-900">{user.username}</p>
-                        <p className="text-sm text-gray-500">{user.department?.name}</p>
-                    </div>
-                </header>
-
-                <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-100">
-                    <h2 className="text-xl font-bold mb-4">Welcome back!</h2>
-                    <p className="text-gray-600 mb-8">Select an option from the sidebar to manage your publications.</p>
+                
+                <div className="relative z-10">
+                    <h2 className="text-3xl font-extrabold text-slate-900 mb-4">Welcome back, {user.username}!</h2>
+                    <p className="text-lg text-slate-500 mb-10 max-w-2xl">You are logged in as a {type} editor. Use the dashboard to manage your publications, issues, and editorial board.</p>
                     
-                    <div className="grid md:grid-cols-3 gap-6">
-                        <div className="bg-blue-50 p-6 rounded-lg border border-blue-100">
-                            <h3 className="font-bold text-blue-900 mb-2">Manage {type}s</h3>
-                            <p className="text-sm text-blue-700 mb-4">Update details, mission, and scope.</p>
-                            <Link href={`/editor/${type}`} className="text-blue-600 font-bold hover:underline">Go &rarr;</Link>
-                        </div>
+                    <div className="grid md:grid-cols-3 gap-8">
+                        <Link 
+                            href={`/editor/${type}`}
+                            className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-blue-500/30 transition-all duration-300 group"
+                        >
+                            <div className="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                </svg>
+                            </div>
+                            <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">Manage {type}s</h3>
+                            <p className="text-slate-500 leading-relaxed">Update publication details, mission, and scope for your assigned {type}s.</p>
+                        </Link>
                     </div>
                 </div>
-            </main>
-        </div>
+            </div>
+        </BackendLayout>
     );
 }

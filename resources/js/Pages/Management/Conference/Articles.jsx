@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Head, useForm, Link } from '@inertiajs/react';
+import BackendLayout from '@/Layouts/BackendLayout';
 
 export default function Articles({ abstractBook, articles }) {
     const [editingArticle, setEditingArticle] = useState(null);
@@ -55,17 +56,17 @@ export default function Articles({ abstractBook, articles }) {
     };
 
     return (
-        <div className="p-8 bg-gray-50 min-h-screen">
+        <BackendLayout title={`Articles - ${abstractBook.version}`}>
             <Head title="Manage Articles" />
             
-            <div className="mb-10 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                <h1 className="text-3xl font-bold text-gray-900 font-serif">Articles</h1>
-                <p className="text-gray-500">Abstract Book: {abstractBook.version} ({abstractBook.year})</p>
+            <div className="mb-10 bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+                <h1 className="text-2xl font-bold text-slate-900">Articles</h1>
+                <p className="text-slate-500">Abstract Book: {abstractBook.version} ({abstractBook.year})</p>
             </div>
 
             <div className="grid lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2">
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                         <table className="w-full text-left">
                             <thead className="bg-gray-50 border-b border-gray-100">
                                 <tr>
@@ -93,45 +94,45 @@ export default function Articles({ abstractBook, articles }) {
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 h-fit">
-                    <h2 className="text-xl font-bold mb-6 text-gray-800 border-b pb-2">
+                <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 h-fit">
+                    <h2 className="text-xl font-bold mb-6 text-slate-800 border-b pb-2">
                         {editingArticle ? 'Edit Article' : 'Add New Article'}
                     </h2>
                     
                     {editingArticle && (
-                         <button onClick={() => setEditingArticle(null)} className="mb-4 text-xs text-gray-500 hover:underline">← Back to Create</button>
+                         <button onClick={() => setEditingArticle(null)} className="mb-4 text-xs text-slate-500 hover:underline">← Back to Create</button>
                     )}
 
                     <form onSubmit={editingArticle ? submitEdit : submit} className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                            <input className="w-full border rounded-lg p-2" value={editingArticle ? editData.title : data.title} onChange={e => editingArticle ? setEditData('title', e.target.value) : setData('title', e.target.value)} required />
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Title</label>
+                            <input className="w-full border border-slate-200 rounded-lg p-2" value={editingArticle ? editData.title : data.title} onChange={e => editingArticle ? setEditData('title', e.target.value) : setData('title', e.target.value)} required />
                             {(editingArticle ? editErrors.title : errors.title) && <div className="text-red-500 text-xs mt-1">{editingArticle ? editErrors.title : errors.title}</div>}
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Author(s)</label>
-                            <input className="w-full border rounded-lg p-2" value={editingArticle ? editData.author : data.author} onChange={e => editingArticle ? setEditData('author', e.target.value) : setData('author', e.target.value)} required />
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Author(s)</label>
+                            <input className="w-full border border-slate-200 rounded-lg p-2" value={editingArticle ? editData.author : data.author} onChange={e => editingArticle ? setEditData('author', e.target.value) : setData('author', e.target.value)} required />
                             {(editingArticle ? editErrors.author : errors.author) && <div className="text-red-500 text-xs mt-1">{editingArticle ? editErrors.author : errors.author}</div>}
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Abstract</label>
-                            <textarea rows="4" className="w-full border rounded-lg p-2" value={editingArticle ? editData.abstract : data.abstract} onChange={e => editingArticle ? setEditData('abstract', e.target.value) : setData('abstract', e.target.value)} required></textarea>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Abstract</label>
+                            <textarea rows="4" className="w-full border border-slate-200 rounded-lg p-2" value={editingArticle ? editData.abstract : data.abstract} onChange={e => editingArticle ? setEditData('abstract', e.target.value) : setData('abstract', e.target.value)} required></textarea>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Keywords</label>
-                            <input className="w-full border rounded-lg p-2" value={editingArticle ? editData.keywords : data.keywords} onChange={e => editingArticle ? setEditData('keywords', e.target.value) : setData('keywords', e.target.value)} />
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Keywords</label>
+                            <input className="w-full border border-slate-200 rounded-lg p-2" value={editingArticle ? editData.keywords : data.keywords} onChange={e => editingArticle ? setEditData('keywords', e.target.value) : setData('keywords', e.target.value)} />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Article PDF</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Article PDF</label>
                             <input type="file" className="w-full text-sm" onChange={e => editingArticle ? setEditData('pdf', e.target.files[0]) : setData('pdf', e.target.files[0])} required={!editingArticle} />
                             {(editingArticle ? editErrors.pdf : errors.pdf) && <div className="text-red-500 text-xs mt-1">{editingArticle ? editErrors.pdf : errors.pdf}</div>}
                         </div>
-                        <button type="submit" disabled={editingArticle ? processing : processing} className="w-full bg-[#1f3a5f] text-white py-2 rounded-lg font-bold hover:bg-blue-800 transition">
+                        <button type="submit" disabled={editingArticle ? processing : processing} className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-500/20">
                             {editingArticle ? 'Update Article' : 'Upload Article'}
                         </button>
                     </form>
                 </div>
             </div>
-        </div>
+        </BackendLayout>
     );
 }

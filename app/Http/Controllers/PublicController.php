@@ -22,6 +22,15 @@ class PublicController extends Controller
             'journals' => Journal::where('status', 'approved')->get(),
             'conferences' => Conference::where('status', 'approved')->get(),
             'symposiums' => Symposium::where('status', 'approved')->get(),
+            'recent_issues' => Issue::whereHas('journal', function($q) {
+                    $q->where('status', 'approved');
+                })->latest()->take(10)->with('journal')->get(),
+            'recent_conference_proceedings' => ConferenceProceeding::whereHas('conference', function($q) {
+                    $q->where('status', 'approved');
+                })->latest()->take(10)->with('conference')->get(),
+            'recent_symposium_proceedings' => SymposiumProceeding::whereHas('symposium', function($q) {
+                    $q->where('status', 'approved');
+                })->latest()->take(10)->with('symposium')->get(),
         ]);
     }
 

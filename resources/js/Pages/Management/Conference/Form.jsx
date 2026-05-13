@@ -1,5 +1,6 @@
 import React from 'react';
 import { Head, useForm } from '@inertiajs/react';
+import BackendLayout from '@/Layouts/BackendLayout';
 
 export default function Form({ conference = null, pre_filled_title = '' }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -33,10 +34,11 @@ export default function Form({ conference = null, pre_filled_title = '' }) {
     };
 
     return (
-        <div className="p-8 max-w-2xl mx-auto">
+        <BackendLayout title={conference ? 'Edit Conference' : 'Create Conference'}>
             <Head title={conference ? 'Edit Conference' : 'Create Conference'} />
-            <h1 className="text-2xl font-bold mb-6">{conference ? 'Edit' : 'Create'} Conference</h1>
-            <form onSubmit={submit} className="space-y-4">
+            <div className="max-w-4xl mx-auto bg-white p-10 rounded-2xl shadow-sm border border-slate-200">
+            <h1 className="text-2xl font-bold mb-8 text-slate-900 border-b pb-4">{conference ? 'Edit' : 'Create'} Conference</h1>
+            <form onSubmit={submit} className="space-y-6">
                 <div>
                     <label className="block mb-1">Conference Title</label>
                     <textarea 
@@ -119,8 +121,9 @@ export default function Form({ conference = null, pre_filled_title = '' }) {
                     </div>
                 </div>
 
-                <button className="bg-blue-600 text-white px-6 py-2 rounded mt-6" disabled={processing}>Save Conference</button>
+                <button className="w-full bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-500/20 mt-8" disabled={processing}>Save Conference</button>
             </form>
-        </div>
+            </div>
+        </BackendLayout>
     );
 }
