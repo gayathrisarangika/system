@@ -1,19 +1,20 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
+import BackendLayout from '@/Layouts/BackendLayout';
 
 export default function List({ journals }) {
     return (
-        <div className="p-8 bg-gray-50 min-h-screen">
+        <BackendLayout title="Manage Journals">
             <Head title="Manage Journals" />
-            <div className="flex flex-col sm:flex-row justify-between items-center mb-10 bg-white p-6 rounded-xl shadow-sm border border-gray-200 gap-4">
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-10 bg-white p-6 rounded-xl shadow-sm border border-slate-200 gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 font-serif">Your Journals</h1>
-                    <p className="text-gray-500">Manage your journal publications and issues</p>
+                    <h1 className="text-2xl font-bold text-slate-900">Your Journals</h1>
+                    <p className="text-slate-500">Manage your journal publications and issues</p>
                 </div>
-                <Link href="/editor/journal/create" className="bg-blue-900 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-800 transition">Add Journal</Link>
+                <Link href="/editor/journal/create" className="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-500/20">Add Journal</Link>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <table className="w-full text-left">
                     <thead className="bg-gray-50 border-b border-gray-100">
                         <tr>
@@ -53,6 +54,6 @@ export default function List({ journals }) {
                     </tbody>
                 </table>
             </div>
-        </div>
+        </BackendLayout>
     );
 }

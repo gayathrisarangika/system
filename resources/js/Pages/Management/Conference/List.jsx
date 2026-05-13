@@ -1,19 +1,20 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
+import BackendLayout from '@/Layouts/BackendLayout';
 
 export default function List({ conferences }) {
     return (
-        <div className="p-8 bg-gray-50 min-h-screen">
+        <BackendLayout title="Manage Conferences">
             <Head title="Manage Conferences" />
-            <div className="flex flex-col sm:flex-row justify-between items-center mb-10 bg-white p-6 rounded-xl shadow-sm border border-gray-200 gap-4">
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-10 bg-white p-6 rounded-xl shadow-sm border border-slate-200 gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 font-serif">Your Conferences</h1>
-                    <p className="text-gray-500">Manage your conference publications and abstract books</p>
+                    <h1 className="text-2xl font-bold text-slate-900">Your Conferences</h1>
+                    <p className="text-slate-500">Manage your conference publications and abstract books</p>
                 </div>
-                <Link href="/editor/conference/create" className="bg-blue-900 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-800 transition">Add Conference</Link>
+                <Link href="/editor/conference/create" className="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-500/20">Add Conference</Link>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <table className="w-full text-left">
                     <thead className="bg-gray-50 border-b border-gray-100">
                         <tr>
@@ -53,6 +54,6 @@ export default function List({ conferences }) {
                     </tbody>
                 </table>
             </div>
-        </div>
+        </BackendLayout>
     );
 }

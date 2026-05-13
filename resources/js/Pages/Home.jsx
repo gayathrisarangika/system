@@ -1,7 +1,21 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 
-export default function Home({ journals, conferences, symposiums }) {
+export default function Home({ journals, conferences, symposiums, recent_issues, recent_conference_proceedings, recent_symposium_proceedings }) {
+    const recentItems = [
+        ...recent_issues.map(i => ({ ...i, type: 'issue', sortDate: i.created_at })),
+        ...recent_conference_proceedings.map(p => ({ ...p, type: 'conference', sortDate: p.created_at })),
+        ...recent_symposium_proceedings.map(p => ({ ...p, type: 'symposium', sortDate: p.created_at }))
+    ].sort((a, b) => new Date(b.sortDate) - new Date(a.sortDate)).slice(0, 10);
+
+    const scrollLeft = () => {
+        document.getElementById('recent-publications-scroll').scrollBy({ left: -300, behavior: 'smooth' });
+    };
+
+    const scrollRight = () => {
+        document.getElementById('recent-publications-scroll').scrollBy({ left: 300, behavior: 'smooth' });
+    };
+
     return (
         <div className="min-h-screen bg-gray-50">
             <Head title="Home" />
@@ -29,6 +43,75 @@ export default function Home({ journals, conferences, symposiums }) {
                     <h2 className="text-4xl font-extrabold text-gray-900 mb-4">Academic Publications</h2>
                     <p className="text-lg text-gray-600 max-w-2xl mx-auto">Access our latest journals, conference proceedings, and symposia from the Faculty of Social Sciences and Languages.</p>
                 </section>
+
+                {recentItems.length > 0 && (
+                    <section className="mb-20">
+                        <h2 className="text-3xl font-extrabold text-blue-900 mb-8">Recent Publications</h2>
+                        <div className="relative group">
+                            <button 
+                                onClick={scrollLeft}
+                                className="absolute left-[-20px] top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-gray-800/80 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-gray-900"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                                </svg>
+                            </button>
+                            
+                            <div 
+                                id="recent-publications-scroll"
+                                className="flex gap-8 overflow-x-auto pb-6 snap-x no-scrollbar"
+                                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                            >
+                                {recentItems.map((item, index) => (
+                                    <Link 
+                                        key={`${item.type}-${item.id}`} 
+                                        href={
+                                            item.type === 'issue' ? `/journal/${item.journal_id}` : 
+                                            item.type === 'conference' ? `/conference/${item.conference_id}` : 
+                                            `/symposium/${item.symposium_id}`
+                                        }
+                                        className="flex-none w-52 snap-start group/card"
+                                    >
+                                        <div className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 group-hover/card:shadow-xl group-hover/card:-translate-y-2 border border-gray-100">
+                                            {item.cover_image_url ? (
+                                                <div className="aspect-[3/4] overflow-hidden">
+                                                    <img 
+                                                        src={item.cover_image_url} 
+                                                        alt="Cover" 
+                                                        className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-110" 
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <div className="aspect-[3/4] bg-blue-900 flex items-center justify-center p-6 text-center">
+                                                    <span className="text-white text-sm font-bold leading-tight">
+                                                        {item.journal?.journal_title || item.conference?.conference_title || item.symposium?.symposium_title}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="mt-4 text-center">
+                                            <p className="text-sm font-bold text-gray-700 group-hover/card:text-blue-900 transition-colors">
+                                                {item.type === 'issue' ? `Volume - ${item.volume}, Issue - ${item.issue}` : `${item.year} - ${item.version}`}
+                                            </p>
+                                            <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-wider font-semibold">
+                                                {item.type === 'issue' ? 'Journal' : item.type === 'conference' ? 'Conference' : 'Symposium'}
+                                            </p>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+
+                            <button 
+                                onClick={scrollRight}
+                                className="absolute right-[-20px] top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-gray-800/80 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-gray-900"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                                </svg>
+                            </button>
+                        </div>
+                    </section>
+                )}
 
                 {journals.length > 0 && (
                     <section className="mb-16">

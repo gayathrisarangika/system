@@ -1,5 +1,6 @@
 import React from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
+import BackendLayout from '@/Layouts/BackendLayout';
 
 export default function Admin({ pendingJournals, pendingConferences, pendingSymposiums, journals, conferences, symposiums, departments, conferenceNames, symposiumNames, users }) {
     const { data, setData, post, reset, errors, processing } = useForm({
@@ -24,17 +25,9 @@ export default function Admin({ pendingJournals, pendingConferences, pendingSymp
     };
 
     return (
-        <div className="p-8 bg-gray-50 min-h-screen">
+        <BackendLayout title="Admin Dashboard">
             <Head title="Admin Dashboard" />
             
-            <header className="flex flex-col sm:flex-row justify-between items-center mb-10 bg-white p-6 rounded-xl shadow-sm border border-gray-200 gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900 font-serif">Admin Dashboard</h1>
-                    <p className="text-gray-500">Review and manage pending publications & users</p>
-                </div>
-                <Link href="/logout" method="post" as="button" className="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg font-bold hover:bg-red-50 hover:text-red-600 transition">Logout</Link>
-            </header>
-
             <div className="grid lg:grid-cols-3 gap-8 mb-12">
                 <section className="lg:col-span-2 space-y-12">
                     {/* Pending Publications */}
@@ -319,6 +312,6 @@ export default function Admin({ pendingJournals, pendingConferences, pendingSymp
                     </div>
                 </aside>
             </div>
-        </div>
+        </BackendLayout>
     );
 }

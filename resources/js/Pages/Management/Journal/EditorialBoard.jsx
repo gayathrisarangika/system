@@ -1,5 +1,6 @@
 import React from 'react';
 import { Head, useForm, Link } from '@inertiajs/react';
+import BackendLayout from '@/Layouts/BackendLayout';
 
 export default function EditorialBoard({ journal, members }) {
     const { data, setData, post, reset, errors } = useForm({
@@ -16,11 +17,13 @@ export default function EditorialBoard({ journal, members }) {
     };
 
     return (
-        <div className="p-8 max-w-4xl mx-auto">
+        <BackendLayout title={`Editorial Board - ${journal.journal_title}`}>
             <Head title="Manage Editorial Board" />
-            <h1 className="text-2xl font-bold mb-6">Editorial Board - {journal.journal_title}</h1>
+            <h1 className="text-2xl font-bold mb-8 text-slate-900">Editorial Board - {journal.journal_title}</h1>
             
-            <form onSubmit={submit} className="bg-gray-50 p-6 rounded mb-8 grid grid-cols-3 gap-4 items-end">
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 mb-12">
+            <h2 className="text-xl font-bold mb-6 text-slate-800">Add Member</h2>
+            <form onSubmit={submit} className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
                 <div>
                     <label className="block text-sm mb-1">Name</label>
                     <input className="w-full border p-2 rounded" value={data.name} onChange={e => setData('name', e.target.value)} />
@@ -33,10 +36,11 @@ export default function EditorialBoard({ journal, members }) {
                     <label className="block text-sm mb-1">Role</label>
                     <input className="w-full border p-2 rounded" value={data.role} onChange={e => setData('role', e.target.value)} />
                 </div>
-                <div className="col-span-3">
-                    <button className="bg-blue-600 text-white px-4 py-2 rounded">Add Member</button>
+                <div className="md:col-span-3">
+                    <button className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-500/20">Add Member</button>
                 </div>
             </form>
+            </div>
 
             <div className="bg-white rounded shadow">
                 <table className="w-full text-left">
@@ -62,6 +66,6 @@ export default function EditorialBoard({ journal, members }) {
                     </tbody>
                 </table>
             </div>
-        </div>
+        </BackendLayout>
     );
 }

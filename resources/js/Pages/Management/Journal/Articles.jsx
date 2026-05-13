@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Head, useForm } from '@inertiajs/react';
+import BackendLayout from '@/Layouts/BackendLayout';
 
 export default function Articles({ issue, articles }) {
     const [editingArticle, setEditingArticle] = useState(null);
@@ -64,17 +65,17 @@ export default function Articles({ issue, articles }) {
     };
 
     return (
-        <div className="p-8 max-w-5xl mx-auto">
+        <BackendLayout title={`Articles - Vol. ${issue.volume} No. ${issue.issue}`}>
             <Head title="Manage Articles" />
-            <h1 className="text-2xl font-bold mb-6">Articles for Vol. {issue.volume} No. {issue.issue}</h1>
+            <h1 className="text-2xl font-bold mb-8 text-slate-900">Articles for Vol. {issue.volume} No. {issue.issue}</h1>
 
             {editingArticle ? (
-                <div className="bg-blue-50 p-6 rounded mb-8 border border-blue-200">
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-bold">Edit Article</h2>
-                        <button onClick={() => setEditingArticle(null)} className="text-gray-500 hover:text-gray-700">Cancel</button>
+                <div className="bg-white p-8 rounded-2xl mb-12 border border-blue-200 shadow-sm shadow-blue-500/5">
+                    <div className="flex justify-between items-center mb-8">
+                        <h2 className="text-xl font-bold text-slate-900">Edit Article</h2>
+                        <button onClick={() => setEditingArticle(null)} className="text-slate-500 hover:text-slate-700 font-bold uppercase text-xs tracking-wider">Cancel</button>
                     </div>
-                    <form onSubmit={submitEdit} className="space-y-4">
+                    <form onSubmit={submitEdit} className="space-y-6">
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm mb-1">Title</label>
@@ -117,13 +118,14 @@ export default function Articles({ issue, articles }) {
                                 {editErrors.pdf && <div className="text-red-500 text-sm">{editErrors.pdf}</div>}
                             </div>
                         </div>
-                        <button className="bg-blue-600 text-white px-4 py-2 rounded">Update Article</button>
+                        <button className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-500/20">Update Article</button>
                     </form>
                 </div>
             ) : (
-                <form onSubmit={submit} className="bg-gray-50 p-6 rounded mb-8 space-y-4">
-                    <h2 className="text-xl font-bold mb-4">Add New Article</h2>
-                    <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white p-8 rounded-2xl mb-12 border border-slate-200 shadow-sm">
+                <h2 className="text-xl font-bold mb-8 text-slate-900">Add New Article</h2>
+                <form onSubmit={submit} className="space-y-6">
+                    <div className="grid grid-cols-2 gap-6">
                         <div>
                             <label className="block text-sm mb-1">Title</label>
                             <input className="w-full border p-2 rounded" value={data.title} onChange={e => setData('title', e.target.value)} />
@@ -165,8 +167,9 @@ export default function Articles({ issue, articles }) {
                             {errors.pdf && <div className="text-red-500 text-sm">{errors.pdf}</div>}
                         </div>
                     </div>
-                    <button className="bg-blue-600 text-white px-4 py-2 rounded">Add Article</button>
+                    <button className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-500/20">Add Article</button>
                 </form>
+                </div>
             )}
 
             <div className="space-y-4">
@@ -183,6 +186,6 @@ export default function Articles({ issue, articles }) {
                     </div>
                 ))}
             </div>
-        </div>
+        </BackendLayout>
     );
 }

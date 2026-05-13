@@ -1,5 +1,6 @@
 import React from 'react';
 import { Head, useForm, Link } from '@inertiajs/react';
+import BackendLayout from '@/Layouts/BackendLayout';
 
 import { router } from '@inertiajs/react';
 
@@ -59,11 +60,13 @@ export default function Issues({ journal, issues }) {
     };
 
     return (
-        <div className="p-8 max-w-5xl mx-auto">
+        <BackendLayout title={`Issues - ${journal.journal_title}`}>
             <Head title="Manage Issues" />
-            <h1 className="text-2xl font-bold mb-6">Issues - {journal.journal_title}</h1>
+            <h1 className="text-2xl font-bold mb-8 text-slate-900">Issues - {journal.journal_title}</h1>
 
-            <form onSubmit={submit} className="bg-gray-50 p-6 rounded mb-8 space-y-4">
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 mb-12">
+            <h2 className="text-xl font-bold mb-6 text-slate-800">{editingIssue ? 'Edit Issue' : 'Add New Issue'}</h2>
+            <form onSubmit={submit} className="space-y-6">
                 <div className="grid grid-cols-3 gap-4">
                     <div>
                         <label className="block text-sm mb-1">Volume</label>
@@ -100,17 +103,18 @@ export default function Issues({ journal, issues }) {
                         <label htmlFor="current" className="ml-2">Current Issue</label>
                     </div>
                 </div>
-                <div className="flex gap-2">
-                    <button className="bg-blue-600 text-white px-4 py-2 rounded mt-4">
+                <div className="flex gap-4">
+                    <button className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-500/20">
                         {editingIssue ? 'Update Issue' : 'Create Issue'}
                     </button>
                     {editingIssue && (
-                        <button type="button" onClick={handleCancel} className="bg-gray-500 text-white px-4 py-2 rounded mt-4">
+                        <button type="button" onClick={handleCancel} className="bg-slate-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-slate-600 transition">
                             Cancel
                         </button>
                     )}
                 </div>
             </form>
+            </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {issues.map(issue => (
@@ -129,6 +133,6 @@ export default function Issues({ journal, issues }) {
                     </div>
                 ))}
             </div>
-        </div>
+        </BackendLayout>
     );
 }
