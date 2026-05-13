@@ -112,6 +112,15 @@ export default function Symposium({ symposium }) {
                         </div>
                     </aside>
                 </div>
+
+                {symposium.proceedings && symposium.proceedings.length > 0 && (
+                    <div className="mt-16 pt-10 border-t border-gray-200">
+                        <RecentPublicationsCarousel
+                            title="Recent Publications"
+                            items={symposium.proceedings.map(p => ({ ...p, type: 'symposium' }))}
+                        />
+                    </div>
+                )}
             </div>
 
             {/* Footer */}
