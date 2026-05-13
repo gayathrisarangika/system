@@ -18,7 +18,11 @@
         "@inertiajs/react": "^3.0.3",
         "@vitejs/plugin-react": "^5.2.0",
         "axios": "^1.15.2",
+        "clsx": "^2.1.1",
+        "framer-motion": "^12.38.0",
+        "lucide-react": "^1.14.0",
         "react": "^19.2.5",
-        "react-dom": "^19.2.5"
+        "react-dom": "^19.2.5",
+        "tailwind-merge": "^3.6.0"
     }
 }
