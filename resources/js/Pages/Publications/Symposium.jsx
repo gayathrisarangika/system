@@ -40,7 +40,7 @@ export default function Symposium({ symposium }) {
                     
                     {/* Main Content */}
                     <div className="flex-1 flex flex-col gap-10">
-                        <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
+                        <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200 min-h-[500px]">
                             <section>
                                 <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-900 inline-block">About the Symposium</h2>
                                 <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap font-serif text-lg">
@@ -48,13 +48,6 @@ export default function Symposium({ symposium }) {
                                 </div>
                             </section>
                         </div>
-
-                        {symposium.proceedings && symposium.proceedings.length > 0 && (
-                            <RecentPublicationsCarousel 
-                                title="Recent Publications"
-                                items={symposium.proceedings.map(p => ({ ...p, type: 'symposium' }))} 
-                            />
-                        )}
                     </div>
 
                     {/* Sidebar */}
@@ -113,6 +106,14 @@ export default function Symposium({ symposium }) {
                     </aside>
                 </div>
 
+                {symposium.proceedings && symposium.proceedings.length > 0 && (
+                    <div className="mt-12">
+                        <RecentPublicationsCarousel
+                            title="Recent Publications"
+                            items={symposium.proceedings.map(p => ({ ...p, type: 'symposium' }))}
+                        />
+                    </div>
+                )}
             </div>
 
             {/* Footer */}
