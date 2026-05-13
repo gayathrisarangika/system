@@ -40,9 +40,9 @@ export default function RecentPublicationsCarousel({ items, title = "Recent Publ
                         <Link 
                             key={`${item.type}-${item.id}`} 
                             href={
-                                item.type === 'issue' ? `/journal/${item.journal_id}` : 
-                                item.type === 'conference' ? `/conference/${item.conference_id}` : 
-                                `/symposium/${item.symposium_id}`
+                                item.type === 'issue' ? `/journal/${item.journal_id}/archive#issue-${item.id}` : 
+                                item.type === 'conference' ? `/conference/${item.conference_id}/archive#proceeding-${item.id}` : 
+                                `/symposium/${item.symposium_id}/archive#proceeding-${item.id}`
                             }
                             className="flex-none w-52 snap-start group/card"
                         >

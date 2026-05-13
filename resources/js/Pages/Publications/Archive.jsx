@@ -52,7 +52,7 @@ export default function Archive({ journal, conference, symposium, is_current = f
                 <div className="space-y-12">
                     {items && items.length > 0 ? (
                         items.map(item => (
-                            <div key={item.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                            <div key={item.id} id={journal ? `issue-${item.id}` : `proceeding-${item.id}`} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                                 <div className="bg-gray-50 px-8 py-4 border-b flex justify-between items-center">
                                     <h3 className="text-xl font-bold text-blue-900 font-serif">
                                         {journal ? `Vol. ${item.volume} No. ${item.issue} (${item.year})` : `${item.version} (${item.year})`}
