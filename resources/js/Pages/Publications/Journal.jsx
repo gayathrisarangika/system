@@ -48,6 +48,13 @@ export default function Journal({ journal }) {
                                 </div>
                             </section>
                         </div>
+
+                        {journal.issues && journal.issues.length > 0 && (
+                            <RecentPublicationsCarousel 
+                                title="Recent Publications"
+                                items={journal.issues.map(i => ({ ...i, type: 'issue' }))} 
+                            />
+                        )}
                     </div>
 
                     {/* Sidebar */}
@@ -106,14 +113,6 @@ export default function Journal({ journal }) {
                     </aside>
                 </div>
 
-                {journal.issues && journal.issues.length > 0 && (
-                    <div className="mt-16 pt-10 border-t border-gray-200">
-                        <RecentPublicationsCarousel 
-                            title="Recent Publications"
-                            items={journal.issues.map(i => ({ ...i, type: 'issue' }))} 
-                        />
-                    </div>
-                )}
             </div>
 
             {/* Footer */}

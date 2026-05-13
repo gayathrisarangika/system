@@ -48,6 +48,13 @@ export default function Conference({ conference }) {
                                 </div>
                             </section>
                         </div>
+
+                        {conference.proceedings && conference.proceedings.length > 0 && (
+                            <RecentPublicationsCarousel 
+                                title="Recent Publications"
+                                items={conference.proceedings.map(p => ({ ...p, type: 'conference' }))} 
+                            />
+                        )}
                     </div>
 
                     {/* Sidebar */}
@@ -106,14 +113,6 @@ export default function Conference({ conference }) {
                     </aside>
                 </div>
 
-                {conference.proceedings && conference.proceedings.length > 0 && (
-                    <div className="mt-16 pt-10 border-t border-gray-200">
-                        <RecentPublicationsCarousel 
-                            title="Recent Publications"
-                            items={conference.proceedings.map(p => ({ ...p, type: 'conference' }))} 
-                        />
-                    </div>
-                )}
             </div>
 
             {/* Footer */}
