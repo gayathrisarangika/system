@@ -112,6 +112,15 @@ export default function Journal({ journal }) {
                         </div>
                     </aside>
                 </div>
+
+                {journal.issues && journal.issues.length > 0 && (
+                    <div className="mt-16 pt-10 border-t border-gray-200">
+                        <RecentPublicationsCarousel 
+                            title="Recent Publications"
+                            items={journal.issues.map(i => ({ ...i, type: 'issue' }))} 
+                        />
+                    </div>
+                )}
             </div>
 
             {/* Footer */}
