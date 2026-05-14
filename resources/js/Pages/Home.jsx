@@ -192,9 +192,10 @@ export default function Home({ journals, conferences, symposiums }) {
                                     <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                                 </Link>
                                 <button 
+                                    onClick={() => window.open('https://www.sab.ac.lk/fssl/', '_blank')}
                                     className="w-full sm:w-auto px-8 py-4 bg-white text-slate-700 border border-slate-200 rounded-2xl font-bold hover:bg-slate-50 transition-all shadow-sm flex items-center justify-center gap-2"
                                 >
-                                    University Website
+                                    Faculty Website
                                     <Globe size={18} />
                                 </button>
                             </div>
@@ -409,7 +410,7 @@ export default function Home({ journals, conferences, symposiums }) {
                                 Quick Links
                             </h4>
                             <ul className="space-y-4">
-                                {['Home', 'Journals', 'Conferences', 'Symposiums', 'Editorial Policy'].map(link => (
+                                {['Home', 'Journals', 'Conferences', 'Symposiums'].map(link => (
                                     <li key={link}>
                                         <Link href="#" className="text-slate-400 hover:text-white transition-colors flex items-center gap-2 group">
                                             <ChevronRight size={14} className="text-blue-600 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
@@ -436,11 +437,17 @@ export default function Home({ journals, conferences, symposiums }) {
                                         Belihuloya, 70140, Sri Lanka.
                                     </p>
                                 </div>
-                                <div className="flex gap-4 items-center">
+                                <div 
+                                    onClick={() => window.open('https://www.sab.ac.lk/fssl/', '_blank')}
+                                    className="flex gap-4 items-center cursor-pointer hover:opacity-80 transition-opacity"
+                                >
                                     <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-blue-400 flex-shrink-0">
                                         <Globe size={20} />
                                     </div>
-                                    <p className="text-slate-400 text-sm">www.sab.ac.lk</p>
+
+                                    <p className="text-slate-400 text-sm">
+                                        https://www.sab.ac.lk/fssl/
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -450,10 +457,6 @@ export default function Home({ journals, conferences, symposiums }) {
                         <p className="text-slate-500 text-sm font-medium">
                             &copy; {new Date().getFullYear()} Sabaragamuwa University of Sri Lanka. All Rights Reserved.
                         </p>
-                        <div className="flex gap-8">
-                            <Link href="#" className="text-slate-500 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors">Privacy Policy</Link>
-                            <Link href="#" className="text-slate-500 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors">Terms of Use</Link>
-                        </div>
                     </div>
                 </div>
             </footer>
