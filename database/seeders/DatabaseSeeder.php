@@ -42,7 +42,7 @@ class DatabaseSeeder extends Seeder
             'status' => 'approved',
         ]);
 
-        \App\Models\Conference::create([
+        $conf = \App\Models\Conference::create([
             'editor_id' => $admin->id,
             'department_id' => $dept->id,
             'conference_title' => 'International Conference on Social Sciences and Languages',
@@ -50,12 +50,26 @@ class DatabaseSeeder extends Seeder
             'status' => 'approved',
         ]);
 
-        \App\Models\Symposium::create([
+        \App\Models\ConferenceProceeding::create([
+            'conference_id' => $conf->id,
+            'year' => 2026,
+            'version' => 'First Edition',
+            'pdf_link' => '#',
+        ]);
+
+        $symp = \App\Models\Symposium::create([
             'editor_id' => $admin->id,
             'department_id' => $dept->id,
             'symposium_title' => "Sabaragamuwa Social Sciences & Languages Students' Annual Symposium",
             'university_name' => 'Sabaragamuwa University of Sri Lanka',
             'status' => 'approved',
+        ]);
+
+        \App\Models\SymposiumProceeding::create([
+            'symposium_id' => $symp->id,
+            'year' => 2026,
+            'version' => 'Inaugural Issue',
+            'pdf_link' => '#',
         ]);
 
         $issue = Issue::create([
