@@ -1,132 +1,312 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Head, Link } from '@inertiajs/react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+    Users, 
+    Calendar, 
+    Info, 
+    Mail, 
+    ChevronRight, 
+    Download,
+    ExternalLink,
+    Search,
+    Menu,
+    X,
+    Globe,
+    Zap,
+    MapPin,
+    Award,
+    Sparkles
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 import RecentPublicationsCarousel from '@/Components/RecentPublicationsCarousel';
 
 export default function Symposium({ symposium }) {
+    const [isScrolled, setIsScrolled] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => setIsScrolled(window.scrollY > 20);
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: { staggerChildren: 0.1 }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.5, ease: "easeOut" }
+        }
+    };
+
+    const navLinks = [
+        { name: 'Home', href: `/symposium/${symposium.id}`, icon: Globe },
+        { name: 'Committee', href: `/symposium/${symposium.id}/committee`, icon: Users },
+        { name: 'Current Book', href: `/symposium/${symposium.id}/current`, icon: Sparkles },
+        { name: 'Archive', href: `/symposium/${symposium.id}/archive`, icon: Calendar },
+        { name: 'Contact', href: `/symposium/${symposium.id}/contact`, icon: Mail },
+    ];
+
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
-            <Head title={symposium.symposium_title} />
+        <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-amber-100 selection:text-amber-900">
+            <Head title={`${symposium.symposium_title} | Academic Symposium`} />
             
-            {/* Header */}
-            <header className="bg-white border-b py-8 shadow-sm">
-                <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
-                    <div className="flex-1 text-center md:text-left">
-                        <h1 className="text-3xl md:text-4xl font-serif font-bold text-blue-900 leading-tight">{symposium.symposium_title}</h1>
-                        <p className="text-lg text-gray-600 mt-2 uppercase tracking-widest font-medium">{symposium.university_name}</p>
-                    </div>
-                    {symposium.university_logo_url && (
-                        <div className="flex-shrink-0">
-                            <img src={symposium.university_logo_url} alt="University Logo" className="h-28 object-contain" />
+            {/* Background Decorative Elements */}
+            <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-amber-100/50 blur-[120px]"></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-orange-100/50 blur-[120px]"></div>
+            </div>
+
+            {/* Header / Navigation */}
+            <header 
+                className={cn(
+                    "fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-6 py-4",
+                    isScrolled ? "py-3" : "py-6"
+                )}
+            >
+                <div className="max-w-7xl mx-auto">
+                    <nav 
+                        className={cn(
+                            "flex items-center justify-between px-6 py-2 rounded-2xl transition-all duration-500 border border-transparent",
+                            isScrolled 
+                                ? "bg-white/80 backdrop-blur-xl shadow-lg shadow-slate-200/50 border-white/40 py-3" 
+                                : "bg-transparent py-2"
+                        )}
+                    >
+                        {/* Logo/Title */}
+                        <Link href="/" className="flex items-center gap-3 group">
+                            <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-700 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-amber-500/20 group-hover:scale-110 transition-transform duration-300">
+                                S
+                            </div>
+                            <div className="flex flex-col max-w-[200px] md:max-w-none">
+                                <span className="text-sm font-extrabold text-slate-900 leading-none tracking-tight truncate">{symposium.symposium_title}</span>
+                                <span className="text-[10px] font-bold text-amber-600 uppercase tracking-widest truncate">{symposium.university_name}</span>
+                            </div>
+                        </Link>
+
+                        {/* Desktop Navigation */}
+                        <div className="hidden lg:flex items-center gap-6">
+                            {navLinks.map((link) => (
+                                <Link 
+                                    key={link.name}
+                                    href={link.href}
+                                    className="text-xs font-bold text-slate-600 hover:text-amber-600 transition-colors uppercase tracking-widest"
+                                >
+                                    {link.name}
+                                </Link>
+                            ))}
                         </div>
-                    )}
+
+                        {/* Right Side: University Logo */}
+                        <div className="flex items-center gap-4">
+                            {symposium.university_logo_url && (
+                                <img src={symposium.university_logo_url} alt="University Logo" className="h-10 hidden md:block opacity-80" />
+                            )}
+                            <button 
+                                className="lg:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+                                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                            >
+                                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                            </button>
+                        </div>
+                    </nav>
                 </div>
             </header>
 
-            {/* Navigation Bar */}
-            <nav className="bg-blue-900 text-white sticky top-0 z-50 shadow-md">
-                <div className="container mx-auto px-6">
-                    <div className="flex flex-wrap justify-center md:justify-start">
-                        <Link href={`/symposium/${symposium.id}`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Home</Link>
-                        <Link href={`/symposium/${symposium.id}`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">About</Link>
-                        <Link href={`/symposium/${symposium.id}/committee`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Committee</Link>
-                        <Link href={`/symposium/${symposium.id}/current`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Current</Link>
-                        <Link href={`/symposium/${symposium.id}/archive`} className="px-6 py-4 hover:bg-blue-800 transition font-medium">Archive</Link>
-                    </div>
-                </div>
-            </nav>
-
-            <div className="container mx-auto px-6 py-10 flex-1">
-                <div className="flex flex-col lg:flex-row gap-10">
-                    
-                    {/* Main Content */}
-                    <div className="flex-1 flex flex-col gap-10">
-                        <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200 min-h-[1000px]">
-                            <section>
-                                <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-900 inline-block">About the Symposium</h2>
-                                <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap font-serif text-lg">
-                                    {symposium.symposium_details || "No description available."}
-                                </div>
-                            </section>
+            {/* Mobile Menu */}
+            <AnimatePresence>
+                {mobileMenuOpen && (
+                    <motion.div 
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="fixed inset-0 z-40 lg:hidden pt-24 px-6 bg-white/95 backdrop-blur-2xl"
+                    >
+                        <div className="flex flex-col gap-6 items-center">
+                            {navLinks.map((link) => (
+                                <Link 
+                                    key={link.name}
+                                    href={link.href}
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="text-xl font-bold text-slate-800"
+                                >
+                                    {link.name}
+                                </Link>
+                            ))}
                         </div>
-                    </div>
-
-                    {/* Sidebar */}
-                    <aside className="lg:w-80 flex flex-col gap-8">
-                        {symposium.cover_image_url && (
-                            <div className="rounded-lg overflow-hidden border border-gray-200 shadow-sm bg-white">
-                                <img src={symposium.cover_image_url} alt={symposium.symposium_title} className="w-full h-auto" />
-                            </div>
-                        )}
-
-                        <div className="bg-blue-900 text-white p-6 rounded-lg shadow-md">
-                            <h3 className="text-xl font-bold mb-4 border-b border-blue-700 pb-2">Information</h3>
-                            <div className="space-y-4">
-                                <div>
-                                    <p className="text-xs text-blue-300 uppercase tracking-wider mb-1 font-bold">ISSN</p>
-                                    <p className="text-lg font-mono tracking-tight">{symposium.issn || "N/A"}</p>
-                                </div>
-                                <div>
-                                    <p className="text-xs text-blue-300 uppercase tracking-wider mb-1 font-bold">Online ISSN</p>
-                                    <p className="text-lg font-mono tracking-tight">{symposium.online_issn || "N/A"}</p>
-                                </div>
-                                <ul className="space-y-3 text-blue-100 pt-2 border-t border-blue-800">
-                                    {symposium.for_authors_url ? (
-                                        <li><a href={symposium.for_authors_url} target="_blank" className="hover:text-white transition flex items-center gap-2 font-bold">Author Guidelines (PDF)</a></li>
-                                    ) : (
-                                        <li className="opacity-50 flex items-center gap-2">Author Guidelines (Pending)</li>
-                                    )}
-                                    {symposium.for_reviewers_url ? (
-                                        <li><a href={symposium.for_reviewers_url} target="_blank" className="hover:text-white transition flex items-center gap-2 font-bold">Reviewer Guidelines (PDF)</a></li>
-                                    ) : (
-                                        <li className="opacity-50 flex items-center gap-2">Reviewer Guidelines (Pending)</li>
-                                    )}
-                                    {symposium.editorial_policies_url ? (
-                                        <li><a href={symposium.editorial_policies_url} target="_blank" className="hover:text-white transition flex items-center gap-2 font-bold">Editorial Policies (PDF)</a></li>
-                                    ) : (
-                                        <li className="opacity-50 flex items-center gap-2">Editorial Policies (Pending)</li>
-                                    )}
-                                    <li><Link href={`/symposium/${symposium.id}/contact`} className="hover:text-white transition flex items-center gap-2 font-bold">Contact Us</Link></li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                            <h3 className="text-xl font-bold text-blue-900 mb-4">Aim & Scope</h3>
-                            <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap">
-                                {symposium.aim_scope || "Information pending."}
-                            </p>
-                        </div>
-
-                        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                            <h3 className="text-xl font-bold text-blue-900 mb-4">Mission</h3>
-                            <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap">
-                                {symposium.mission || "Information pending."}
-                            </p>
-                        </div>
-                    </aside>
-                </div>
-
-                {symposium.proceedings && symposium.proceedings.length > 0 && (
-                    <div className="mt-12">
-                        <RecentPublicationsCarousel 
-                            title="Recent Publications"
-                            items={symposium.proceedings.map(p => ({ ...p, type: 'symposium' }))} 
-                        />
-                    </div>
+                    </motion.div>
                 )}
-            </div>
+            </AnimatePresence>
+
+            <main className="relative z-10 pt-32 pb-20">
+                <div className="container mx-auto px-6">
+                    <motion.div 
+                        initial="hidden"
+                        animate="visible"
+                        variants={containerVariants}
+                        className="flex flex-col lg:flex-row gap-12"
+                    >
+                        {/* Main Content Area */}
+                        <div className="flex-1 space-y-12">
+                            {/* Hero Section */}
+                            <motion.section variants={itemVariants}>
+                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 border border-amber-100 text-amber-700 text-xs font-bold uppercase tracking-widest mb-8">
+                                    <Sparkles size={14} />
+                                    <span>Research Symposium</span>
+                                </div>
+                                <h2 className="text-4xl lg:text-6xl font-black text-slate-900 mb-8 leading-tight tracking-tight">
+                                    {symposium.symposium_title}
+                                </h2>
+                                <div className="bg-white/70 backdrop-blur-xl rounded-[2.5rem] border border-white/40 shadow-2xl shadow-slate-200/50 p-8 lg:p-12 min-h-[500px]">
+                                    <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+                                        <div className="w-1.5 h-6 bg-amber-600 rounded-full"></div>
+                                        About the Symposium
+                                    </h3>
+                                    <div className="prose max-w-none text-slate-600 leading-relaxed whitespace-pre-wrap font-medium text-lg">
+                                        {symposium.symposium_details || "No description available."}
+                                    </div>
+                                </div>
+                            </motion.section>
+
+                            {/* Aim & Scope + Mission Grid */}
+                            <div className="grid md:grid-cols-2 gap-8">
+                                <motion.div variants={itemVariants} className="bg-white/70 backdrop-blur-xl rounded-3xl border border-white/40 p-8 shadow-xl shadow-slate-200/40">
+                                    <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-3">
+                                        <div className="w-1.5 h-6 bg-orange-600 rounded-full"></div>
+                                        Aim & Scope
+                                    </h3>
+                                    <p className="text-slate-500 font-medium leading-relaxed">
+                                        {symposium.aim_scope || "Information pending."}
+                                    </p>
+                                </motion.div>
+                                <motion.div variants={itemVariants} className="bg-white/70 backdrop-blur-xl rounded-3xl border border-white/40 p-8 shadow-xl shadow-slate-200/40">
+                                    <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-3">
+                                        <div className="w-1.5 h-6 bg-amber-500 rounded-full"></div>
+                                        Mission
+                                    </h3>
+                                    <p className="text-slate-500 font-medium leading-relaxed">
+                                        {symposium.mission || "Information pending."}
+                                    </p>
+                                </motion.div>
+                            </div>
+                        </div>
+
+                        {/* Sidebar */}
+                        <aside className="lg:w-96 space-y-8">
+                            {/* Symposium Cover */}
+                            {symposium.cover_image_url && (
+                                <motion.div 
+                                    variants={itemVariants}
+                                    className="rounded-[2.5rem] overflow-hidden border border-white shadow-2xl shadow-slate-200/50 relative group"
+                                >
+                                    <img src={symposium.cover_image_url} alt={symposium.symposium_title} className="w-full h-auto transition-transform duration-700 group-hover:scale-110" />
+                                </motion.div>
+                            )}
+
+                            {/* Information Card */}
+                            <motion.div 
+                                variants={itemVariants}
+                                className="bg-slate-900 text-white rounded-[2.5rem] p-10 shadow-2xl shadow-slate-900/20 relative overflow-hidden group"
+                            >
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-amber-600/20 rounded-full -mr-16 -mt-16 blur-2xl group-hover:bg-amber-600/30 transition-colors"></div>
+                                
+                                <h3 className="text-xl font-bold mb-8 flex items-center gap-3">
+                                    <Info className="text-amber-400" />
+                                    Event Info
+                                </h3>
+                                
+                                <div className="space-y-6 relative z-10">
+                                    <div className="flex justify-between items-center pb-4 border-b border-white/10">
+                                        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">ISSN</span>
+                                        <span className="font-mono text-sm text-amber-400">{symposium.issn || "N/A"}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center pb-4 border-b border-white/10">
+                                        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Location</span>
+                                        <span className="text-xs font-bold text-amber-400 flex items-center gap-1">
+                                            <MapPin size={12} />
+                                            University Campus
+                                        </span>
+                                    </div>
+
+                                    <div className="pt-4 space-y-4">
+                                        {[
+                                            { label: 'Author Guidelines', url: symposium.for_authors_url },
+                                            { label: 'Reviewer Guidelines', url: symposium.for_reviewers_url },
+                                            { label: 'Editorial Policies', url: symposium.editorial_policies_url }
+                                        ].map((guideline) => (
+                                            <a 
+                                                key={guideline.label}
+                                                href={guideline.url || '#'}
+                                                target="_blank"
+                                                className={cn(
+                                                    "flex items-center justify-between p-4 rounded-2xl transition-all font-bold text-sm",
+                                                    guideline.url 
+                                                        ? "bg-white/5 hover:bg-white/10 text-white" 
+                                                        : "bg-white/5 opacity-40 cursor-not-allowed text-slate-400"
+                                                )}
+                                            >
+                                                {guideline.label}
+                                                <Download size={16} className={guideline.url ? "text-amber-400" : ""} />
+                                            </a>
+                                        ))}
+                                    </div>
+
+                                    <Link 
+                                        href={`/symposium/${symposium.id}/contact`}
+                                        className="w-full mt-4 flex items-center justify-center gap-3 py-4 bg-amber-600 text-white rounded-2xl font-bold hover:bg-amber-700 transition-all shadow-xl shadow-amber-600/20 group"
+                                    >
+                                        <Mail size={18} />
+                                        Contact Committee
+                                        <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                                    </Link>
+                                </div>
+                            </motion.div>
+                        </aside>
+                    </motion.div>
+
+                    {/* Recent Abstract Books Section */}
+                    {symposium.proceedings && symposium.proceedings.length > 0 && (
+                        <motion.div 
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="mt-24 pt-24 border-t border-slate-200/60"
+                        >
+                            <RecentPublicationsCarousel 
+                                title="Recent Abstract Books"
+                                items={symposium.proceedings.map(p => ({ ...p, type: 'symposium' }))} 
+                            />
+                        </motion.div>
+                    )}
+                </div>
+            </main>
 
             {/* Footer */}
-            <footer className="bg-gray-800 text-white py-12">
-                <div className="container mx-auto px-6">
-                    <div className="flex flex-col md:flex-row justify-between items-center gap-8 border-b border-gray-700 pb-8 mb-8">
+            <footer className="bg-slate-950 text-white pt-24 pb-12 relative overflow-hidden mt-20">
+                <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
+                    <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_2px_2px,_rgba(255,255,255,0.1)_1px,_transparent_0)] bg-[size:40px_40px]"></div>
+                </div>
+
+                <div className="container mx-auto px-6 relative z-10">
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-8 mb-12">
                         <div>
-                            <h2 className="text-2xl font-bold">{symposium.symposium_title}</h2>
-                            <p className="text-gray-400 mt-1">{symposium.university_name}</p>
+                            <h2 className="text-3xl font-black tracking-tight">{symposium.symposium_title}</h2>
+                            <p className="text-amber-400 font-bold uppercase tracking-widest text-xs mt-2">{symposium.university_name}</p>
                         </div>
-                        <div className="text-center md:text-right">
-                            <p className="text-gray-400">Powered by Publication Management System</p>
-                            <p className="text-gray-400 text-sm mt-1">&copy; {new Date().getFullYear()} All Rights Reserved.</p>
+                        <div className="flex gap-4">
+                            <Link href="/" className="px-6 py-3 bg-white/5 hover:bg-white/10 rounded-xl transition-all text-sm font-bold flex items-center gap-2">
+                                <ExternalLink size={16} />
+                                Main Hub
+                            </Link>
                         </div>
                     </div>
                 </div>

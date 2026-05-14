@@ -73,6 +73,8 @@ export default function Login({ pub_id, type }) {
                                         </div>
                                         <input
                                             type="text"
+                                            name="username"
+                                            id="username"
                                             className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all font-semibold"
                                             placeholder="Enter your username"
                                             value={data.username}
@@ -93,6 +95,8 @@ export default function Login({ pub_id, type }) {
                                         </div>
                                         <input
                                             type="password"
+                                            name="password"
+                                            id="password"
                                             className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all font-semibold"
                                             placeholder="••••••••"
                                             value={data.password}
