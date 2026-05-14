@@ -89,6 +89,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/conference/committee/{member}', [ConferenceManagementController::class, 'deleteCommitteeMember']);
         Route::get('/conference/{conference}/abstract-books', [ConferenceManagementController::class, 'manageAbstractBooks'])->name('conference.abstract_books');
         Route::post('/conference/{conference}/abstract-books', [ConferenceManagementController::class, 'storeAbstractBook']);
+        Route::post('/conference/abstract-book/{proceeding}', [ConferenceManagementController::class, 'updateAbstractBook']);
         Route::delete('/conference/abstract-book/{proceeding}', [ConferenceManagementController::class, 'deleteAbstractBook']);
         Route::get('/conference/abstract-book/{proceeding}/articles', [ConferenceManagementController::class, 'manageArticles'])->name('conference.articles');
         Route::post('/conference/abstract-book/{proceeding}/articles', [ConferenceManagementController::class, 'storeArticle']);
@@ -105,6 +106,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/symposium/committee/{member}', [SymposiumManagementController::class, 'deleteCommitteeMember']);
         Route::get('/symposium/{symposium}/abstract-books', [SymposiumManagementController::class, 'manageAbstractBooks'])->name('symposium.abstract_books');
         Route::post('/symposium/{symposium}/abstract-books', [SymposiumManagementController::class, 'storeAbstractBook']);
+        Route::post('/symposium/abstract-book/{proceeding}', [SymposiumManagementController::class, 'updateAbstractBook']);
         Route::delete('/symposium/abstract-book/{proceeding}', [SymposiumManagementController::class, 'deleteAbstractBook']);
         Route::get('/symposium/abstract-book/{proceeding}/articles', [SymposiumManagementController::class, 'manageArticles'])->name('symposium.articles');
         Route::post('/symposium/abstract-book/{proceeding}/articles', [SymposiumManagementController::class, 'storeArticle']);

@@ -169,6 +169,32 @@ class ConferenceManagementController extends Controller
         return back();
     }
 
+    public function updateAbstractBook(Request $request, ConferenceProceeding $proceeding)
+    {
+        $this->authorizeEditor($proceeding->conference);
+        $data = $request->validate([
+            'year' => 'required|integer',
+            'version' => 'required',
+            'pdf_link' => 'nullable|file|mimes:pdf',
+            'cover_image' => 'nullable|image',
+        ]);
+
+        if ($request->hasFile('pdf_link')) {
+            $data['pdf_link'] = $request->file('pdf_link')->store('proceedings_pdfs', 'public');
+        } else {
+            unset($data['pdf_link']);
+        }
+
+        if ($request->hasFile('cover_image')) {
+            $data['cover_image'] = $request->file('cover_image')->store('proceedings_covers', 'public');
+        } else {
+            unset($data['cover_image']);
+        }
+
+        $proceeding->update($data);
+        return back();
+    }
+
     public function deleteAbstractBook(ConferenceProceeding $proceeding)
     {
         $this->authorizeEditor($proceeding->conference);
