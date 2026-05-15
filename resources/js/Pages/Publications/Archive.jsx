@@ -108,7 +108,7 @@ export default function Archive({ journal, conference, symposium, is_current = f
                                                             </Link>
                                                             <p className="text-slate-500 font-bold text-sm mb-4 flex items-center gap-2">
                                                                 <Users size={14} className="text-slate-400" />
-                                                                {article.author.replace(/[\d*]/g, '')}
+                                                                {article.author.replace(/[0-9*]/g, '')}
                                                             </p>
                                                             <div className="flex flex-wrap gap-6 items-center">
                                                                 <Link 
