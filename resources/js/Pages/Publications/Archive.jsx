@@ -11,6 +11,7 @@ import {
     Layers
 } from 'lucide-react';
 import PublicLayout from '@/Layouts/PublicLayout';
+import { splitAuthors } from '@/lib/utils';
 
 export default function Archive({ journal, conference, symposium, is_current = false }) {
     const publication = journal || conference || symposium;
@@ -108,7 +109,7 @@ export default function Archive({ journal, conference, symposium, is_current = f
                                                             </Link>
                                                             <p className="text-slate-500 font-bold text-sm mb-4 flex items-center gap-2">
                                                                 <Users size={14} className="text-slate-400" />
-                                                                {article.author.replace(/[0-9*]/g, '')}
+                                                                {splitAuthors(article.author, true).join(', ')}
                                                             </p>
                                                             <div className="flex flex-wrap gap-6 items-center">
                                                                 <Link 

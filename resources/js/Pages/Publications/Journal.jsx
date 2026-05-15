@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import RecentPublicationsCarousel from '@/Components/RecentPublicationsCarousel';
+import { splitAuthors } from '@/lib/utils';
 
 export default function Journal({ journal, latestIssue, recentIssues }) {
     const containerVariants = {
@@ -158,7 +159,7 @@ export default function Journal({ journal, latestIssue, recentIssues }) {
                                                     </Link>
                                                     <p className="text-slate-500 text-sm font-bold flex items-center gap-2">
                                                         <Users size={14} className="text-slate-400" />
-                                                        {article.author.replace(/[\d*]/g, '')}
+                                                        {splitAuthors(article.author, true).join(', ')}
                                                     </p>
                                                 </div>
                                             ))}
