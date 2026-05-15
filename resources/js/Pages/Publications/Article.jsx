@@ -32,7 +32,7 @@ export default function Article({ article, journal, conference, symposium }) {
 
     // Process authors for display
     const authors = article.author 
-        ? article.author.split(/,(?![^()]*\))|\band\b/).map(s => s.trim()).filter(s => s !== "")
+        ? article.author.split(/\s*;\s*|\s+and\s+|\s+&\s+/i).map(s => s.trim()).filter(s => s !== "")
         : [];
 
     const handleCopyCitation = () => {
@@ -58,33 +58,63 @@ export default function Article({ article, journal, conference, symposium }) {
         window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`, '_blank');
     };
 
+    const getInitials = (name) => {
+        if (!name) return "";
+        // Clean and handle already initial-like strings (e.g., "P.A.D.P.")
+        const cleaned = name.replace(/[0-9*]/g, '').trim();
+        const parts = cleaned.split(/[\s.]+/).filter(p => p.length > 0);
+        return parts.map(p => p[0].toUpperCase() + ".").join(" ");
+    };
+
+    const parseAuthor = (author) => {
+        const cleaned = author.replace(/[0-9*]/g, '').trim();
+        if (cleaned.includes(',')) {
+            const parts = cleaned.split(',').map(s => s.trim());
+            return { surname: parts[0], given: parts.slice(1).join(', ') };
+        } else {
+            const parts = cleaned.split(/\s+/);
+            if (parts.length === 1) return { surname: parts[0], given: "" };
+            return { surname: parts[parts.length - 1], given: parts.slice(0, -1).join(' ') };
+        }
+    };
+
     const formatAuthorIEEE = (author) => {
-        const parts = author.replace(/[0-9*]/g, '').trim().split(' ');
-        if (parts.length === 1) return parts[0];
-        const lastName = parts[parts.length - 1];
-        const initials = parts.slice(0, -1).map(p => p[0] + ".").join(" ");
-        return `${initials} ${lastName}`;
+        const { surname, given } = parseAuthor(author);
+        const initials = getInitials(given);
+        return initials ? `${initials} ${surname}` : surname;
     };
 
     const formatAuthorAPA = (author) => {
-        const parts = author.replace(/[0-9*]/g, '').trim().split(' ');
-        if (parts.length === 1) return parts[0];
-        const lastName = parts[parts.length - 1];
-        const initials = parts.slice(0, -1).map(p => p[0] + ".").join(". ");
-        return `${lastName}, ${initials}.`;
+        const { surname, given } = parseAuthor(author);
+        const initials = getInitials(given);
+        return initials ? `${surname}, ${initials}` : surname;
     };
 
-    const authorsIEEE = authors.length > 3 
-        ? `${formatAuthorIEEE(authors[0])} et al.` 
-        : authors.map((a, i) => (i === authors.length - 1 && i > 0 ? "and " : "") + formatAuthorIEEE(a)).join(authors.length > 2 ? ", " : " ");
+    const joinAuthors = (formattedAuthors, separator = "and") => {
+        if (formattedAuthors.length === 0) return "";
+        if (formattedAuthors.length === 1) return formattedAuthors[0];
+        if (formattedAuthors.length === 2) return `${formattedAuthors[0]} ${separator} ${formattedAuthors[1]}`;
+        return formattedAuthors.slice(0, -1).join(", ") + ` ${separator} ` + formattedAuthors[formattedAuthors.length - 1];
+    };
 
-    const authorsAPA = authors.length > 7
-        ? `${authors.slice(0, 6).map(formatAuthorAPA).join(", ")}, ... ${formatAuthorAPA(authors[authors.length - 1])}`
-        : authors.map((a, i) => (i === authors.length - 1 && i > 0 ? "& " : "") + formatAuthorAPA(a)).join(authors.length > 2 ? ", " : " ");
+    const authorsIEEE = joinAuthors(authors.map(formatAuthorIEEE), "and");
+    const authorsAPA = joinAuthors(authors.map(formatAuthorAPA), "&");
+
+    const getMonthName = (dateStr) => {
+        if (!dateStr) return "";
+        try {
+            const date = new Date(dateStr);
+            return date.toLocaleString('default', { month: 'Long' });
+        } catch (e) {
+            return "";
+        }
+    };
 
     const pubTitle = publication?.journal_title || publication?.conference_title || publication?.symposium_title;
-    const citationIEEE = `${authorsIEEE}, "${article.title}," ${pubTitle}, ${article.issue ? `vol. ${article.issue.volume}, no. ${article.issue.issue},` : ''} pp. ${article.pages || '??'}, ${article.year}.`;
-    const citationAPA = `${authorsAPA} (${article.year}). ${article.title}. ${pubTitle}${article.issue ? `, ${article.issue.volume}(${article.issue.issue})` : ''}, ${article.pages || '??'}.`;
+    const month = getMonthName(article.published_date);
+
+    const citationIEEE = `${authorsIEEE}, "${article.title}," ${pubTitle}, ${article.issue ? `vol. ${article.issue.volume}, no. ${article.issue.issue},` : ''} pp. ${article.pages || '??'}, ${month ? month + ', ' : ''}${article.year}${article.doi ? `, doi: ${article.doi}.` : '.'}`;
+    const citationAPA = `${authorsAPA} (${article.year}). ${article.title}. ${pubTitle}${article.issue ? `, ${article.issue.volume}(${article.issue.issue})` : ''}, ${article.pages || '??'}. ${article.doi ? `https://doi.org/${article.doi}` : window.location.href}`;
 
     const breadcrumbLinks = [
         { label: "Archive", href: `/${type}/${publication.id}/archive` },
