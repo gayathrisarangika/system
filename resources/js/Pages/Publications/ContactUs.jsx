@@ -1,81 +1,121 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
+import { motion } from 'framer-motion';
+import { 
+    Mail, 
+    Globe,
+    MapPin,
+    MessageCircle,
+    Info,
+    ExternalLink
+} from 'lucide-react';
+import PublicLayout from '@/Layouts/PublicLayout';
 
 export default function ContactUs({ journal, conference, symposium }) {
     const publication = journal || conference || symposium;
     const type = journal ? 'journal' : (conference ? 'conference' : 'symposium');
     const title = publication.journal_title || publication.conference_title || publication.symposium_title;
 
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: { staggerChildren: 0.1 }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.5, ease: "easeOut" }
+        }
+    };
+
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
+        <PublicLayout publication={publication} type={type} active_page="contact">
             <Head title={`Contact Us - ${title}`} />
             
-            {/* Header */}
-            <header className="bg-white border-b py-8 shadow-sm">
-                <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
-                    <div className="flex-1 text-center md:text-left">
-                        <h1 className="text-3xl md:text-4xl font-serif font-bold text-blue-900 leading-tight">{title}</h1>
-                        <p className="text-lg text-gray-600 mt-2 uppercase tracking-widest font-medium">{publication.university_name}</p>
-                    </div>
-                    {publication.university_logo_url && (
-                        <div className="flex-shrink-0">
-                            <img src={publication.university_logo_url} alt="University Logo" className="h-28 object-contain" />
-                        </div>
-                    )}
-                </div>
-            </header>
-
-            {/* Navigation Bar */}
-            <nav className="bg-blue-900 text-white sticky top-0 z-50 shadow-md">
+            <div className="pt-32 pb-20">
                 <div className="container mx-auto px-6">
-                    <div className="flex flex-wrap justify-center md:justify-start">
-                        <Link href={`/${type}/${publication.id}`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Home</Link>
-                        <Link 
-                            href={`/${type}/${publication.id}/${journal ? 'editorial-board' : 'committee'}`} 
-                            className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800"
-                        >
-                            {journal ? 'Editorial' : 'Committee'}
-                        </Link>
-                        <Link href={`/${type}/${publication.id}/current`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Current</Link>
-                        <Link href={`/${type}/${publication.id}/archive`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Archive</Link>
-                        <Link href={`/${type}/${publication.id}/contact`} className="px-6 py-4 bg-blue-800 transition font-medium">Contact Us</Link>
-                    </div>
-                </div>
-            </nav>
+                    <motion.div 
+                        initial="hidden"
+                        animate="visible"
+                        variants={containerVariants}
+                        className="max-w-4xl mx-auto"
+                    >
+                        <motion.div variants={itemVariants} className="mb-12">
+                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-xs font-bold uppercase tracking-widest mb-6">
+                                <MessageCircle size={14} />
+                                <span>Get in Touch</span>
+                            </div>
+                            <h2 className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">
+                                Contact Information
+                            </h2>
+                        </motion.div>
 
-            <div className="container mx-auto px-6 py-10 flex-1">
-                <div className="max-w-3xl mx-auto bg-white p-10 rounded-lg shadow-sm border border-gray-200">
-                    <h2 className="text-3xl font-bold text-gray-800 mb-8 pb-4 border-b-2 border-blue-900">Contact Us</h2>
-                    
-                    <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap font-serif text-lg">
-                        {publication.contact_us || "No contact information available."}
-                    </div>
+                        <div className="grid md:grid-cols-3 gap-8">
+                            <motion.div 
+                                variants={itemVariants}
+                                className="md:col-span-2 bg-white/70 backdrop-blur-xl rounded-[2.5rem] border border-white/40 shadow-2xl shadow-slate-200/50 p-10 lg:p-12"
+                            >
+                                <h3 className="text-xl font-black text-slate-900 mb-8 flex items-center gap-3">
+                                    <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+                                    Editorial Correspondence
+                                </h3>
+                                
+                                <div className="prose max-w-none text-slate-600 leading-relaxed whitespace-pre-wrap font-medium text-lg mb-10">
+                                    {publication.contact_us || "No contact information available at this time."}
+                                </div>
 
-                    <div className="mt-12 p-6 bg-blue-50 rounded-lg border border-blue-100">
-                        <h3 className="text-xl font-bold text-blue-900 mb-4 font-serif">Inquiries</h3>
-                        <p className="text-gray-700">
-                            For any inquiries regarding this publication, please reach out using the contact details provided above. 
-                            Our team will get back to you as soon as possible.
-                        </p>
-                    </div>
+                                <div className="pt-8 border-t border-slate-100">
+                                    <div className="flex items-start gap-4">
+                                        <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 shrink-0">
+                                            <Info size={24} />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-black text-slate-900 uppercase tracking-widest text-xs mb-2">Note to Authors</h4>
+                                            <p className="text-slate-500 font-medium text-sm leading-relaxed">
+                                                For specific inquiries regarding manuscript submission, peer review status, or ethical guidelines, please mention your manuscript ID if applicable.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </motion.div>
+
+                            <div className="space-y-6">
+                                <motion.div 
+                                    variants={itemVariants}
+                                    className="bg-slate-900 text-white rounded-[2rem] p-8 shadow-xl shadow-slate-900/20 relative overflow-hidden"
+                                >
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-blue-600/20 rounded-full -mr-12 -mt-12 blur-2xl"></div>
+                                    <MapPin className="text-blue-400 mb-6" size={32} />
+                                    <h4 className="font-black uppercase tracking-widest text-xs text-slate-400 mb-2">Location</h4>
+                                    <p className="font-bold text-sm leading-relaxed">
+                                        Sabaragamuwa University of Sri Lanka,<br />
+                                        Belihuloya, 70140,<br />
+                                        Sri Lanka.
+                                    </p>
+                                </motion.div>
+
+                                <motion.div 
+                                    variants={itemVariants}
+                                    className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-lg shadow-slate-200/40"
+                                >
+                                    <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-6">
+                                        <Globe size={24} />
+                                    </div>
+                                    <h4 className="font-black uppercase tracking-widest text-xs text-slate-400 mb-2">Website</h4>
+                                    <a href="https://www.sab.ac.lk/fssl/" target="_blank" className="font-black text-slate-900 hover:text-blue-600 transition-colors flex items-center gap-2">
+                                        https://www.sab.ac.lk/fssl/ <ExternalLink size={14} />
+                                    </a>
+                                </motion.div>
+                            </div>
+                        </div>
+                    </motion.div>
                 </div>
             </div>
-
-            {/* Footer */}
-            <footer className="bg-gray-800 text-white py-12 mt-auto">
-                <div className="container mx-auto px-6">
-                    <div className="flex flex-col md:flex-row justify-between items-center gap-8 border-b border-gray-700 pb-8 mb-8">
-                        <div>
-                            <h2 className="text-2xl font-bold">{title}</h2>
-                            <p className="text-gray-400 mt-1">{publication.university_name}</p>
-                        </div>
-                        <div className="text-center md:text-right">
-                            <p className="text-gray-400">Powered by Publication Management System</p>
-                            <p className="text-gray-400 text-sm mt-1">&copy; {new Date().getFullYear()} All Rights Reserved.</p>
-                        </div>
-                    </div>
-                </div>
-            </footer>
-        </div>
+        </PublicLayout>
     );
 }

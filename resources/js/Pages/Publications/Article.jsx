@@ -1,223 +1,311 @@
-import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import React, { useState, useEffect } from "react";
+import { Head, Link } from "@inertiajs/react";
+import PublicLayout from "@/Layouts/PublicLayout";
+import { 
+    FileText, 
+    Calendar, 
+    User, 
+    Download, 
+    Eye, 
+    Share2, 
+    Quote, 
+    ChevronLeft,
+    Clock,
+    BookOpen,
+    ExternalLink,
+    Check,
+    Copy,
+    Send,
+    Link2,
+    Mail
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
-export default function Article({ article, journal }) {
-    // journal prop here can be a Journal, Conference or Symposium model
-    const publication = journal;
-    const type = article.issue_id ? 'journal' : (article.conference_proceeding_id ? 'conference' : 'symposium');
-    const pubTitle = publication.journal_title || publication.conference_title || publication.symposium_title;
+export default function Article({ article, journal, conference, symposium }) {
+    const [copied, setCopied] = useState(false);
+    const [activeTab, setActiveTab] = useState("abstract");
     
-    const formatAuthors = (authorStr) => {
-        return authorStr.split(',').map((author, index) => {
-            const parts = author.trim().split(/(\d+|\*)/);
-            return (
-                <span key={index} className="hover:underline cursor-pointer">
-                    {parts.map((part, i) => (
-                        /(\d+|\*)/.test(part) ? <sup key={i} className="text-xs">{part}</sup> : part
-                    ))}
-                    {index < authorStr.split(',').length - 1 ? ', ' : ''}
-                </span>
-            );
-        });
-    };
+    const publication = journal || conference || symposium;
+    const type = journal ? 'journal' : (conference ? 'conference' : 'symposium');
 
-    const getIEEECitation = () => {
-        const authors = article.author.split(',').map(a => a.trim().replace(/[\d*]/g, ''));
-        const authorList = authors.length > 3 ? `${authors[0]} et al.` : authors.join(', ');
-        
-        let sourceInfo = "";
-        if (article.issue) {
-            sourceInfo = `${pubTitle}, vol. ${article.issue.volume}, no. ${article.issue.issue}, pp. ${article.pages || 'n/a'}`;
-        } else if (article.conference_proceeding) {
-            sourceInfo = `${pubTitle}, ${article.conference_proceeding.version}`;
-        } else if (article.symposium_proceeding) {
-            sourceInfo = `${pubTitle}, ${article.symposium_proceeding.version}`;
+    // Process authors for display
+    const authors = article.author ? article.author.split(/,|\band\b/).map(s => s.trim()) : [];
+
+    const handleCopyCitation = () => {
+        const citation = document.getElementById('citation-text')?.innerText;
+        if (citation) {
+            navigator.clipboard.writeText(citation);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
         }
-
-        return `${authorList}, "${article.title}," ${sourceInfo}, ${article.year}.`;
     };
 
-    const shareUrl = window.location.href;
+    const citationIEEE = `${authors.length > 3 ? authors[0] + " et al." : authors.join(", ")}, "${article.title}," ${publication?.journal_title || publication?.conference_title || publication?.symposium_title}, ${article.issue ? `vol. ${article.issue.volume}, no. ${article.issue.issue},` : ''} ${article.conference_proceeding ? 'Conference Proceedings,' : ''} ${article.symposium_proceeding ? 'Symposium Proceedings,' : ''} pp. ${article.pages || '??'}, ${article.year}.`;
 
-    const issueInfo = article.issue 
-        ? `Vol. ${article.issue.volume} No. ${article.issue.issue}`
-        : (article.conference_proceeding?.version || article.symposium_proceeding?.version || "");
+    const breadcrumbLinks = [
+        { label: "Archive", href: `/${type}/${publication.id}/archive` },
+        { 
+            label: article.issue ? `Vol. ${article.issue.volume} No. ${article.issue.issue}` : (article.conference_proceeding ? 'Abstract Book' : 'Abstract Book'), 
+            href: `/${type}/${publication.id}/archive#${article.issue ? `issue-${article.issue.id}` : (article.conference_proceeding ? `proceeding-${article.conference_proceeding.id}` : `proceeding-${article.symposium_proceeding.id}`)}` 
+        },
+        { label: "Article Details", href: "#" }
+    ];
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
+        <PublicLayout publication={publication} type={type}>
             <Head>
-                <title>{article.title}</title>
-                <meta name="description" content={article.abstract.substring(0, 160)} />
+                <title>{`${article.title} | ${publication.journal_title || publication.conference_title || publication.symposium_title}`}</title>
+                <meta name="description" content={article.abstract?.substring(0, 160)} />
                 <meta name="keywords" content={article.keywords} />
-                <meta property="og:title" content={article.title} />
-                <meta property="og:description" content={article.abstract.substring(0, 160)} />
-                <meta property="og:type" content="article" />
-                <meta name="twitter:card" content="summary" />
+                
+                {/* Academic Meta Tags */}
                 <meta name="citation_title" content={article.title} />
-                <meta name="citation_author" content={article.author} />
-                <meta name="citation_publication_date" content={article.published_date || article.created_at} />
-                <meta name="citation_journal_title" content={pubTitle} />
+                {authors.map((author, index) => (
+                    <meta key={index} name="citation_author" content={author.replace(/[*0-9]/g, '')} />
+                ))}
+                <meta name="citation_publication_date" content={article.year} />
+                <meta name="citation_journal_title" content={publication.journal_title || publication.conference_title || publication.symposium_title} />
                 {article.issue && (
                     <>
                         <meta name="citation_volume" content={article.issue.volume} />
                         <meta name="citation_issue" content={article.issue.issue} />
                     </>
                 )}
+                {article.pdf_url && <meta name="citation_pdf_url" content={window.location.origin + article.pdf_url} />}
+                
+                {/* OpenGraph */}
+                <meta property="og:title" content={article.title} />
+                <meta property="og:description" content={article.abstract?.substring(0, 160)} />
+                <meta property="og:type" content="article" />
+                <meta property="og:url" content={window.location.href} />
             </Head>
-            
-            {/* Header */}
-            <header className="bg-white border-b py-8 shadow-sm">
-                <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
-                    <div className="flex-1 text-center md:text-left">
-                        <h1 className="text-3xl md:text-4xl font-serif font-bold text-blue-900 leading-tight">{pubTitle}</h1>
-                        <p className="text-lg text-gray-600 mt-2 uppercase tracking-widest font-medium">{publication.university_name}</p>
-                    </div>
-                    {publication.university_logo_url && (
-                        <div className="flex-shrink-0">
-                            <img src={publication.university_logo_url} alt="University Logo" className="h-28 object-contain" />
-                        </div>
-                    )}
-                </div>
-            </header>
 
-            {/* Navigation Bar */}
-            <nav className="bg-blue-900 text-white sticky top-0 z-50 shadow-md">
-                <div className="container mx-auto px-6">
-                    <div className="flex flex-wrap justify-center md:justify-start">
-                        <Link href={`/${type}/${publication.id}`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Home</Link>
-                        <Link 
-                            href={`/${type}/${publication.id}/${journal ? 'editorial-board' : 'committee'}`} 
-                            className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800"
-                        >
-                            {journal ? 'Editorial' : 'Committee'}
-                        </Link>
-                        <Link href={`/${type}/${publication.id}/current`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Current</Link>
-                        <Link href={`/${type}/${publication.id}/archive`} className="px-6 py-4 hover:bg-blue-800 transition font-medium border-r border-blue-800">Archive</Link>
-                        <Link href={`/${type}/${publication.id}/contact`} className="px-6 py-4 hover:bg-blue-800 transition font-medium">Contact Us</Link>
-                    </div>
-                </div>
-            </nav>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-12">
+                {/* Breadcrumbs */}
+                <nav className="flex mb-8 items-center space-x-2 text-sm text-slate-500">
+                    <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
+                    <ChevronLeft className="h-4 w-4 rotate-180" />
+                    {breadcrumbLinks.map((link, idx) => (
+                        <React.Fragment key={idx}>
+                            <Link href={link.href} className={cn("hover:text-blue-600 transition-colors", idx === breadcrumbLinks.length - 1 && "font-semibold text-slate-900")}>
+                                {link.label}
+                            </Link>
+                            {idx < breadcrumbLinks.length - 1 && <ChevronLeft className="h-4 w-4 rotate-180" />}
+                        </React.Fragment>
+                    ))}
+                </nav>
 
-            <div className="container mx-auto px-6 py-10 flex-1">
-                <div className="flex flex-col lg:flex-row gap-10">
-                    
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                     {/* Main Content */}
-                    <div className="flex-1 bg-white p-8 rounded-lg shadow-sm border border-gray-200">
-                        <nav className="text-sm text-gray-500 mb-8 flex gap-2 items-center overflow-x-auto whitespace-nowrap border-b pb-4">
-                            <Link href="/" className="hover:text-blue-900">Home</Link>
-                            <span>/</span>
-                            <Link href={`/${type}/${publication.id}`} className="hover:text-blue-900">{pubTitle}</Link>
-                            <span>/</span>
-                            <Link href={`/${type}/${publication.id}/archive`} className="hover:text-blue-900">{issueInfo}</Link>
-                        </nav>
-
-                        <header className="mb-10">
-                            <p className="text-blue-900 font-bold mb-2 uppercase tracking-wide text-sm">Original Research Article</p>
-                            <h2 className="text-3xl font-serif font-bold text-gray-900 leading-tight mb-4">{article.title}</h2>
-                            <div className="flex flex-wrap gap-2 text-lg text-blue-700 font-medium mb-6">
-                                {formatAuthors(article.author)}
-                            </div>
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-6 border-y border-gray-100 text-sm text-gray-600">
-                                <div>
-                                    {article.doi && <p><span className="font-bold">DOI:</span> {article.doi}</p>}
-                                    <p><span className="font-bold">Published:</span> {new Date(article.published_date || article.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                    <div className="lg:col-span-2 space-y-8">
+                        <section className="bg-white rounded-3xl p-8 md:p-10 shadow-sm border border-slate-100">
+                            <div className="space-y-6">
+                                <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider">
+                                    Research Article
                                 </div>
-                                <div>
-                                    <p><span className="font-bold">{article.issue_id ? 'Issue:' : 'Proceeding:'}</span> {issueInfo} ({article.year})</p>
-                                    {article.pages && <p><span className="font-bold">Pages:</span> {article.pages}</p>}
-                                </div>
-                            </div>
-                        </header>
+                                
+                                <h1 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight">
+                                    {article.title}
+                                </h1>
 
-                        <section className="mb-10">
-                            <h3 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Abstract</h3>
-                            <div className="prose max-w-none text-gray-700 leading-relaxed font-serif text-lg whitespace-pre-wrap text-justify">
-                                {article.abstract}
+                                <div className="flex flex-wrap gap-4 text-slate-600">
+                                    {authors.map((author, index) => (
+                                        <div key={index} className="flex items-center group">
+                                            <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center mr-2 group-hover:bg-blue-100 transition-colors">
+                                                <User className="h-4 w-4 text-slate-500 group-hover:text-blue-600" />
+                                            </div>
+                                            <span className="font-medium text-slate-900">
+                                                {author.split('*').map((part, i) => (
+                                                    <React.Fragment key={i}>
+                                                        {part}
+                                                        {i < author.split('*').length - 1 && <sup className="text-blue-600 font-bold">*</sup>}
+                                                    </React.Fragment>
+                                                ))}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-6 border-y border-slate-100">
+                                    <div className="space-y-1">
+                                        <span className="text-xs text-slate-500 uppercase font-semibold">Published</span>
+                                        <div className="flex items-center text-slate-900 font-medium">
+                                            <Calendar className="h-4 w-4 mr-2 text-blue-600" />
+                                            {article.year}
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <span className="text-xs text-slate-500 uppercase font-semibold">Views</span>
+                                        <div className="flex items-center text-slate-900 font-medium">
+                                            <Eye className="h-4 w-4 mr-2 text-blue-600" />
+                                            {article.views || 0}
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <span className="text-xs text-slate-500 uppercase font-semibold">Downloads</span>
+                                        <div className="flex items-center text-slate-900 font-medium">
+                                            <Download className="h-4 w-4 mr-2 text-blue-600" />
+                                            {article.downloads || 0}
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <span className="text-xs text-slate-500 uppercase font-semibold">Pages</span>
+                                        <div className="flex items-center text-slate-900 font-medium">
+                                            <BookOpen className="h-4 w-4 mr-2 text-blue-600" />
+                                            {article.pages || 'N/A'}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="flex border-b border-slate-100">
+                                        <button 
+                                            onClick={() => setActiveTab("abstract")}
+                                            className={cn("px-6 py-3 text-sm font-bold transition-all relative", activeTab === "abstract" ? "text-blue-600" : "text-slate-500 hover:text-slate-700")}
+                                        >
+                                            Abstract
+                                            {activeTab === "abstract" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full" />}
+                                        </button>
+                                        <button 
+                                            onClick={() => setActiveTab("details")}
+                                            className={cn("px-6 py-3 text-sm font-bold transition-all relative", activeTab === "details" ? "text-blue-600" : "text-slate-500 hover:text-slate-700")}
+                                        >
+                                            Metadata
+                                            {activeTab === "details" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full" />}
+                                        </button>
+                                    </div>
+
+                                    <div className="py-4">
+                                        {activeTab === "abstract" ? (
+                                            <div className="space-y-6">
+                                                <p className="text-slate-700 leading-relaxed text-justify">
+                                                    {article.abstract}
+                                                </p>
+                                                {article.keywords && (
+                                                    <div className="flex flex-wrap gap-2 pt-4">
+                                                        <span className="text-sm font-bold text-slate-900 mr-2">Keywords:</span>
+                                                        {article.keywords.split(',').map((kw, i) => (
+                                                            <span key={i} className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-medium">
+                                                                {kw.trim()}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
+                                                <div className="space-y-4">
+                                                    <div>
+                                                        <span className="block text-slate-500 font-semibold mb-1">DOI</span>
+                                                        <span className="text-slate-900">{article.doi || 'Not available'}</span>
+                                                    </div>
+                                                    <div>
+                                                        <span className="block text-slate-500 font-semibold mb-1">Publication Date</span>
+                                                        <span className="text-slate-900">{article.year}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-4">
+                                                    <div>
+                                                        <span className="block text-slate-500 font-semibold mb-1">Citation Style</span>
+                                                        <span className="text-slate-900">IEEE</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         </section>
 
-                        <section className="mb-10">
-                            <h3 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Keywords</h3>
-                            <p className="text-gray-700 italic">{article.keywords || "No keywords available."}</p>
+                        {/* Citation Card */}
+                        <section className="bg-slate-900 rounded-3xl p-8 text-white">
+                            <div className="flex items-center justify-between mb-6">
+                                <div className="flex items-center">
+                                    <Quote className="h-6 w-6 text-blue-400 mr-3" />
+                                    <h3 className="text-xl font-bold">How to Cite</h3>
+                                </div>
+                                <button 
+                                    onClick={handleCopyCitation}
+                                    className="flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-sm font-medium border border-white/10"
+                                >
+                                    {copied ? <Check className="h-4 w-4 mr-2 text-green-400" /> : <Copy className="h-4 w-4 mr-2" />}
+                                    {copied ? 'Copied!' : 'Copy IEEE'}
+                                </button>
+                            </div>
+                            <div id="citation-text" className="text-slate-300 leading-relaxed font-mono text-sm bg-black/20 p-6 rounded-2xl border border-white/5">
+                                {citationIEEE}
+                            </div>
                         </section>
-
                     </div>
 
                     {/* Sidebar */}
-                    <aside className="lg:w-80 flex flex-col gap-8">
-                        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                            <h4 className="text-lg font-bold text-blue-900 mb-4 border-b pb-2">Full Text</h4>
-                            <div className="flex flex-col gap-3">
-                                {article.pdf_url && (
-                                    <>
-                                        <a 
-                                            href={article.pdf_url} 
-                                            target="_blank" 
-                                            className="w-full bg-white border-2 border-blue-900 text-blue-900 text-center py-2 rounded font-bold hover:bg-blue-50 transition"
-                                        >
-                                            View PDF
-                                        </a>
-                                        <a 
-                                            href={`/article/${article.id}/download`}
-                                            className="w-full bg-blue-900 text-white text-center py-2 rounded font-bold hover:bg-blue-800 transition"
-                                        >
-                                            Download PDF
-                                        </a>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                            <h4 className="text-lg font-bold text-blue-900 mb-4 border-b pb-2">Metrics</h4>
-                            <div className="grid grid-cols-2 gap-4 text-center">
-                                <div className="p-3 bg-gray-50 rounded border">
-                                    <p className="text-2xl font-bold text-blue-900">{article.views || 0}</p>
-                                    <p className="text-xs text-gray-500 uppercase tracking-wider font-bold">Views</p>
-                                </div>
-                                <div className="p-3 bg-gray-50 rounded border">
-                                    <p className="text-2xl font-bold text-blue-900">{article.downloads || 0}</p>
-                                    <p className="text-xs text-gray-500 uppercase tracking-wider font-bold">Downloads</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                            <h4 className="text-lg font-bold text-blue-900 mb-4 border-b pb-2">How to Cite (IEEE)</h4>
-                            <div className="text-sm text-gray-600 bg-gray-50 p-4 rounded border border-gray-100 font-serif break-words">
-                                {getIEEECitation()}
-                            </div>
-                            <button 
-                                onClick={() => navigator.clipboard.writeText(getIEEECitation())}
-                                className="mt-4 text-blue-700 text-sm font-bold hover:underline flex items-center gap-1"
+                    <div className="space-y-8">
+                        {/* Download Section */}
+                        <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
+                            <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center">
+                                <FileText className="h-5 w-5 text-blue-600 mr-2" />
+                                Full Text
+                            </h3>
+                            <a 
+                                href={`/article/${article.id}/download`}
+                                className="flex items-center justify-center w-full px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-blue-200 group"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                </svg>
-                                Copy Citation
-                            </button>
+                                <Download className="h-5 w-5 mr-3 group-hover:translate-y-0.5 transition-transform" />
+                                Download PDF
+                            </a>
+                            <p className="mt-4 text-center text-xs text-slate-400">
+                                Open access provided by Sabaragamuwa University of Sri Lanka
+                            </p>
                         </div>
 
-
-                        <div className="bg-blue-900 text-white p-6 rounded-lg shadow-md">
-                            <h4 className="text-lg font-bold mb-4 border-b border-blue-700 pb-2">Social Share</h4>
-                            <div className="flex gap-4">
-                                <a href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`} target="_blank" className="w-10 h-10 bg-blue-800 rounded-full flex items-center justify-center hover:bg-blue-700 cursor-pointer transition flex items-center justify-center font-bold">f</a>
-                                <a href={`https://twitter.com/intent/tweet?url=${shareUrl}&text=${article.title}`} target="_blank" className="w-10 h-10 bg-blue-800 rounded-full flex items-center justify-center hover:bg-blue-700 cursor-pointer transition flex items-center justify-center font-bold text-sm">X</a>
-                                <a href={`https://www.linkedin.com/shareArticle?mini=true&url=${shareUrl}`} target="_blank" className="w-10 h-10 bg-blue-800 rounded-full flex items-center justify-center hover:bg-blue-700 cursor-pointer transition flex items-center justify-center font-bold">in</a>
+                        {/* Share Section */}
+                        <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
+                            <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center">
+                                <Share2 className="h-5 w-5 text-blue-600 mr-2" />
+                                Share Article
+                            </h3>
+                            <div className="grid grid-cols-3 gap-4">
+                                <button className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 transition-colors">
+                                    <Send className="h-6 w-6" />
+                                </button>
+                                <button className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 transition-colors">
+                                    <Link2 className="h-6 w-6" />
+                                </button>
+                                <button className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 transition-colors">
+                                    <Mail className="h-6 w-6" />
+                                </button>
                             </div>
                         </div>
-                    </aside>
+
+                        {/* Publication Info */}
+                        <div className="bg-blue-600 rounded-3xl p-8 text-white relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+                                <BookOpen className="h-24 w-24" />
+                            </div>
+                            <h3 className="text-lg font-bold mb-4 relative z-10">Part of</h3>
+                            <div className="space-y-4 relative z-10">
+                                <p className="font-medium text-blue-100">
+                                    {publication.journal_title || publication.conference_title || publication.symposium_title}
+                                </p>
+                                <div className="text-sm text-blue-100/80">
+                                    {article.issue ? (
+                                        <>Volume {article.issue.volume}, Issue {article.issue.issue}</>
+                                    ) : (
+                                        <>Abstract Book {article.year}</>
+                                    )}
+                                </div>
+                                <Link 
+                                    href={`/${type}/${publication.id}`}
+                                    className="inline-flex items-center text-sm font-bold text-white hover:underline pt-2"
+                                >
+                                    View Publication
+                                    <ExternalLink className="h-4 w-4 ml-2" />
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            {/* Footer */}
-            <footer className="bg-gray-800 text-white py-8 mt-10">
-                <div className="container mx-auto px-6 text-center text-gray-400 text-sm">
-                    <p>&copy; {new Date().getFullYear()} {publication.university_name}. All Rights Reserved.</p>
-                </div>
-            </footer>
-        </div>
+        </PublicLayout>
     );
 }
