@@ -1,11 +1,31 @@
 import React, { useState } from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, Link } from '@inertiajs/react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+    Plus,
+    FileText,
+    Users,
+    Calendar,
+    Type,
+    Save,
+    X,
+    Edit3,
+    Search,
+    ChevronLeft,
+    FileUp,
+    LayoutList,
+    Layers,
+    Hash,
+    BookOpen
+} from 'lucide-react';
 import BackendLayout from '@/Layouts/BackendLayout';
+import { cn } from '@/lib/utils';
 
 export default function Articles({ issue, articles }) {
     const [editingArticle, setEditingArticle] = useState(null);
+    const [isFormVisible, setIsFormVisible] = useState(false);
 
-    const { data, setData, post, reset, errors } = useForm({
+    const { data, setData, post, reset, errors, processing } = useForm({
         title: '',
         author: '',
         abstract: '',
@@ -17,7 +37,7 @@ export default function Articles({ issue, articles }) {
         pdf: null,
     });
 
-    const { data: editData, setData: setEditData, post: postEdit, errors: editErrors, reset: resetEdit } = useForm({
+    const { data: editData, setData: setEditData, post: postEdit, errors: editErrors, reset: resetEdit, processing: editProcessing } = useForm({
         title: '',
         author: '',
         abstract: '',
@@ -33,7 +53,10 @@ export default function Articles({ issue, articles }) {
     const submit = (e) => {
         e.preventDefault();
         post(`/editor/journal/issue/${issue.id}/articles`, {
-            onSuccess: () => reset(),
+            onSuccess: () => {
+                reset();
+                setIsFormVisible(false);
+            },
             forceFormData: true,
         });
     };
@@ -64,128 +87,276 @@ export default function Articles({ issue, articles }) {
         });
     };
 
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: { staggerChildren: 0.1 }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.4, ease: "easeOut" }
+        }
+    };
+
+    const InputGroup = ({ label, icon: Icon, children, error, className }) => (
+        <div className={cn("space-y-1.5", className)}>
+            <label className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] ml-1">
+                {Icon && <Icon size={12} className="text-blue-500" />} {label}
+            </label>
+            {children}
+            {error && <div className="text-rose-500 text-[10px] font-bold mt-1 ml-1 uppercase">{error}</div>}
+        </div>
+    );
+
     return (
         <BackendLayout title={`Articles - Vol. ${issue.volume} No. ${issue.issue}`}>
             <Head title="Manage Articles" />
-            <h1 className="text-2xl font-bold mb-8 text-slate-900">Articles for Vol. {issue.volume} No. {issue.issue}</h1>
 
-            {editingArticle ? (
-                <div className="bg-white p-8 rounded-2xl mb-12 border border-blue-200 shadow-sm shadow-blue-500/5">
-                    <div className="flex justify-between items-center mb-8">
-                        <h2 className="text-xl font-bold text-slate-900">Edit Article</h2>
-                        <button onClick={() => setEditingArticle(null)} className="text-slate-500 hover:text-slate-700 font-bold uppercase text-xs tracking-wider">Cancel</button>
-                    </div>
-                    <form onSubmit={submitEdit} className="space-y-6">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm mb-1">Title</label>
-                                <input className="w-full border p-2 rounded" value={editData.title} onChange={e => setEditData('title', e.target.value)} />
-                                {editErrors.title && <div className="text-red-500 text-sm">{editErrors.title}</div>}
-                            </div>
-                            <div>
-                                <label className="block text-sm mb-1">Author(s)</label>
-                                <input className="w-full border p-2 rounded" value={editData.author} onChange={e => setEditData('author', e.target.value)} />
-                                {editErrors.author && <div className="text-red-500 text-sm">{editErrors.author}</div>}
-                            </div>
-                        </div>
-                        <div>
-                            <label className="block text-sm mb-1">Abstract</label>
-                            <textarea className="w-full border p-2 rounded" rows="4" value={editData.abstract} onChange={e => setEditData('abstract', e.target.value)} />
-                            {editErrors.abstract && <div className="text-red-500 text-sm">{editErrors.abstract}</div>}
-                        </div>
-                        <div className="grid grid-cols-3 gap-4">
-                            <div>
-                                <label className="block text-sm mb-1">Keywords</label>
-                                <input className="w-full border p-2 rounded" value={editData.keywords} onChange={e => setEditData('keywords', e.target.value)} />
-                            </div>
-                            <div>
-                                <label className="block text-sm mb-1">DOI</label>
-                                <input className="w-full border p-2 rounded" value={editData.doi} onChange={e => setEditData('doi', e.target.value)} />
-                            </div>
-                            <div>
-                                <label className="block text-sm mb-1">Pages</label>
-                                <input className="w-full border p-2 rounded" placeholder="e.g. 1-10" value={editData.pages} onChange={e => setEditData('pages', e.target.value)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm mb-1">Published Date</label>
-                                <input type="date" className="w-full border p-2 rounded" value={editData.published_date} onChange={e => setEditData('published_date', e.target.value)} />
-                            </div>
-                            <div>
-                                <label className="block text-sm mb-1">Article PDF</label>
-                                <input type="file" className="w-full border p-2 rounded" onChange={e => setEditData('pdf', e.target.files[0])} />
-                                {editErrors.pdf && <div className="text-red-500 text-sm">{editErrors.pdf}</div>}
-                            </div>
-                        </div>
-                        <button className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-500/20">Update Article</button>
-                    </form>
+            <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={containerVariants}
+                className="max-w-6xl mx-auto space-y-8 pb-20"
+            >
+                <div className="flex items-center justify-between">
+                    <Link href={`/editor/journal/${issue.journal_id}/issues`} className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors group">
+                        <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" /> Back to Issues
+                    </Link>
                 </div>
-            ) : (
-                <div className="bg-white p-8 rounded-2xl mb-12 border border-slate-200 shadow-sm">
-                <h2 className="text-xl font-bold mb-8 text-slate-900">Add New Article</h2>
-                <form onSubmit={submit} className="space-y-6">
-                    <div className="grid grid-cols-2 gap-6">
-                        <div>
-                            <label className="block text-sm mb-1">Title</label>
-                            <input className="w-full border p-2 rounded" value={data.title} onChange={e => setData('title', e.target.value)} />
-                            {errors.title && <div className="text-red-500 text-sm">{errors.title}</div>}
-                        </div>
-                        <div>
-                            <label className="block text-sm mb-1">Author(s)</label>
-                            <input className="w-full border p-2 rounded" value={data.author} onChange={e => setData('author', e.target.value)} />
-                            {errors.author && <div className="text-red-500 text-sm">{errors.author}</div>}
-                        </div>
-                    </div>
-                    <div>
-                        <label className="block text-sm mb-1">Abstract</label>
-                        <textarea className="w-full border p-2 rounded" rows="4" value={data.abstract} onChange={e => setData('abstract', e.target.value)} />
-                        {errors.abstract && <div className="text-red-500 text-sm">{errors.abstract}</div>}
-                    </div>
-                    <div className="grid grid-cols-3 gap-4">
-                        <div>
-                            <label className="block text-sm mb-1">Keywords</label>
-                            <input className="w-full border p-2 rounded" value={data.keywords} onChange={e => setData('keywords', e.target.value)} />
-                        </div>
-                        <div>
-                            <label className="block text-sm mb-1">DOI</label>
-                            <input className="w-full border p-2 rounded" value={data.doi} onChange={e => setData('doi', e.target.value)} />
-                        </div>
-                        <div>
-                            <label className="block text-sm mb-1">Pages</label>
-                            <input className="w-full border p-2 rounded" placeholder="e.g. 1-10" value={data.pages} onChange={e => setData('pages', e.target.value)} />
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm mb-1">Published Date</label>
-                            <input type="date" className="w-full border p-2 rounded" value={data.published_date} onChange={e => setData('published_date', e.target.value)} />
-                        </div>
-                        <div>
-                            <label className="block text-sm mb-1">Article PDF</label>
-                            <input type="file" className="w-full border p-2 rounded" onChange={e => setData('pdf', e.target.files[0])} />
-                            {errors.pdf && <div className="text-red-500 text-sm">{errors.pdf}</div>}
-                        </div>
-                    </div>
-                    <button className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-500/20">Add Article</button>
-                </form>
-                </div>
-            )}
 
-            <div className="space-y-4">
-                <h2 className="text-xl font-bold mb-4">Existing Articles</h2>
-                {articles.map(article => (
-                    <div key={article.id} className="bg-white p-4 rounded shadow flex justify-between items-center">
-                        <div>
-                            <h4 className="font-bold">{article.title}</h4>
-                            <p className="text-sm text-gray-500">{article.author}</p>
+                {/* Header Section */}
+                <motion.div variants={itemVariants} className="bg-white/80 backdrop-blur-md p-8 rounded-[2rem] shadow-sm border border-slate-200/60 flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div className="flex items-center gap-5">
+                        <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+                            <Layers size={28} />
                         </div>
-                        <div className="flex gap-4">
-                            <button onClick={() => startEdit(article)} className="text-green-600 hover:underline">Edit</button>
+                        <div>
+                            <h1 className="text-2xl font-black text-slate-900 tracking-tight">Articles Manager</h1>
+                            <p className="text-slate-500 font-medium flex items-center gap-2 mt-1">
+                                <BookOpen size={16} className="text-blue-500" />
+                                Volume {issue.volume}, Issue {issue.issue} ({issue.year})
+                            </p>
                         </div>
                     </div>
-                ))}
-            </div>
+                    {!isFormVisible && !editingArticle && (
+                        <button
+                            onClick={() => setIsFormVisible(true)}
+                            className="w-full md:w-auto bg-slate-900 text-white px-8 py-4 rounded-2xl font-black shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all flex items-center justify-center gap-2 group"
+                        >
+                            <span>Add New Article</span>
+                            <Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" />
+                        </button>
+                    )}
+                </motion.div>
+
+                {/* Add/Edit Form */}
+                <AnimatePresence mode="wait">
+                    {(isFormVisible || editingArticle) && (
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="bg-white rounded-[2.5rem] p-8 lg:p-12 border-2 border-blue-100 shadow-2xl shadow-blue-500/5"
+                        >
+                            <div className="flex items-center justify-between mb-10">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
+                                        {editingArticle ? <Edit3 size={24} /> : <Plus size={24} />}
+                                    </div>
+                                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+                                        {editingArticle ? 'Edit Article Details' : 'Add New Article'}
+                                    </h2>
+                                </div>
+                                <button
+                                    onClick={() => {
+                                        setIsFormVisible(false);
+                                        setEditingArticle(null);
+                                        reset();
+                                        resetEdit();
+                                    }}
+                                    className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-400 hover:text-slate-600"
+                                >
+                                    <X size={24} />
+                                </button>
+                            </div>
+
+                            <form onSubmit={editingArticle ? submitEdit : submit} className="space-y-8">
+                                <div className="grid md:grid-cols-2 gap-8">
+                                    <InputGroup label="Article Title" icon={Type} error={editingArticle ? editErrors.title : errors.title}>
+                                        <textarea
+                                            className="w-full bg-slate-50 border-slate-200 rounded-2xl p-4 text-sm font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all min-h-[100px]"
+                                            placeholder="Enter full title..."
+                                            value={editingArticle ? editData.title : data.title}
+                                            onChange={e => (editingArticle ? setEditData('title', e.target.value) : setData('title', e.target.value))}
+                                        />
+                                    </InputGroup>
+                                    <InputGroup label="Author(s)" icon={Users} error={editingArticle ? editErrors.author : errors.author}>
+                                        <textarea
+                                            className="w-full bg-slate-50 border-slate-200 rounded-2xl p-4 text-sm font-bold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all min-h-[100px]"
+                                            placeholder="Split authors with ; or and..."
+                                            value={editingArticle ? editData.author : data.author}
+                                            onChange={e => (editingArticle ? setEditData('author', e.target.value) : setData('author', e.target.value))}
+                                        />
+                                    </InputGroup>
+                                </div>
+
+                                <InputGroup label="Abstract" icon={LayoutList} error={editingArticle ? editErrors.abstract : errors.abstract}>
+                                    <textarea
+                                        className="w-full bg-slate-50 border-slate-200 rounded-2xl p-5 text-sm font-medium leading-relaxed focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all min-h-[200px]"
+                                        placeholder="Enter article abstract..."
+                                        value={editingArticle ? editData.abstract : data.abstract}
+                                        onChange={e => (editingArticle ? setEditData('abstract', e.target.value) : setData('abstract', e.target.value))}
+                                    />
+                                </InputGroup>
+
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                                    <InputGroup label="DOI" icon={Hash}>
+                                        <input
+                                            className="w-full bg-slate-50 border-slate-200 rounded-xl p-3 text-sm font-bold"
+                                            value={editingArticle ? editData.doi : data.doi}
+                                            onChange={e => (editingArticle ? setEditData('doi', e.target.value) : setData('doi', e.target.value))}
+                                        />
+                                    </InputGroup>
+                                    <InputGroup label="Pages" icon={Search}>
+                                        <input
+                                            className="w-full bg-slate-50 border-slate-200 rounded-xl p-3 text-sm font-bold"
+                                            placeholder="e.g. 15-28"
+                                            value={editingArticle ? editData.pages : data.pages}
+                                            onChange={e => (editingArticle ? setEditData('pages', e.target.value) : setData('pages', e.target.value))}
+                                        />
+                                    </InputGroup>
+                                    <InputGroup label="Keywords" icon={Layers}>
+                                        <input
+                                            className="w-full bg-slate-50 border-slate-200 rounded-xl p-3 text-sm font-bold"
+                                            placeholder="comma separated"
+                                            value={editingArticle ? editData.keywords : data.keywords}
+                                            onChange={e => (editingArticle ? setEditData('keywords', e.target.value) : setData('keywords', e.target.value))}
+                                        />
+                                    </InputGroup>
+                                    <InputGroup label="Published Date" icon={Calendar}>
+                                        <input
+                                            type="date"
+                                            className="w-full bg-slate-50 border-slate-200 rounded-xl p-3 text-sm font-bold"
+                                            value={editingArticle ? editData.published_date : data.published_date}
+                                            onChange={e => (editingArticle ? setEditData('published_date', e.target.value) : setData('published_date', e.target.value))}
+                                        />
+                                    </InputGroup>
+                                </div>
+
+                                <div className="p-8 bg-blue-50/50 rounded-3xl border border-blue-100 flex flex-col md:flex-row items-center justify-between gap-6">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-blue-600 shadow-sm">
+                                            <FileUp size={24} />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-black text-slate-900">Article Manuscript (PDF)</p>
+                                            <p className="text-xs font-medium text-slate-500">Ensure the file is web-optimized.</p>
+                                        </div>
+                                    </div>
+                                    <div className="relative group">
+                                        <input
+                                            type="file"
+                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                            onChange={e => (editingArticle ? setEditData('pdf', e.target.files[0]) : setData('pdf', e.target.files[0]))}
+                                        />
+                                        <div className="bg-white px-6 py-3 rounded-xl border border-slate-200 font-bold text-xs group-hover:border-blue-400 group-hover:text-blue-600 transition-all flex items-center gap-2">
+                                            <FileUp size={16} /> Choose File
+                                        </div>
+                                    </div>
+                                    {(editingArticle ? editErrors.pdf : errors.pdf) && <div className="text-rose-500 text-[10px] font-black uppercase">{editingArticle ? editErrors.pdf : errors.pdf}</div>}
+                                </div>
+
+                                <div className="flex justify-end gap-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setIsFormVisible(false);
+                                            setEditingArticle(null);
+                                        }}
+                                        className="px-8 py-4 rounded-2xl font-black text-slate-500 hover:bg-slate-100 transition-all uppercase tracking-widest text-xs"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={processing || editProcessing}
+                                        className="bg-blue-600 text-white px-10 py-4 rounded-2xl font-black shadow-xl shadow-blue-500/20 hover:bg-blue-700 transition-all flex items-center gap-2 group disabled:opacity-50"
+                                    >
+                                        <Save size={18} />
+                                        <span>{editingArticle ? 'Update Article' : 'Save Article'}</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* Articles List */}
+                <motion.div variants={itemVariants} className="space-y-6">
+                    <div className="flex items-center justify-between px-4">
+                        <h2 className="text-xl font-black text-slate-800 flex items-center gap-2">
+                            <LayoutList size={20} className="text-blue-600" />
+                            Publication Content
+                        </h2>
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{articles.length} Manuscripts</span>
+                    </div>
+
+                    <div className="grid gap-4">
+                        {articles.length > 0 ? articles.map(article => (
+                            <motion.div
+                                key={article.id}
+                                whileHover={{ y: -2 }}
+                                className="bg-white p-6 rounded-3xl border border-slate-200/60 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6 group hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300"
+                            >
+                                <div className="flex items-start gap-5 flex-1">
+                                    <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+                                        <FileText size={24} />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-black text-slate-900 group-hover:text-blue-700 transition-colors leading-tight mb-1">{article.title}</h4>
+                                        <p className="text-xs font-bold text-slate-500 flex items-center gap-2">
+                                            <Users size={12} className="text-blue-400" /> {article.author}
+                                        </p>
+                                        <div className="flex items-center gap-4 mt-3">
+                                            <span className="text-[10px] font-black text-slate-400 bg-slate-50 px-2 py-0.5 rounded uppercase tracking-widest">PP. {article.pages || 'N/A'}</span>
+                                            {article.doi && <span className="text-[10px] font-black text-blue-400 bg-blue-50 px-2 py-0.5 rounded uppercase tracking-widest">DOI: {article.doi}</span>}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2 w-full md:w-auto self-end md:self-center">
+                                    <button
+                                        onClick={() => startEdit(article)}
+                                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-50 text-emerald-700 rounded-xl border border-emerald-100 font-black text-xs uppercase tracking-widest hover:bg-emerald-600 hover:text-white transition-all duration-300"
+                                    >
+                                        <Edit3 size={14} /> Edit
+                                    </button>
+                                    <a
+                                        href={article.pdf_link_url}
+                                        target="_blank"
+                                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-50 text-slate-600 rounded-xl border border-slate-200 font-black text-xs uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all duration-300"
+                                    >
+                                        <Search size={14} /> View PDF
+                                    </a>
+                                </div>
+                            </motion.div>
+                        )) : (
+                            <div className="bg-white/50 border-2 border-dashed border-slate-200 rounded-[2.5rem] py-20 text-center">
+                                <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
+                                    <FileText size={32} />
+                                </div>
+                                <p className="text-lg font-black text-slate-900">No articles yet</p>
+                                <p className="text-slate-500 font-medium">Click "Add New Article" to populate this issue.</p>
+                            </div>
+                        )}
+                    </div>
+                </motion.div>
+            </motion.div>
         </BackendLayout>
     );
 }

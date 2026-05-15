@@ -1,59 +1,161 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
+import { motion } from 'framer-motion';
+import {
+    Plus,
+    Globe,
+    Edit3,
+    BookOpen,
+    Users,
+    ChevronRight,
+    Search,
+    LayoutGrid,
+    CheckCircle2,
+    Clock,
+    XCircle
+} from 'lucide-react';
 import BackendLayout from '@/Layouts/BackendLayout';
+import { cn } from '@/lib/utils';
 
 export default function List({ journals }) {
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: { staggerChildren: 0.1 }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.4, ease: "easeOut" }
+        }
+    };
+
     return (
         <BackendLayout title="Manage Journals">
             <Head title="Manage Journals" />
-            <div className="flex flex-col sm:flex-row justify-between items-center mb-10 bg-white p-6 rounded-xl shadow-sm border border-slate-200 gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-900">Your Journals</h1>
-                    <p className="text-slate-500">Manage your journal publications and issues</p>
-                </div>
-                <Link href="/editor/journal/create" className="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-500/20">Add Journal</Link>
-            </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <table className="w-full text-left">
-                    <thead className="bg-gray-50 border-b border-gray-100">
-                        <tr>
-                            <th className="px-6 py-4 font-bold text-gray-600 uppercase text-xs tracking-wider">Journal Title</th>
-                            <th className="px-6 py-4 font-bold text-gray-600 uppercase text-xs tracking-wider">Status</th>
-                            <th className="px-6 py-4 font-bold text-gray-600 uppercase text-xs tracking-wider text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-50">
-                        {journals.length > 0 ? journals.map(journal => (
-                            <tr key={journal.id} className="hover:bg-gray-50 transition">
-                                <td className="px-6 py-4">
-                                    <div className="font-bold text-gray-900">{journal.journal_title}</div>
-                                    <div className="text-xs text-gray-400">ID: #{journal.id}</div>
-                                </td>
-                                <td className="px-6 py-4">
-                                    <span className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${
-                                        journal.status === 'approved' ? 'bg-green-100 text-green-700' : 
-                                        journal.status === 'rejected' ? 'bg-red-100 text-red-700' : 
-                                        'bg-yellow-100 text-yellow-700'
-                                    }`}>
-                                        {journal.status}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-4 text-right">
-                                    <div className="flex justify-end gap-3 font-bold text-sm">
-                                        <Link href={`/journal/${journal.id}`} className="text-blue-900 hover:underline">View Website</Link>
-                                        <Link href={`/editor/journal/${journal.id}/edit`} className="text-gray-600 hover:underline">Edit</Link>
-                                        <Link href={`/editor/journal/${journal.id}/issues`} className="text-green-600 hover:underline">Issues</Link>
-                                        <Link href={`/editor/journal/${journal.id}/board`} className="text-purple-600 hover:underline">Board</Link>
-                                    </div>
-                                </td>
-                            </tr>
-                        )) : (
-                            <tr><td colSpan="3" className="p-10 text-center text-gray-400 italic">No journals found for your department.</td></tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
+            <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={containerVariants}
+                className="space-y-8"
+            >
+                {/* Header Section */}
+                <motion.div
+                    variants={itemVariants}
+                    className="flex flex-col md:flex-row justify-between items-center bg-white/80 backdrop-blur-md p-8 rounded-[2rem] shadow-sm border border-slate-200/60 gap-6"
+                >
+                    <div className="flex items-center gap-5">
+                        <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+                            <LayoutGrid size={28} />
+                        </div>
+                        <div>
+                            <h1 className="text-2xl font-black text-slate-900 tracking-tight">Your Journals</h1>
+                            <p className="text-slate-500 font-medium">Oversee and update your department's scholarly publications.</p>
+                        </div>
+                    </div>
+                    <Link
+                        href="/editor/journal/create"
+                        className="w-full md:w-auto bg-slate-900 text-white px-8 py-4 rounded-2xl font-black shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all flex items-center justify-center gap-2 group"
+                    >
+                        <span>Add New Journal</span>
+                        <Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" />
+                    </Link>
+                </motion.div>
+
+                {/* Table Section */}
+                <motion.div variants={itemVariants} className="bg-white rounded-[2rem] shadow-sm border border-slate-200/60 overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-slate-50/50 border-b border-slate-100">
+                                    <th className="px-8 py-5 font-black text-slate-500 uppercase text-[10px] tracking-[0.2em]">Journal Information</th>
+                                    <th className="px-8 py-5 font-black text-slate-500 uppercase text-[10px] tracking-[0.2em]">Publication Status</th>
+                                    <th className="px-8 py-5 font-black text-slate-500 uppercase text-[10px] tracking-[0.2em] text-right">Management Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-50">
+                                {journals.length > 0 ? journals.map(journal => (
+                                    <tr key={journal.id} className="hover:bg-blue-50/30 transition-colors group">
+                                        <td className="px-8 py-6">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 font-black group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                                                    {journal.journal_title.charAt(0).toUpperCase()}
+                                                </div>
+                                                <div>
+                                                    <div className="font-black text-slate-900 group-hover:text-blue-700 transition-colors">{journal.journal_title}</div>
+                                                    <div className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-tighter bg-slate-50 px-2 py-0.5 rounded w-fit group-hover:bg-blue-50 transition-colors">
+                                                        Ref ID: #{journal.id}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-6">
+                                            <div className="flex items-center gap-2">
+                                                {journal.status === 'approved' ? (
+                                                    <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-100 text-[10px] font-black uppercase tracking-wider">
+                                                        <CheckCircle2 size={12} /> Approved
+                                                    </div>
+                                                ) : journal.status === 'rejected' ? (
+                                                    <div className="flex items-center gap-1.5 px-3 py-1 bg-rose-50 text-rose-700 rounded-full border border-rose-100 text-[10px] font-black uppercase tracking-wider">
+                                                        <XCircle size={12} /> Rejected
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 rounded-full border border-amber-100 text-[10px] font-black uppercase tracking-wider">
+                                                        <Clock size={12} className="animate-pulse" /> Pending
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-6">
+                                            <div className="flex justify-end gap-2">
+                                                {[
+                                                    { href: `/journal/${journal.id}`, icon: Globe, label: 'Public Site', color: 'hover:text-blue-600' },
+                                                    { href: `/editor/journal/${journal.id}/edit`, icon: Edit3, label: 'Edit Info', color: 'hover:text-indigo-600' },
+                                                    { href: `/editor/journal/${journal.id}/issues`, icon: BookOpen, label: 'Issues', color: 'hover:text-emerald-600' },
+                                                    { href: `/editor/journal/${journal.id}/board`, icon: Users, label: 'Board', color: 'hover:text-purple-600' }
+                                                ].map((action, idx) => (
+                                                    <Link
+                                                        key={idx}
+                                                        href={action.href}
+                                                        className={cn(
+                                                            "p-2.5 bg-slate-50 text-slate-400 rounded-xl transition-all duration-300 border border-slate-100 flex items-center gap-2 font-bold text-xs hover:bg-white hover:shadow-lg hover:shadow-slate-200/50",
+                                                            action.color
+                                                        )}
+                                                        title={action.label}
+                                                    >
+                                                        <action.icon size={16} />
+                                                        <span className="hidden xl:inline">{action.label}</span>
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )) : (
+                                    <tr>
+                                        <td colSpan="3" className="px-8 py-20 text-center">
+                                            <div className="flex flex-col items-center gap-4">
+                                                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300">
+                                                    <Search size={32} />
+                                                </div>
+                                                <div>
+                                                    <p className="text-lg font-bold text-slate-900">No journals found</p>
+                                                    <p className="text-slate-500 font-medium">Get started by creating your first academic publication.</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </motion.div>
+            </motion.div>
         </BackendLayout>
     );
 }
