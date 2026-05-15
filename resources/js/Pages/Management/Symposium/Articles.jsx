@@ -10,6 +10,7 @@ export default function Articles({ abstractBook, articles }) {
         author: '',
         abstract: '',
         keywords: '',
+        pages: '',
         year: abstractBook.year,
         pdf: null,
     });
@@ -19,6 +20,7 @@ export default function Articles({ abstractBook, articles }) {
         author: '',
         abstract: '',
         keywords: '',
+        pages: '',
         year: abstractBook.year,
         pdf: null,
         _method: 'POST'
@@ -27,7 +29,7 @@ export default function Articles({ abstractBook, articles }) {
     const submit = (e) => {
         e.preventDefault();
         post(`/editor/symposium/abstract-book/${abstractBook.id}/articles`, {
-            onSuccess: () => reset('title', 'author', 'abstract', 'keywords', 'pdf'),
+            onSuccess: () => reset('title', 'author', 'abstract', 'keywords', 'pages', 'pdf'),
             forceFormData: true,
         });
     };
@@ -39,6 +41,7 @@ export default function Articles({ abstractBook, articles }) {
             author: article.author || '',
             abstract: article.abstract || '',
             keywords: article.keywords || '',
+            pages: article.pages || '',
             year: article.year || abstractBook.year,
             pdf: null,
         });
@@ -121,6 +124,10 @@ export default function Articles({ abstractBook, articles }) {
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-1">Keywords</label>
                             <input className="w-full border border-slate-200 rounded-lg p-2" value={editingArticle ? editData.keywords : data.keywords} onChange={e => editingArticle ? setEditData('keywords', e.target.value) : setData('keywords', e.target.value)} />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Pages</label>
+                            <input placeholder="e.g. 10-15" className="w-full border border-slate-200 rounded-lg p-2" value={editingArticle ? editData.pages : data.pages} onChange={e => editingArticle ? setEditData('pages', e.target.value) : setData('pages', e.target.value)} />
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-1">Article PDF</label>

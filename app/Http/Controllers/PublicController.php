@@ -225,7 +225,9 @@ class PublicController extends Controller
 
         return Inertia::render('Publications/Article', [
             'article' => $article,
-            'journal' => $publication, // Keeping the prop name 'journal' for frontend compatibility or rename if possible
+            'journal' => $article->issue_id ? $publication : null,
+            'conference' => $article->conference_proceeding_id ? $publication : null,
+            'symposium' => $article->symposium_proceeding_id ? $publication : null,
         ]);
     }
 

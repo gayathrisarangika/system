@@ -220,6 +220,7 @@ class ConferenceManagementController extends Controller
             'abstract' => 'required',
             'keywords' => 'nullable',
             'year' => 'required|integer',
+            'pages' => 'nullable',
             'pdf' => 'required|file|mimes:pdf',
         ]);
 
@@ -241,6 +242,7 @@ class ConferenceManagementController extends Controller
             'abstract' => 'required',
             'keywords' => 'nullable',
             'year' => 'required|integer',
+            'pages' => 'nullable',
             'pdf' => 'nullable|file|mimes:pdf',
         ]);
 

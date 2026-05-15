@@ -23,16 +23,20 @@ import { cn } from "@/lib/utils";
 
 export default function Article({ article, journal, conference, symposium }) {
     const [copied, setCopied] = useState(false);
+    const [linkCopied, setLinkCopied] = useState(false);
     const [activeTab, setActiveTab] = useState("abstract");
+    const [citationStyle, setCitationStyle] = useState("IEEE");
     
     const publication = journal || conference || symposium;
     const type = journal ? 'journal' : (conference ? 'conference' : 'symposium');
 
     // Process authors for display
-    const authors = article.author ? article.author.split(/,|\band\b/).map(s => s.trim()) : [];
+    const authors = article.author 
+        ? article.author.split(/,(?![^()]*\))|\band\b/).map(s => s.trim()).filter(s => s !== "")
+        : [];
 
     const handleCopyCitation = () => {
-        const citation = document.getElementById('citation-text')?.innerText;
+        const citation = citationStyle === "IEEE" ? citationIEEE : citationAPA;
         if (citation) {
             navigator.clipboard.writeText(citation);
             setCopied(true);
@@ -40,13 +44,53 @@ export default function Article({ article, journal, conference, symposium }) {
         }
     };
 
-    const citationIEEE = `${authors.length > 3 ? authors[0] + " et al." : authors.join(", ")}, "${article.title}," ${publication?.journal_title || publication?.conference_title || publication?.symposium_title}, ${article.issue ? `vol. ${article.issue.volume}, no. ${article.issue.issue},` : ''} ${article.conference_proceeding ? 'Conference Proceedings,' : ''} ${article.symposium_proceeding ? 'Symposium Proceedings,' : ''} pp. ${article.pages || '??'}, ${article.year}.`;
+    const handleCopyLink = () => {
+        navigator.clipboard.writeText(window.location.href);
+        setLinkCopied(true);
+        setTimeout(() => setLinkCopied(false), 2000);
+    };
+
+    const shareOnFacebook = () => {
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank');
+    };
+
+    const shareOnLinkedIn = () => {
+        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`, '_blank');
+    };
+
+    const formatAuthorIEEE = (author) => {
+        const parts = author.replace(/[0-9*]/g, '').trim().split(' ');
+        if (parts.length === 1) return parts[0];
+        const lastName = parts[parts.length - 1];
+        const initials = parts.slice(0, -1).map(p => p[0] + ".").join(" ");
+        return `${initials} ${lastName}`;
+    };
+
+    const formatAuthorAPA = (author) => {
+        const parts = author.replace(/[0-9*]/g, '').trim().split(' ');
+        if (parts.length === 1) return parts[0];
+        const lastName = parts[parts.length - 1];
+        const initials = parts.slice(0, -1).map(p => p[0] + ".").join(". ");
+        return `${lastName}, ${initials}.`;
+    };
+
+    const authorsIEEE = authors.length > 3 
+        ? `${formatAuthorIEEE(authors[0])} et al.` 
+        : authors.map((a, i) => (i === authors.length - 1 && i > 0 ? "and " : "") + formatAuthorIEEE(a)).join(authors.length > 2 ? ", " : " ");
+
+    const authorsAPA = authors.length > 7
+        ? `${authors.slice(0, 6).map(formatAuthorAPA).join(", ")}, ... ${formatAuthorAPA(authors[authors.length - 1])}`
+        : authors.map((a, i) => (i === authors.length - 1 && i > 0 ? "& " : "") + formatAuthorAPA(a)).join(authors.length > 2 ? ", " : " ");
+
+    const pubTitle = publication?.journal_title || publication?.conference_title || publication?.symposium_title;
+    const citationIEEE = `${authorsIEEE}, "${article.title}," ${pubTitle}, ${article.issue ? `vol. ${article.issue.volume}, no. ${article.issue.issue},` : ''} pp. ${article.pages || '??'}, ${article.year}.`;
+    const citationAPA = `${authorsAPA} (${article.year}). ${article.title}. ${pubTitle}${article.issue ? `, ${article.issue.volume}(${article.issue.issue})` : ''}, ${article.pages || '??'}.`;
 
     const breadcrumbLinks = [
         { label: "Archive", href: `/${type}/${publication.id}/archive` },
         { 
-            label: article.issue ? `Vol. ${article.issue.volume} No. ${article.issue.issue}` : (article.conference_proceeding ? 'Abstract Book' : 'Abstract Book'), 
-            href: `/${type}/${publication.id}/archive#${article.issue ? `issue-${article.issue.id}` : (article.conference_proceeding ? `proceeding-${article.conference_proceeding.id}` : `proceeding-${article.symposium_proceeding.id}`)}` 
+            label: article.issue ? `Vol. ${article.issue.volume} No. ${article.issue.issue}` : 'Abstract Book', 
+            href: `/${type}/${publication.id}/archive#${article.issue ? `issue-${article.issue.id}` : (article.conference_proceeding_id ? `proceeding-${article.conference_proceeding_id}` : `proceeding-${article.symposium_proceeding_id}`)}` 
         },
         { label: "Article Details", href: "#" }
     ];
@@ -61,7 +105,7 @@ export default function Article({ article, journal, conference, symposium }) {
                 {/* Academic Meta Tags */}
                 <meta name="citation_title" content={article.title} />
                 {authors.map((author, index) => (
-                    <meta key={index} name="citation_author" content={author.replace(/[*0-9]/g, '')} />
+                    <meta key={index} name="citation_author" content={author.replace(/[0-9*]/g, '')} />
                 ))}
                 <meta name="citation_publication_date" content={article.year} />
                 <meta name="citation_journal_title" content={publication.journal_title || publication.conference_title || publication.symposium_title} />
@@ -115,12 +159,7 @@ export default function Article({ article, journal, conference, symposium }) {
                                                 <User className="h-4 w-4 text-slate-500 group-hover:text-blue-600" />
                                             </div>
                                             <span className="font-medium text-slate-900">
-                                                {author.split('*').map((part, i) => (
-                                                    <React.Fragment key={i}>
-                                                        {part}
-                                                        {i < author.split('*').length - 1 && <sup className="text-blue-600 font-bold">*</sup>}
-                                                    </React.Fragment>
-                                                ))}
+                                                {author.replace(/[0-9*]/g, '').trim()}
                                             </span>
                                         </div>
                                     ))}
@@ -219,21 +258,37 @@ export default function Article({ article, journal, conference, symposium }) {
 
                         {/* Citation Card */}
                         <section className="bg-slate-900 rounded-3xl p-8 text-white">
-                            <div className="flex items-center justify-between mb-6">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
                                 <div className="flex items-center">
                                     <Quote className="h-6 w-6 text-blue-400 mr-3" />
                                     <h3 className="text-xl font-bold">How to Cite</h3>
                                 </div>
-                                <button 
-                                    onClick={handleCopyCitation}
-                                    className="flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-sm font-medium border border-white/10"
-                                >
-                                    {copied ? <Check className="h-4 w-4 mr-2 text-green-400" /> : <Copy className="h-4 w-4 mr-2" />}
-                                    {copied ? 'Copied!' : 'Copy IEEE'}
-                                </button>
+                                
+                                <div className="flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/10">
+                                    <button 
+                                        onClick={() => setCitationStyle("IEEE")}
+                                        className={cn("px-4 py-1.5 rounded-lg text-xs font-bold transition-all", citationStyle === "IEEE" ? "bg-blue-600 text-white shadow-lg" : "text-slate-400 hover:text-white")}
+                                    >
+                                        IEEE
+                                    </button>
+                                    <button 
+                                        onClick={() => setCitationStyle("APA")}
+                                        className={cn("px-4 py-1.5 rounded-lg text-xs font-bold transition-all", citationStyle === "APA" ? "bg-blue-600 text-white shadow-lg" : "text-slate-400 hover:text-white")}
+                                    >
+                                        APA
+                                    </button>
+                                    <div className="w-px h-4 bg-white/10 mx-1" />
+                                    <button 
+                                        onClick={handleCopyCitation}
+                                        className="flex items-center px-3 py-1.5 hover:bg-white/10 rounded-lg transition-colors text-xs font-bold"
+                                    >
+                                        {copied ? <Check className="h-3.5 w-3.5 mr-1.5 text-green-400" /> : <Copy className="h-3.5 w-3.5 mr-1.5" />}
+                                        {copied ? 'Copied!' : 'Copy'}
+                                    </button>
+                                </div>
                             </div>
-                            <div id="citation-text" className="text-slate-300 leading-relaxed font-mono text-sm bg-black/20 p-6 rounded-2xl border border-white/5">
-                                {citationIEEE}
+                            <div className="text-slate-300 leading-relaxed font-mono text-sm bg-black/20 p-6 rounded-2xl border border-white/5">
+                                {citationStyle === "IEEE" ? citationIEEE : citationAPA}
                             </div>
                         </section>
                     </div>
@@ -265,14 +320,27 @@ export default function Article({ article, journal, conference, symposium }) {
                                 Share Article
                             </h3>
                             <div className="grid grid-cols-3 gap-4">
-                                <button className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 transition-colors">
+                                <button 
+                                    onClick={shareOnFacebook}
+                                    title="Share on Facebook"
+                                    className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 transition-colors"
+                                >
                                     <Send className="h-6 w-6" />
                                 </button>
-                                <button className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 transition-colors">
+                                <button 
+                                    onClick={shareOnLinkedIn}
+                                    title="Share on LinkedIn"
+                                    className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 transition-colors"
+                                >
                                     <Link2 className="h-6 w-6" />
                                 </button>
-                                <button className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 transition-colors">
-                                    <Mail className="h-6 w-6" />
+                                <button 
+                                    onClick={handleCopyLink}
+                                    title="Copy Link"
+                                    className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 transition-colors relative"
+                                >
+                                    {linkCopied ? <Check className="h-6 w-6 text-green-600" /> : <Copy className="h-6 w-6" />}
+                                    {linkCopied && <span className="absolute -top-8 bg-slate-800 text-white text-[10px] py-1 px-2 rounded">Copied!</span>}
                                 </button>
                             </div>
                         </div>
