@@ -19,7 +19,7 @@ import {
     Link2,
     Mail
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, splitAuthors } from "@/lib/utils";
 
 export default function Article({ article, journal, conference, symposium }) {
     const [copied, setCopied] = useState(false);
@@ -31,9 +31,7 @@ export default function Article({ article, journal, conference, symposium }) {
     const type = journal ? 'journal' : (conference ? 'conference' : 'symposium');
 
     // Process authors for display
-    const authors = article.author 
-        ? article.author.split(/\s*;\s*|\s+and\s+|\s+&\s+/i).map(s => s.trim()).filter(s => s !== "")
-        : [];
+    const authors = splitAuthors(article.author, true);
 
     const handleCopyCitation = () => {
         const citation = citationStyle === "IEEE" ? citationIEEE : citationAPA;
@@ -60,19 +58,18 @@ export default function Article({ article, journal, conference, symposium }) {
 
     const getInitials = (name) => {
         if (!name) return "";
-        // Clean and handle already initial-like strings (e.g., "P.A.D.P.")
-        const cleaned = name.replace(/[0-9*]/g, '').trim();
-        const parts = cleaned.split(/[\s.]+/).filter(p => p.length > 0);
+        // Already cleaned by splitAuthors(..., true)
+        const parts = name.split(/[\s.]+/).filter(p => p.length > 0);
         return parts.map(p => p[0].toUpperCase() + ".").join(" ");
     };
 
     const parseAuthor = (author) => {
-        const cleaned = author.replace(/[0-9*]/g, '').trim();
-        if (cleaned.includes(',')) {
-            const parts = cleaned.split(',').map(s => s.trim());
+        // Already cleaned by splitAuthors(..., true)
+        if (author.includes(',')) {
+            const parts = author.split(',').map(s => s.trim());
             return { surname: parts[0], given: parts.slice(1).join(', ') };
         } else {
-            const parts = cleaned.split(/\s+/);
+            const parts = author.split(/\s+/);
             if (parts.length === 1) return { surname: parts[0], given: "" };
             return { surname: parts[parts.length - 1], given: parts.slice(0, -1).join(' ') };
         }
@@ -135,7 +132,7 @@ export default function Article({ article, journal, conference, symposium }) {
                 {/* Academic Meta Tags */}
                 <meta name="citation_title" content={article.title} />
                 {authors.map((author, index) => (
-                    <meta key={index} name="citation_author" content={author.replace(/[0-9*]/g, '')} />
+                    <meta key={index} name="citation_author" content={author} />
                 ))}
                 <meta name="citation_publication_date" content={article.year} />
                 <meta name="citation_journal_title" content={publication.journal_title || publication.conference_title || publication.symposium_title} />
@@ -189,7 +186,7 @@ export default function Article({ article, journal, conference, symposium }) {
                                                 <User className="h-4 w-4 text-slate-500 group-hover:text-blue-600" />
                                             </div>
                                             <span className="font-medium text-slate-900">
-                                                {author.replace(/[0-9*]/g, '').trim()}
+                                                {author}
                                             </span>
                                         </div>
                                     ))}
