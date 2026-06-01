@@ -118,7 +118,8 @@ export default function List({ symposiums }) {
                                                     { href: `/symposium/${symp.id}`, icon: Globe, label: 'Public Site', color: 'hover:text-blue-600' },
                                                     { href: `/editor/symposium/${symp.id}/edit`, icon: Edit3, label: 'Edit Info', color: 'hover:text-indigo-600' },
                                                     { href: `/editor/symposium/${symp.id}/abstract-books`, icon: BookOpen, label: 'Abstract Books', color: 'hover:text-emerald-600' },
-                                                    { href: `/editor/symposium/${symp.id}/committee`, icon: Users, label: 'Committee', color: 'hover:text-purple-600' }
+                                                    { href: `/editor/symposium/${symp.id}/committee`, icon: Users, label: 'Committee', color: 'hover:text-purple-600' },
+                                                    { href: `/editor/symposium/${symp.id}/gallery`, icon: ImageIcon, label: 'Gallery', color: 'hover:text-amber-600' }
                                                 ].map((action, idx) => (
                                                     <Link 
                                                         key={idx}
