@@ -87,138 +87,179 @@ export default function Archive({ journal, conference, symposium, is_current = f
                             </h2>
                         </motion.div>
 
-                        <div className="space-y-12">
+                        <div className={is_current ? "space-y-12" : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12"}>
                             {items && items.length > 0 ? (
                                 items.map((item, idx) => (
-                                    <motion.div 
-                                        key={item.id} 
-                                        variants={itemVariants}
-                                        id={journal ? `issue-${item.id}` : `proceeding-${item.id}`} 
-                                        className="bg-white/70 backdrop-blur-xl rounded-[2.5rem] border border-white/40 shadow-xl shadow-slate-200/50 overflow-hidden"
-                                    >
-                                        <div className="flex flex-col md:flex-row">
-                                            {/* Cover Image Section */}
-                                            <div 
-                                                className="w-full md:w-64 bg-slate-100 relative group cursor-pointer overflow-hidden"
-                                                onClick={() => toggleExpand(item.id)}
-                                            >
-                                                {item.cover_image_url ? (
-                                                    <img 
-                                                        src={item.cover_image_url} 
-                                                        alt={`${itemLabel} Cover`} 
-                                                        className="w-full h-full object-cover aspect-[3/4] transition-transform duration-500 group-hover:scale-105"
-                                                    />
-                                                ) : (
-                                                    <div className="w-full h-full aspect-[3/4] bg-blue-900 flex items-center justify-center p-6 text-center">
-                                                        <span className="text-white text-xs font-bold leading-tight uppercase tracking-widest">
-                                                            {title}
-                                                        </span>
-                                                    </div>
-                                                )}
-                                                <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                    <div className="bg-white/20 backdrop-blur-md p-3 rounded-full text-white border border-white/30">
-                                                        {expandedItemId === item.id ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* Details Section */}
-                                            <div className="flex-1 flex flex-col">
-                                                <div className="bg-slate-900/5 px-8 py-6 border-b border-white/40 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                                                    <div className="cursor-pointer" onClick={() => toggleExpand(item.id)}>
-                                                        <h3 className="text-xl font-black text-slate-900 flex items-center gap-3">
-                                                            <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div>
-                                                            {journal ? `Vol. ${item.volume} No. ${item.issue} (${item.year})` : `${item.version} (${item.year})`}
-                                                        </h3>
-                                                        <div className="flex items-center gap-4 mt-2">
-                                                            <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-slate-400">
-                                                                <Calendar size={12} /> {item.year}
+                                    is_current ? (
+                                        <motion.div 
+                                            key={item.id} 
+                                            variants={itemVariants}
+                                            id={journal ? `issue-${item.id}` : `proceeding-${item.id}`} 
+                                            className="bg-white/70 backdrop-blur-xl rounded-[2.5rem] border border-white/40 shadow-xl shadow-slate-200/50 overflow-hidden"
+                                        >
+                                            <div className="flex flex-col md:flex-row">
+                                                {/* Cover Image Section */}
+                                                <div 
+                                                    className="w-full md:w-64 bg-slate-100 relative group cursor-pointer overflow-hidden"
+                                                    onClick={() => toggleExpand(item.id)}
+                                                >
+                                                    {item.cover_image_url ? (
+                                                        <img 
+                                                            src={item.cover_image_url} 
+                                                            alt={`${itemLabel} Cover`} 
+                                                            className="w-full h-full object-cover aspect-[3/4] transition-transform duration-500 group-hover:scale-105"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full aspect-[3/4] bg-blue-900 flex items-center justify-center p-6 text-center">
+                                                            <span className="text-white text-xs font-bold leading-tight uppercase tracking-widest">
+                                                                {title}
                                                             </span>
-                                                            {journal && (
-                                                                <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-slate-400">
-                                                                    <Hash size={12} /> Vol {item.volume} Issue {item.issue}
-                                                                </span>
-                                                            )}
+                                                        </div>
+                                                    )}
+                                                    <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                        <div className="bg-white/20 backdrop-blur-md p-3 rounded-full text-white border border-white/30">
+                                                            {expandedItemId === item.id ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
                                                         </div>
                                                     </div>
-                                                    <div className="flex gap-3">
-                                                        {item.pdf_link_url && (
-                                                            <a 
-                                                                href={item.pdf_link_url} 
-                                                                target="_blank" 
-                                                                className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20"
-                                                            >
-                                                                <Download size={14} />
-                                                                Full {itemLabel}
-                                                            </a>
-                                                        )}
-                                                        <button
-                                                            onClick={() => toggleExpand(item.id)}
-                                                            className="inline-flex items-center gap-2 bg-white text-slate-900 border border-slate-200 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm"
-                                                        >
-                                                            {expandedItemId === item.id ? 'Hide Articles' : 'Show Articles'}
-                                                            {expandedItemId === item.id ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                                                        </button>
-                                                    </div>
                                                 </div>
-                                                
-                                                <AnimatePresence>
-                                                    {expandedItemId === item.id && (
-                                                        <motion.div 
-                                                            initial={{ height: 0, opacity: 0 }}
-                                                            animate={{ height: "auto", opacity: 1 }}
-                                                            exit={{ height: 0, opacity: 0 }}
-                                                            transition={{ duration: 0.4, ease: "easeInOut" }}
-                                                            className="overflow-hidden"
-                                                        >
-                                                            <div className="p-8 lg:p-10 bg-white/50">
-                                                                <div className="space-y-10">
-                                                                    {item.articles && item.articles.length > 0 ? (
-                                                                        item.articles.map((article) => (
-                                                                            <div key={article.id} className="group">
-                                                                                <Link href={`/article/${article.id}`} className="block mb-3">
-                                                                                    <h4 className="text-xl font-black text-slate-900 group-hover:text-blue-600 transition-colors leading-tight tracking-tight">
-                                                                                        {article.title}
-                                                                                    </h4>
-                                                                                </Link>
-                                                                                <p className="text-slate-500 font-bold text-sm mb-4 flex items-center gap-2">
-                                                                                    <Users size={14} className="text-slate-400" />
-                                                                                    {splitAuthors(article.author, true).join(', ')}
-                                                                                </p>
-                                                                                <div className="flex flex-wrap gap-6 items-center">
-                                                                                    <Link 
-                                                                                        href={`/article/${article.id}`} 
-                                                                                        className="text-xs font-black text-blue-600 uppercase tracking-widest flex items-center gap-1 hover:gap-2 transition-all"
-                                                                                    >
-                                                                                        View Abstract <ChevronRight size={14} />
-                                                                                    </Link>
-                                                                                    {article.pdf_url && (
-                                                                                        <a 
-                                                                                            href={article.pdf_url} 
-                                                                                            target="_blank" 
-                                                                                            className="text-xs font-black text-slate-400 hover:text-slate-900 uppercase tracking-widest flex items-center gap-2 transition-all"
-                                                                                        >
-                                                                                            <FileText size={14} />
-                                                                                            PDF
-                                                                                        </a>
-                                                                                    )}
-                                                                                </div>
-                                                                            </div>
-                                                                        ))
-                                                                    ) : (
-                                                                        <div className="flex flex-col items-center justify-center py-12 text-slate-400 gap-3">
-                                                                            <FileText size={40} className="opacity-20" />
-                                                                            <p className="font-bold uppercase tracking-widest text-xs">No articles published in this {itemLabel.toLowerCase()}.</p>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
+
+                                                {/* Details Section */}
+                                                <div className="flex-1 flex flex-col">
+                                                    <div className="bg-slate-900/5 px-8 py-6 border-b border-white/40 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                                        <div className="cursor-pointer" onClick={() => toggleExpand(item.id)}>
+                                                            <h3 className="text-xl font-black text-slate-900 flex items-center gap-3">
+                                                                <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+                                                                {journal ? `Vol. ${item.volume} No. ${item.issue} (${item.year})` : `${item.version} (${item.year})`}
+                                                            </h3>
+                                                            <div className="flex items-center gap-4 mt-2">
+                                                                <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                                                    <Calendar size={12} /> {item.year}
+                                                                </span>
+                                                                {journal && (
+                                                                    <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                                                        <Hash size={12} /> Vol {item.volume} Issue {item.issue}
+                                                                    </span>
+                                                                )}
                                                             </div>
-                                                        </motion.div>
-                                                    )}
-                                                </AnimatePresence>
+                                                        </div>
+                                                        <div className="flex gap-3">
+                                                            {item.pdf_link_url && (
+                                                                <a 
+                                                                    href={item.pdf_link_url} 
+                                                                    target="_blank" 
+                                                                    className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20"
+                                                                >
+                                                                    <Download size={14} />
+                                                                    Full {itemLabel}
+                                                                </a>
+                                                            )}
+                                                            <button
+                                                                onClick={() => toggleExpand(item.id)}
+                                                                className="inline-flex items-center gap-2 bg-white text-slate-900 border border-slate-200 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm"
+                                                            >
+                                                                {expandedItemId === item.id ? 'Hide Articles' : 'Show Articles'}
+                                                                {expandedItemId === item.id ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <AnimatePresence>
+                                                        {expandedItemId === item.id && (
+                                                            <motion.div 
+                                                                initial={{ height: 0, opacity: 0 }}
+                                                                animate={{ height: "auto", opacity: 1 }}
+                                                                exit={{ height: 0, opacity: 0 }}
+                                                                transition={{ duration: 0.4, ease: "easeInOut" }}
+                                                                className="overflow-hidden"
+                                                            >
+                                                                <div className="p-8 lg:p-10 bg-white/50">
+                                                                    <div className="space-y-10">
+                                                                        {item.articles && item.articles.length > 0 ? (
+                                                                            item.articles.map((article) => (
+                                                                                <div key={article.id} className="group">
+                                                                                    <Link href={`/article/${article.id}`} className="block mb-3">
+                                                                                        <h4 className="text-xl font-black text-slate-900 group-hover:text-blue-600 transition-colors leading-tight tracking-tight">
+                                                                                            {article.title}
+                                                                                        </h4>
+                                                                                    </Link>
+                                                                                    <p className="text-slate-500 font-bold text-sm mb-4 flex items-center gap-2">
+                                                                                        <Users size={14} className="text-slate-400" />
+                                                                                        {splitAuthors(article.author, true).join(', ')}
+                                                                                    </p>
+                                                                                    <div className="flex flex-wrap gap-6 items-center">
+                                                                                        <Link 
+                                                                                            href={`/article/${article.id}`} 
+                                                                                            className="text-xs font-black text-blue-600 uppercase tracking-widest flex items-center gap-1 hover:gap-2 transition-all"
+                                                                                        >
+                                                                                            View Abstract <ChevronRight size={14} />
+                                                                                        </Link>
+                                                                                        {article.pdf_url && (
+                                                                                            <a 
+                                                                                                href={article.pdf_url} 
+                                                                                                target="_blank" 
+                                                                                                className="text-xs font-black text-slate-400 hover:text-slate-900 uppercase tracking-widest flex items-center gap-2 transition-all"
+                                                                                            >
+                                                                                                <FileText size={14} />
+                                                                                                PDF
+                                                                                            </a>
+                                                                                        )}
+                                                                                    </div>
+                                                                                </div>
+                                                                            ))
+                                                                        ) : (
+                                                                            <div className="flex flex-col items-center justify-center py-12 text-slate-400 gap-3">
+                                                                                <FileText size={40} className="opacity-20" />
+                                                                                <p className="font-bold uppercase tracking-widest text-xs">No articles published in this {itemLabel.toLowerCase()}.</p>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </motion.div>
+                                                        )}
+                                                    </AnimatePresence>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </motion.div>
+                                        </motion.div>
+                                    ) : (
+                                        <motion.div 
+                                            key={item.id} 
+                                            variants={itemVariants}
+                                            className="group"
+                                        >
+                                            <Link 
+                                                href={
+                                                    journal ? `/journal/${publication.id}/issue/${item.id}` : 
+                                                    (conference ? `/conference/${publication.id}/proceeding/${item.id}` : `/symposium/${publication.id}/proceeding/${item.id}`)
+                                                }
+                                                className="block"
+                                            >
+                                                <div className="relative aspect-[3/4] rounded-3xl overflow-hidden shadow-xl shadow-slate-200/50 border border-white/40 mb-6 transition-transform duration-500 group-hover:-translate-y-2">
+                                                    {item.cover_image_url ? (
+                                                        <img 
+                                                            src={item.cover_image_url} 
+                                                            alt={`${itemLabel} Cover`} 
+                                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full bg-blue-900 flex items-center justify-center p-8 text-center">
+                                                            <span className="text-white text-sm font-black leading-tight uppercase tracking-widest">
+                                                                {title}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                    <div className="absolute inset-0 bg-slate-900/20 group-hover:bg-slate-900/0 transition-colors"></div>
+                                                </div>
+                                                <div className="px-2">
+                                                    <h3 className="text-lg font-black text-slate-900 group-hover:text-blue-600 transition-colors leading-tight mb-2">
+                                                        {journal ? `Vol. ${item.volume} No. ${item.issue}` : item.version}
+                                                    </h3>
+                                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                                                        <Calendar size={12} /> {item.year}
+                                                    </p>
+                                                </div>
+                                            </Link>
+                                        </motion.div>
+                                    )
                                 ))
                             ) : (
                                 <motion.div 
