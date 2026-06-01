@@ -155,8 +155,22 @@ class PublicController extends Controller
         $this->authorizeView($journal);
 
         return Inertia::render('Publications/Archive', [
-            'journal' => $journal->load('issues.articles'),
+            'journal' => $journal->load(['issues' => function($q) {
+                $q->orderBy('year', 'desc')->orderBy('volume', 'desc')->orderBy('issue', 'desc');
+            }]),
             'is_current' => false,
+        ]);
+    }
+
+    public function journalIssue(Journal $journal, Issue $issue)
+    {
+        $this->authorizeView($journal);
+
+        return Inertia::render('Publications/Archive', [
+            'journal' => $journal->load(['issues' => function($q) use ($issue) {
+                $q->where('id', $issue->id)->with('articles');
+            }]),
+            'is_current' => true, // We use is_current to trigger expanded view
         ]);
     }
 
@@ -164,8 +178,21 @@ class PublicController extends Controller
     {
         $this->authorizeView($conference);
         return Inertia::render('Publications/Archive', [
-            'conference' => $conference->load('proceedings.articles'),
+            'conference' => $conference->load(['proceedings' => function($q) {
+                $q->orderBy('year', 'desc');
+            }]),
             'is_current' => false,
+        ]);
+    }
+
+    public function conferenceProceeding(Conference $conference, ConferenceProceeding $proceeding)
+    {
+        $this->authorizeView($conference);
+        return Inertia::render('Publications/Archive', [
+            'conference' => $conference->load(['proceedings' => function($q) use ($proceeding) {
+                $q->where('id', $proceeding->id)->with('articles');
+            }]),
+            'is_current' => true,
         ]);
     }
 
@@ -173,8 +200,21 @@ class PublicController extends Controller
     {
         $this->authorizeView($symposium);
         return Inertia::render('Publications/Archive', [
-            'symposium' => $symposium->load('proceedings.articles'),
+            'symposium' => $symposium->load(['proceedings' => function($q) {
+                $q->orderBy('year', 'desc');
+            }]),
             'is_current' => false,
+        ]);
+    }
+
+    public function symposiumProceeding(Symposium $symposium, SymposiumProceeding $proceeding)
+    {
+        $this->authorizeView($symposium);
+        return Inertia::render('Publications/Archive', [
+            'symposium' => $symposium->load(['proceedings' => function($q) use ($proceeding) {
+                $q->where('id', $proceeding->id)->with('articles');
+            }]),
+            'is_current' => true,
         ]);
     }
 
