@@ -63,7 +63,7 @@ export default function List({ journals }) {
                         href="/editor/journal/create" 
                         className="w-full md:w-auto bg-slate-900 text-white px-8 py-4 rounded-2xl font-black shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all flex items-center justify-center gap-2 group"
                     >
-                        <span>Add New Journal</span>
+                        <span>Add</span>
                         <Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" />
                     </Link>
                 </motion.div>
