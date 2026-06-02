@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Conference;
 use App\Models\ConferenceProceeding;
 use App\Models\ConferenceCommittee;
+use App\Models\PublicationGallery;
 use App\Models\Article;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -253,6 +254,41 @@ class ConferenceManagementController extends Controller
         }
 
         $article->update($data);
+        return back();
+    }
+
+    public function manageGallery(Conference $conference)
+    {
+        $this->authorizeEditor($conference);
+        return Inertia::render('Management/Conference/Gallery', [
+            'conference' => $conference,
+            'images' => $conference->gallery()->latest()->get()
+        ]);
+    }
+
+    public function storeGalleryImage(Request $request, Conference $conference)
+    {
+        $this->authorizeEditor($conference);
+        $data = $request->validate([
+            'image' => 'required|image',
+            'caption' => 'nullable|string|max:255',
+        ]);
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('galleries', 'public');
+            $conference->gallery()->create([
+                'image_path' => $path,
+                'caption' => $request->caption
+            ]);
+        }
+
+        return back();
+    }
+
+    public function deleteGalleryImage(PublicationGallery $image)
+    {
+        $this->authorizeEditor($image->publication);
+        $image->delete();
         return back();
     }
 

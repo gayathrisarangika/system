@@ -53,7 +53,7 @@ class PublicController extends Controller
 
         $conference->load(['proceedings' => function ($query) {
             $query->orderBy('year', 'desc')->take(10);
-        }]);
+        }, 'gallery']);
 
         return Inertia::render('Publications/Conference', [
             'conference' => $conference,
@@ -66,7 +66,7 @@ class PublicController extends Controller
 
         $symposium->load(['proceedings' => function ($query) {
             $query->orderBy('year', 'desc')->take(10);
-        }]);
+        }, 'gallery']);
 
         return Inertia::render('Publications/Symposium', [
             'symposium' => $symposium,

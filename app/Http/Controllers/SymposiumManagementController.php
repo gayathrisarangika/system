@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Symposium;
 use App\Models\SymposiumProceeding;
 use App\Models\SymposiumCommittee;
+use App\Models\PublicationGallery;
 use App\Models\Article;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -253,6 +254,41 @@ class SymposiumManagementController extends Controller
         }
 
         $article->update($data);
+        return back();
+    }
+
+    public function manageGallery(Symposium $symposium)
+    {
+        $this->authorizeEditor($symposium);
+        return Inertia::render('Management/Symposium/Gallery', [
+            'symposium' => $symposium,
+            'images' => $symposium->gallery()->latest()->get()
+        ]);
+    }
+
+    public function storeGalleryImage(Request $request, Symposium $symposium)
+    {
+        $this->authorizeEditor($symposium);
+        $data = $request->validate([
+            'image' => 'required|image',
+            'caption' => 'nullable|string|max:255',
+        ]);
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('galleries', 'public');
+            $symposium->gallery()->create([
+                'image_path' => $path,
+                'caption' => $request->caption
+            ]);
+        }
+
+        return back();
+    }
+
+    public function deleteGalleryImage(PublicationGallery $image)
+    {
+        $this->authorizeEditor($image->publication);
+        $image->delete();
         return back();
     }
 

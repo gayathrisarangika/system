@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import RecentPublicationsCarousel from '@/Components/RecentPublicationsCarousel';
+import GallerySlideshow from '@/Components/GallerySlideshow';
 
 export default function Symposium({ symposium, latestProceeding, recentProceedings }) {
     const containerVariants = {
@@ -190,6 +191,14 @@ export default function Symposium({ symposium, latestProceeding, recentProceedin
                     )}
                 </div>
             </section>
+
+            {/* Gallery Slideshow */}
+            {symposium.gallery?.length > 0 && (
+                <GallerySlideshow 
+                    images={symposium.gallery} 
+                    title="Programs & Workshops" 
+                />
+            )}
         </PublicLayout>
     );
 }

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Storage;
 
 class Conference extends Model
@@ -48,4 +49,5 @@ class Conference extends Model
     public function department(): BelongsTo { return $this->belongsTo(Department::class)->withDefault(); }
     public function proceedings(): HasMany { return $this->hasMany(ConferenceProceeding::class); }
     public function committee(): HasMany { return $this->hasMany(ConferenceCommittee::class); }
+    public function gallery(): MorphMany { return $this->morphMany(PublicationGallery::class, 'publication'); }
 }
