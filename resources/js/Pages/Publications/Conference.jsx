@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import RecentPublicationsCarousel from '@/Components/RecentPublicationsCarousel';
+import GallerySlideshow from '@/Components/GallerySlideshow';
 
 export default function Conference({ conference, latestProceeding, recentProceedings }) {
     const containerVariants = {
@@ -191,6 +192,14 @@ export default function Conference({ conference, latestProceeding, recentProceed
                     )}
                 </div>
             </section>
+
+            {/* Gallery Slideshow */}
+            {conference.gallery?.length > 0 && (
+                <GallerySlideshow 
+                    images={conference.gallery} 
+                    title="Programs & Workshops" 
+                />
+            )}
         </PublicLayout>
     );
 }
