@@ -90,6 +90,30 @@ class DashboardController extends Controller
         return back();
     }
 
+    public function storeDepartment(Request $request)
+    {
+        if (Auth::user()->role !== 'admin') abort(403);
+        $data = $request->validate(['name' => 'required|string|unique:departments,name']);
+        Department::create($data);
+        return back();
+    }
+
+    public function storeConferenceName(Request $request)
+    {
+        if (Auth::user()->role !== 'admin') abort(403);
+        $data = $request->validate(['name' => 'required|string|unique:conference_names,name']);
+        ConferenceName::create($data);
+        return back();
+    }
+
+    public function storeSymposiumName(Request $request)
+    {
+        if (Auth::user()->role !== 'admin') abort(403);
+        $data = $request->validate(['name' => 'required|string|unique:symposium_names,name']);
+        SymposiumName::create($data);
+        return back();
+    }
+
     public function editor(Request $request)
     {
         $type = $request->segment(2); // journal, conference, or symposium
