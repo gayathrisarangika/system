@@ -12,7 +12,8 @@ import {
     LayoutGrid,
     CheckCircle2,
     Clock,
-    XCircle
+    XCircle,
+    Image as ImageIcon
 } from 'lucide-react';
 import BackendLayout from '@/Layouts/BackendLayout';
 import { cn } from '@/lib/utils';
@@ -85,10 +86,10 @@ export default function List({ conferences }) {
                                         <td className="px-8 py-6">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 font-black group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300">
-                                                    {conf.conference_title.charAt(0).toUpperCase()}
+                                                    {conf.conference_title?.charAt(0).toUpperCase() || 'C'}
                                                 </div>
                                                 <div>
-                                                    <div className="font-black text-slate-900 group-hover:text-emerald-700 transition-colors">{conf.conference_title}</div>
+                                                    <div className="font-black text-slate-900 group-hover:text-emerald-700 transition-colors">{conf.conference_title || 'Untitled Conference'}</div>
                                                     <div className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-tighter bg-slate-50 px-2 py-0.5 rounded w-fit group-hover:bg-emerald-50 transition-colors">
                                                         Ref ID: #{conf.id}
                                                     </div>

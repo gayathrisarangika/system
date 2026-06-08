@@ -12,8 +12,9 @@ import {
 import BackendLayout from '@/Layouts/BackendLayout';
 import { cn } from '@/lib/utils';
 
-export default function Editor({ type, user }) {
-    const dashboardTitle = type.charAt(0).toUpperCase() + type.slice(1) + " Editor Dashboard";
+export default function Editor({ type = 'publication', user = {} }) {
+    const safeType = type || 'publication';
+    const dashboardTitle = (safeType.charAt(0).toUpperCase() + safeType.slice(1)) + " Editor Dashboard";
 
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -63,12 +64,12 @@ export default function Editor({ type, user }) {
                             <h2 className="text-4xl lg:text-5xl font-black text-slate-900 mb-4 tracking-tight leading-tight">
                                 Welcome back,<br />
                                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-700">
-                                    {user.username}!
+                                    {user?.username || 'Editor'}!
                                 </span>
                             </h2>
                             
                             <p className="text-lg text-slate-500 font-medium leading-relaxed mb-8">
-                                You are currently managing the <span className="text-slate-900 font-bold uppercase">{type}</span> section. 
+                                You are currently managing the <span className="text-slate-900 font-bold uppercase">{safeType}</span> section. 
                                 Everything you need to oversee publications and peer reviews is right at your fingertips.
                             </p>
 
@@ -79,7 +80,7 @@ export default function Editor({ type, user }) {
                                 </div>
                                 <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-xl border border-slate-100">
                                     <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                                    <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">{type} Portal</span>
+                                    <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">{safeType} Portal</span>
                                 </div>
                             </div>
                         </div>
@@ -99,7 +100,7 @@ export default function Editor({ type, user }) {
                 <div className="grid md:grid-cols-3 gap-6">
                     <motion.div variants={itemVariants}>
                         <Link 
-                            href={`/editor/${type}`}
+                            href={`/editor/${safeType}`}
                             className="group block h-full bg-white p-8 rounded-3xl border border-slate-200/60 shadow-sm hover:shadow-2xl hover:shadow-blue-500/10 hover:border-blue-500/30 transition-all duration-500 relative overflow-hidden"
                         >
                             <div className="absolute top-0 right-0 p-8 text-slate-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
@@ -111,10 +112,10 @@ export default function Editor({ type, user }) {
                                     <BookOpen size={28} />
                                 </div>
                                 <h3 className="text-2xl font-black text-slate-900 mb-3 group-hover:text-blue-600 transition-colors">
-                                    Manage {type}s
+                                    Manage {safeType}s
                                 </h3>
                                 <p className="text-slate-500 font-medium leading-relaxed">
-                                    Update publication details, mission statements, and scope for your assigned {type}s.
+                                    Update publication details, mission statements, and scope for your assigned {safeType}s.
                                 </p>
                                 
                                 <div className="mt-8 flex items-center gap-2 text-sm font-bold text-blue-600 opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 transition-all duration-500">
