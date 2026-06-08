@@ -35,11 +35,38 @@ export default function Admin({ pendingJournals, pendingConferences, pendingSymp
         symposium_title: '',
     });
 
+    const { data: deptData, setData: setDeptData, post: postDept, reset: resetDept, errors: deptErrors, processing: deptProcessing } = useForm({
+        name: '',
+    });
+
+    const { data: confData, setData: setConfData, post: postConf, reset: resetConf, errors: confErrors, processing: confProcessing } = useForm({
+        name: '',
+    });
+
+    const { data: sympData, setData: setSympData, post: postSymp, reset: resetSymp, errors: sympErrors, processing: sympProcessing } = useForm({
+        name: '',
+    });
+
     const submitUser = (e) => {
         e.preventDefault();
         post('/admin/users', {
             onSuccess: () => reset('name', 'email', 'username', 'password'),
         });
+    };
+
+    const submitDept = (e) => {
+        e.preventDefault();
+        postDept('/admin/departments', { onSuccess: () => resetDept() });
+    };
+
+    const submitConf = (e) => {
+        e.preventDefault();
+        postConf('/admin/conference-names', { onSuccess: () => resetConf() });
+    };
+
+    const submitSymp = (e) => {
+        e.preventDefault();
+        postSymp('/admin/symposium-names', { onSuccess: () => resetSymp() });
     };
 
     const containerVariants = {
@@ -382,6 +409,74 @@ export default function Admin({ pendingJournals, pendingConferences, pendingSymp
                                     <PlusCircle size={18} className="group-hover:rotate-90 transition-transform duration-300" />
                                 </button>
                             </form>
+                        </div>
+                    </motion.div>
+
+                    {/* Master Data Management */}
+                    <motion.div variants={itemVariants} className="bg-white/80 backdrop-blur-md p-8 rounded-[2rem] shadow-xl shadow-slate-200/50 border border-white relative overflow-hidden group">
+                        <div className="relative z-10">
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="p-2.5 bg-indigo-600 rounded-xl text-white shadow-lg shadow-indigo-500/30">
+                                    <PlusCircle size={20} />
+                                </div>
+                                <h2 className="text-xl font-black text-slate-800 tracking-tight">Master Data</h2>
+                            </div>
+
+                            <div className="space-y-8">
+                                {/* Department Form */}
+                                <form onSubmit={submitDept} className="space-y-3">
+                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">New Journal Type (Dept)</label>
+                                    <div className="flex gap-2">
+                                        <input 
+                                            className="flex-1 bg-slate-50 border-slate-200 rounded-xl p-3 text-sm font-semibold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" 
+                                            placeholder="Department name"
+                                            value={deptData.name} 
+                                            onChange={e => setDeptData('name', e.target.value)} 
+                                            required
+                                        />
+                                        <button disabled={deptProcessing} className="p-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-500/20 cursor-pointer">
+                                            <PlusCircle size={18} />
+                                        </button>
+                                    </div>
+                                    {deptErrors.name && <div className="text-rose-500 text-[10px] font-bold mt-1 ml-1 uppercase">{deptErrors.name}</div>}
+                                </form>
+
+                                {/* Conference Name Form */}
+                                <form onSubmit={submitConf} className="space-y-3">
+                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">New Conference Type</label>
+                                    <div className="flex gap-2">
+                                        <input 
+                                            className="flex-1 bg-slate-50 border-slate-200 rounded-xl p-3 text-sm font-semibold focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" 
+                                            placeholder="Conference name"
+                                            value={confData.name} 
+                                            onChange={e => setConfData('name', e.target.value)} 
+                                            required
+                                        />
+                                        <button disabled={confProcessing} className="p-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-500/20 cursor-pointer">
+                                            <PlusCircle size={18} />
+                                        </button>
+                                    </div>
+                                    {confErrors.name && <div className="text-rose-500 text-[10px] font-bold mt-1 ml-1 uppercase">{confErrors.name}</div>}
+                                </form>
+
+                                {/* Symposium Name Form */}
+                                <form onSubmit={submitSymp} className="space-y-3">
+                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">New Symposium Type</label>
+                                    <div className="flex gap-2">
+                                        <input 
+                                            className="flex-1 bg-slate-50 border-slate-200 rounded-xl p-3 text-sm font-semibold focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all" 
+                                            placeholder="Symposium name"
+                                            value={sympData.name} 
+                                            onChange={e => setSympData('name', e.target.value)} 
+                                            required
+                                        />
+                                        <button disabled={sympProcessing} className="p-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-all shadow-lg shadow-purple-500/20 cursor-pointer">
+                                            <PlusCircle size={18} />
+                                        </button>
+                                    </div>
+                                    {sympErrors.name && <div className="text-rose-500 text-[10px] font-bold mt-1 ml-1 uppercase">{sympErrors.name}</div>}
+                                </form>
+                            </div>
                         </div>
                     </motion.div>
 
