@@ -5,9 +5,9 @@ export default function BackendLayout({ children, title }) {
     const { auth } = usePage().props;
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-    const user = auth.user;
-    const role = user.role;
-    const type = user.type;
+    const user = auth?.user || {};
+    const role = user?.role || 'guest';
+    const type = user?.type || 'journal';
 
     return (
         <div className="min-h-screen bg-slate-50 flex">
@@ -68,10 +68,10 @@ export default function BackendLayout({ children, title }) {
                     <div className="p-6 bg-[#1e293b] border-t border-slate-700/50">
                         <div className="flex items-center">
                             <div className="w-10 h-10 rounded-full bg-slate-600 flex items-center justify-center text-white font-bold">
-                                {user.username.charAt(0).toUpperCase()}
+                                {user?.username?.charAt(0).toUpperCase() || 'U'}
                             </div>
                             <div className="ml-3 truncate">
-                                <p className="text-sm font-bold text-white truncate">{user.username}</p>
+                                <p className="text-sm font-bold text-white truncate">{user?.username || 'User'}</p>
                                 <p className="text-xs text-slate-400 truncate capitalize">{role}</p>
                             </div>
                         </div>
@@ -99,8 +99,8 @@ export default function BackendLayout({ children, title }) {
                         <div className="h-8 w-px bg-slate-200"></div>
                         <div className="flex items-center gap-3">
                             <div className="text-right hidden sm:block">
-                                <p className="text-sm font-bold text-slate-800">{user.username}</p>
-                                <p className="text-xs text-slate-500 truncate max-w-[150px]">{user.department?.name || 'Faculty Administration'}</p>
+                                <p className="text-sm font-bold text-slate-800">{user?.username || 'User'}</p>
+                                <p className="text-xs text-slate-500 truncate max-w-[150px]">{user?.department?.name || 'Faculty Administration'}</p>
                             </div>
                         </div>
                     </div>
