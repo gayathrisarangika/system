@@ -48,6 +48,11 @@ Route::get('/symposium/{symposium}/contact', [PublicController::class, 'symposiu
 Route::middleware('auth')->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
     Route::post('/admin/users', [DashboardController::class, 'storeUser'])->name('admin.users.store');
+    
+    Route::post('/admin/departments', [DashboardController::class, 'storeDepartment'])->name('admin.departments.store');
+    Route::post('/admin/conference-names', [DashboardController::class, 'storeConferenceName'])->name('admin.conference-names.store');
+    Route::post('/admin/symposium-names', [DashboardController::class, 'storeSymposiumName'])->name('admin.symposium-names.store');
+
     Route::post('/admin/approve/journal/{journal}', [DashboardController::class, 'approveJournal'])->name('admin.approve.journal');
     Route::post('/admin/reject/journal/{journal}', [DashboardController::class, 'rejectJournal'])->name('admin.reject.journal');
     
