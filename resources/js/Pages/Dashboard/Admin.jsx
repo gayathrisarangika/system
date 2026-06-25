@@ -429,7 +429,11 @@ export default function Admin({ pendingJournals, pendingConferences, pendingSymp
                                     <div className="flex gap-2">
                                         <input 
                                             className="flex-1 bg-slate-50 border-slate-200 rounded-xl p-3 text-sm font-semibold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" 
+<<<<<<< HEAD
                                             placeholder="Journal name"
+=======
+                                            placeholder="Department name"
+>>>>>>> a2dde319552a3edbe0de23ad5eed13020f417325
                                             value={deptData.name} 
                                             onChange={e => setDeptData('name', e.target.value)} 
                                             required
