@@ -1,0 +1,4 @@
+# Safety net: the project root must never be served directly.
+# HTTPS exposes only public/ via Alias (and ignores this file),
+# but the port-80 vhost maps /var/www/html as DocumentRoot without that Alias.
+Require all denied

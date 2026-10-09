@@ -8,7 +8,7 @@ import {
     Users,
     Award
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { u, cn } from '@/lib/utils';
 
 export default function DepartmentSelection({ departments, conferenceNames, symposiumNames, type }) {
     const getList = () => {
@@ -57,7 +57,7 @@ export default function DepartmentSelection({ departments, conferenceNames, symp
                         className="mb-8"
                     >
                         <Link 
-                            href="/backend-login" 
+                            href={u("/backend-login")} 
                             className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors group"
                         >
                             <ChevronLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
@@ -100,7 +100,7 @@ export default function DepartmentSelection({ departments, conferenceNames, symp
                                 {list.map(item => (
                                     <motion.div key={item.id} variants={itemVariants}>
                                         <Link 
-                                            href={`/login?pub_id=${item.id}&type=${type}`}
+                                            href={u(`/login?pub_id=${item.id}&type=${type}`)}
                                             className="group block p-6 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-xl hover:shadow-blue-500/5 hover:border-blue-200 transition-all duration-300 h-full relative overflow-hidden"
                                         >
                                             <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-full -mr-12 -mt-12 opacity-0 group-hover:opacity-100 transition-opacity"></div>

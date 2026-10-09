@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import RecentPublicationsCarousel from '@/Components/RecentPublicationsCarousel';
-import { splitAuthors } from '@/lib/utils';
+import { u, splitAuthors } from '@/lib/utils';
 
 export default function Journal({ journal, latestIssue, recentIssues }) {
     const containerVariants = {
@@ -59,14 +59,14 @@ export default function Journal({ journal, latestIssue, recentIssues }) {
                             </p>
                             <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
                                 <Link 
-                                    href={`/journal/${journal.id}/current`}
+                                    href={u(`/journal/${journal.id}/current`)}
                                     className="px-8 py-4 bg-slate-900 text-white rounded-2xl font-bold shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all flex items-center gap-2 group"
                                 >
                                     Current Issue
                                     <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                                 </Link>
                                 <Link 
-                                    href={`/journal/${journal.id}/archive`}
+                                    href={u(`/journal/${journal.id}/archive`)}
                                     className="px-8 py-4 bg-white text-slate-700 border border-slate-200 rounded-2xl font-bold hover:bg-slate-50 transition-all shadow-sm"
                                 >
                                     Browse Archive
@@ -141,7 +141,7 @@ export default function Journal({ journal, latestIssue, recentIssues }) {
                                                 <p className="text-slate-500 font-bold mt-1">Vol. {latestIssue.volume} No. {latestIssue.issue} ({latestIssue.year})</p>
                                             </div>
                                             <Link 
-                                                href={`/journal/${journal.id}/current`}
+                                                href={u(`/journal/${journal.id}/current`)}
                                                 className="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all flex items-center gap-2"
                                             >
                                                 View Full Issue
@@ -152,7 +152,7 @@ export default function Journal({ journal, latestIssue, recentIssues }) {
                                         <div className="space-y-8">
                                             {latestIssue.articles?.slice(0, 3).map((article) => (
                                                 <div key={article.id} className="group">
-                                                    <Link href={`/article/${article.id}`}>
+                                                    <Link href={u(`/article/${article.id}`)}>
                                                         <h4 className="text-xl font-black text-slate-900 group-hover:text-blue-600 transition-colors mb-2 leading-tight">
                                                             {article.title}
                                                         </h4>
@@ -236,7 +236,7 @@ export default function Journal({ journal, latestIssue, recentIssues }) {
                             <div className="flex items-center justify-between mb-10">
                                 <h3 className="text-2xl font-black text-slate-900 tracking-tight">Recent Issues</h3>
                                 <Link 
-                                    href={`/journal/${journal.id}/archive`}
+                                    href={u(`/journal/${journal.id}/archive`)}
                                     className="text-xs font-black text-blue-600 uppercase tracking-[0.2em] hover:text-blue-700 transition-colors"
                                 >
                                     View Archive

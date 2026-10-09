@@ -1,4 +1,5 @@
 import React from 'react';
+import { u } from '@/lib/utils';
 import { useForm, Head, Link } from '@inertiajs/react';
 
 export default function Register({ dept_id, type }) {
@@ -11,7 +12,7 @@ export default function Register({ dept_id, type }) {
 
     const submit = (e) => {
         e.preventDefault();
-        post('/register');
+        post(u('/register'));
     };
 
     return (

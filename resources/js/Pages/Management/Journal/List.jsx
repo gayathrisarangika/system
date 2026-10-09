@@ -15,7 +15,7 @@ import {
     XCircle
 } from 'lucide-react';
 import BackendLayout from '@/Layouts/BackendLayout';
-import { cn } from '@/lib/utils';
+import { u, cn } from '@/lib/utils';
 
 export default function List({ journals }) {
     const containerVariants = {
@@ -60,7 +60,7 @@ export default function List({ journals }) {
                         </div>
                     </div>
                     <Link 
-                        href="/editor/journal/create" 
+                        href={u("/editor/journal/create")} 
                         className="w-full md:w-auto bg-slate-900 text-white px-8 py-4 rounded-2xl font-black shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all flex items-center justify-center gap-2 group"
                     >
                         <span>Add</span>
@@ -115,10 +115,10 @@ export default function List({ journals }) {
                                         <td className="px-8 py-6">
                                             <div className="flex justify-end gap-2">
                                                 {[
-                                                    { href: `/journal/${journal.id}`, icon: Globe, label: 'Public Site', color: 'hover:text-blue-600' },
-                                                    { href: `/editor/journal/${journal.id}/edit`, icon: Edit3, label: 'Edit Info', color: 'hover:text-indigo-600' },
-                                                    { href: `/editor/journal/${journal.id}/issues`, icon: BookOpen, label: 'Issues', color: 'hover:text-emerald-600' },
-                                                    { href: `/editor/journal/${journal.id}/board`, icon: Users, label: 'Board', color: 'hover:text-purple-600' }
+                                                    { href: u(`/journal/${journal.id}`), icon: Globe, label: 'Public Site', color: 'hover:text-blue-600' },
+                                                    { href: u(`/editor/journal/${journal.id}/edit`), icon: Edit3, label: 'Edit Info', color: 'hover:text-indigo-600' },
+                                                    { href: u(`/editor/journal/${journal.id}/issues`), icon: BookOpen, label: 'Issues', color: 'hover:text-emerald-600' },
+                                                    { href: u(`/editor/journal/${journal.id}/board`), icon: Users, label: 'Board', color: 'hover:text-purple-600' }
                                                 ].map((action, idx) => (
                                                     <Link 
                                                         key={idx}

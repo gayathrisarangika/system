@@ -1,4 +1,5 @@
 import React from 'react';
+import { u } from '@/lib/utils';
 import { Head, Link } from '@inertiajs/react';
 
 export default function ForgotPassword() {
@@ -17,7 +18,7 @@ export default function ForgotPassword() {
                     </p>
                 </div>
 
-                <Link href="/backend-login" className="text-blue-600 hover:underline font-medium">
+                <Link href={u("/backend-login")} className="text-blue-600 hover:underline font-medium">
                     &larr; Back to Login
                 </Link>
             </div>

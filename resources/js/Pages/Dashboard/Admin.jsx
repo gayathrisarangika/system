@@ -18,7 +18,7 @@ import {
     LayoutDashboard
 } from 'lucide-react';
 import BackendLayout from '@/Layouts/BackendLayout';
-import { cn } from '@/lib/utils';
+import { u, cn } from '@/lib/utils';
 
 export default function Admin({ pendingJournals, pendingConferences, pendingSymposiums, journals, conferences, symposiums, departments, conferenceNames, symposiumNames, users }) {
     const { data, setData, post, reset, errors, processing } = useForm({
@@ -49,24 +49,24 @@ export default function Admin({ pendingJournals, pendingConferences, pendingSymp
 
     const submitUser = (e) => {
         e.preventDefault();
-        post('/admin/users', {
+        post(u('/admin/users'), {
             onSuccess: () => reset('name', 'email', 'username', 'password'),
         });
     };
 
     const submitDept = (e) => {
         e.preventDefault();
-        postDept('/admin/departments', { onSuccess: () => resetDept() });
+        postDept(u('/admin/departments'), { onSuccess: () => resetDept() });
     };
 
     const submitConf = (e) => {
         e.preventDefault();
-        postConf('/admin/conference-names', { onSuccess: () => resetConf() });
+        postConf(u('/admin/conference-names'), { onSuccess: () => resetConf() });
     };
 
     const submitSymp = (e) => {
         e.preventDefault();
-        postSymp('/admin/symposium-names', { onSuccess: () => resetSymp() });
+        postSymp(u('/admin/symposium-names'), { onSuccess: () => resetSymp() });
     };
 
     const containerVariants = {
@@ -139,14 +139,14 @@ export default function Admin({ pendingJournals, pendingConferences, pendingSymp
                                 <td className="px-6 py-5 text-right">
                                     <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <Link 
-                                            href={`/${type}/${item.id}`} 
+                                            href={u(`/${type}/${item.id}`)} 
                                             className="p-2 bg-white text-slate-600 rounded-lg hover:text-blue-600 hover:shadow-md transition-all border border-slate-100"
                                             title="Preview"
                                         >
                                             <Eye size={16} />
                                         </Link>
                                         <Link 
-                                            href={`/admin/approve/${type}/${item.id}`} 
+                                            href={u(`/admin/approve/${type}/${item.id}`)} 
                                             method="post" as="button" 
                                             className="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-600 hover:text-white hover:shadow-lg hover:shadow-emerald-500/20 transition-all border border-emerald-100"
                                             title="Approve"
@@ -154,7 +154,7 @@ export default function Admin({ pendingJournals, pendingConferences, pendingSymp
                                             <CheckCircle2 size={16} />
                                         </Link>
                                         <Link 
-                                            href={`/admin/reject/${type}/${item.id}`} 
+                                            href={u(`/admin/reject/${type}/${item.id}`)} 
                                             method="post" as="button" 
                                             className="p-2 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-600 hover:text-white hover:shadow-lg hover:shadow-rose-500/20 transition-all border border-rose-100"
                                             title="Reject"
@@ -429,11 +429,7 @@ export default function Admin({ pendingJournals, pendingConferences, pendingSymp
                                     <div className="flex gap-2">
                                         <input 
                                             className="flex-1 bg-slate-50 border-slate-200 rounded-xl p-3 text-sm font-semibold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" 
-<<<<<<< HEAD
                                             placeholder="Journal name"
-=======
-                                            placeholder="Department name"
->>>>>>> a2dde319552a3edbe0de23ad5eed13020f417325
                                             value={deptData.name} 
                                             onChange={e => setDeptData('name', e.target.value)} 
                                             required

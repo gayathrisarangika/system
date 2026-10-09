@@ -16,7 +16,7 @@ import {
     Image as ImageIcon
 } from 'lucide-react';
 import BackendLayout from '@/Layouts/BackendLayout';
-import { cn } from '@/lib/utils';
+import { u, cn } from '@/lib/utils';
 
 export default function List({ symposiums }) {
     const containerVariants = {
@@ -61,7 +61,7 @@ export default function List({ symposiums }) {
                         </div>
                     </div>
                     <Link 
-                        href="/editor/symposium/create" 
+                        href={u("/editor/symposium/create")} 
                         className="w-full md:w-auto bg-slate-900 text-white px-8 py-4 rounded-2xl font-black shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all flex items-center justify-center gap-2 group"
                     >
                         <span>Add Symposium</span>
@@ -116,11 +116,11 @@ export default function List({ symposiums }) {
                                         <td className="px-8 py-6">
                                             <div className="flex justify-end gap-2">
                                                 {[
-                                                    { href: `/symposium/${symp.id}`, icon: Globe, label: 'Public Site', color: 'hover:text-blue-600' },
-                                                    { href: `/editor/symposium/${symp.id}/edit`, icon: Edit3, label: 'Edit Info', color: 'hover:text-indigo-600' },
-                                                    { href: `/editor/symposium/${symp.id}/abstract-books`, icon: BookOpen, label: 'Abstract Books', color: 'hover:text-emerald-600' },
-                                                    { href: `/editor/symposium/${symp.id}/committee`, icon: Users, label: 'Committee', color: 'hover:text-purple-600' },
-                                                    { href: `/editor/symposium/${symp.id}/gallery`, icon: ImageIcon, label: 'Gallery', color: 'hover:text-amber-600' }
+                                                    { href: u(`/symposium/${symp.id}`), icon: Globe, label: 'Public Site', color: 'hover:text-blue-600' },
+                                                    { href: u(`/editor/symposium/${symp.id}/edit`), icon: Edit3, label: 'Edit Info', color: 'hover:text-indigo-600' },
+                                                    { href: u(`/editor/symposium/${symp.id}/abstract-books`), icon: BookOpen, label: 'Abstract Books', color: 'hover:text-emerald-600' },
+                                                    { href: u(`/editor/symposium/${symp.id}/committee`), icon: Users, label: 'Committee', color: 'hover:text-purple-600' },
+                                                    { href: u(`/editor/symposium/${symp.id}/gallery`), icon: ImageIcon, label: 'Gallery', color: 'hover:text-amber-600' }
                                                 ].map((action, idx) => (
                                                     <Link 
                                                         key={idx}

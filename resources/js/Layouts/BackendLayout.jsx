@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { u } from '@/lib/utils';
 import { Link, usePage } from '@inertiajs/react';
 
 export default function BackendLayout({ children, title }) {
@@ -26,8 +27,8 @@ export default function BackendLayout({ children, title }) {
                     {role === 'admin' ? (
                         <>
                             <Link 
-                                href="/admin/dashboard" 
-                                className={`flex items-center p-3 rounded-xl transition-all duration-200 group ${usePage().url === '/admin/dashboard' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'hover:bg-slate-800 hover:text-white'}`}
+                                href={u("/admin/dashboard")} 
+                                className={`flex items-center p-3 rounded-xl transition-all duration-200 group ${usePage().url === u('/admin/dashboard') ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'hover:bg-slate-800 hover:text-white'}`}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -38,8 +39,8 @@ export default function BackendLayout({ children, title }) {
                     ) : (
                         <>
                             <Link 
-                                href={`/editor/${type}`} 
-                                className={`flex items-center p-3 rounded-xl transition-all duration-200 group ${usePage().url.startsWith(`/editor/${type}`) ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'hover:bg-slate-800 hover:text-white'}`}
+                                href={u(`/editor/${type}`)} 
+                                className={`flex items-center p-3 rounded-xl transition-all duration-200 group ${usePage().url.startsWith(u(`/editor/${type}`)) ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'hover:bg-slate-800 hover:text-white'}`}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -51,7 +52,7 @@ export default function BackendLayout({ children, title }) {
                     
                     <div className="pt-4 mt-4 border-t border-slate-700/50">
                         <Link 
-                            href="/logout" 
+                            href={u("/logout")} 
                             method="post" 
                             as="button" 
                             className="w-full flex items-center p-3 rounded-xl transition-all duration-200 text-slate-400 hover:bg-red-500/10 hover:text-red-500 group"
@@ -95,7 +96,7 @@ export default function BackendLayout({ children, title }) {
                     </div>
                     
                     <div className="flex items-center gap-4">
-                        <Link href="/" className="text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors">View Website</Link>
+                        <Link href={u("/")} className="text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors">View Website</Link>
                         <div className="h-8 w-px bg-slate-200"></div>
                         <div className="flex items-center gap-3">
                             <div className="text-right hidden sm:block">

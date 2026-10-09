@@ -1,4 +1,5 @@
 import React from 'react';
+import { u } from '@/lib/utils';
 import { Head, Link } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { 
@@ -59,14 +60,14 @@ export default function Conference({ conference, latestProceeding, recentProceed
                             </p>
                             <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
                                 <Link 
-                                    href={`/conference/${conference.id}/current`}
+                                    href={u(`/conference/${conference.id}/current`)}
                                     className="px-8 py-4 bg-slate-900 text-white rounded-2xl font-bold shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all flex items-center gap-2 group"
                                 >
                                     Current Abstract Book
                                     <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                                 </Link>
                                 <Link 
-                                    href={`/conference/${conference.id}/archive`}
+                                    href={u(`/conference/${conference.id}/archive`)}
                                     className="px-8 py-4 bg-white text-slate-700 border border-slate-200 rounded-2xl font-bold hover:bg-slate-50 transition-all shadow-sm"
                                 >
                                     Browse Archive
@@ -181,7 +182,7 @@ export default function Conference({ conference, latestProceeding, recentProceed
                             <div className="flex items-center justify-between mb-10">
                                 <h3 className="text-2xl font-black text-slate-900 tracking-tight">Previous Abstract Books</h3>
                                 <Link 
-                                    href={`/conference/${conference.id}/archive`}
+                                    href={u(`/conference/${conference.id}/archive`)}
                                     className="text-xs font-black text-indigo-600 uppercase tracking-[0.2em] hover:text-indigo-700 transition-colors"
                                 >
                                     View Archive

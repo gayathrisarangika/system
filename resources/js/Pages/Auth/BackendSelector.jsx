@@ -9,7 +9,7 @@ import {
     LayoutDashboard,
     Zap
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { u, cn } from '@/lib/utils';
 
 export default function BackendSelector() {
     const containerVariants = {
@@ -77,7 +77,7 @@ export default function BackendSelector() {
                         ].map((item) => (
                             <motion.div key={item.type} variants={itemVariants}>
                                 <Link 
-                                    href={`/backend-selection?type=${item.type}`}
+                                    href={u(`/backend-selection?type=${item.type}`)}
                                     className="group relative flex items-center justify-between p-5 bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl shadow-sm hover:shadow-xl hover:shadow-slate-200/50 hover:-translate-y-0.5 transition-all duration-300 overflow-hidden"
                                 >
                                     <div className="flex items-center gap-5">
@@ -102,7 +102,7 @@ export default function BackendSelector() {
 
                     <motion.div variants={itemVariants} className="mt-8 pt-8 border-t border-slate-200/60">
                         <Link 
-                            href="/login"
+                            href={u("/login")}
                             className="flex items-center justify-center gap-3 w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/20 group"
                         >
                             <LayoutDashboard size={20} />

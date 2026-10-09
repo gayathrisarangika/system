@@ -16,7 +16,7 @@ import {
     ExternalLink,
     GraduationCap
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { u, cn } from '@/lib/utils';
 import PublicationCard from '@/Components/PublicationCard';
 
 export default function Home({ journals, conferences, symposiums }) {
@@ -78,7 +78,7 @@ export default function Home({ journals, conferences, symposiums }) {
                         )}
                     >
                         {/* Logo */}
-                        <Link href="/" className="flex items-center gap-3 group">
+                        <Link href={u("/")} className="flex items-center gap-3 group">
                             <div className="relative">
                                 <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform duration-300">
                                     P
@@ -102,13 +102,13 @@ export default function Home({ journals, conferences, symposiums }) {
                             <div className="h-6 w-px bg-slate-200 mx-2"></div>
                             
                             <Link 
-                                href="/backend-login"
+                                 href={u("/backend-login")}
                                 className="relative group px-6 py-2.5 rounded-xl overflow-hidden"
                             >
                                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-700 group-hover:scale-105 transition-transform duration-300"></div>
                                 <div className="absolute inset-0 opacity-0 group-hover:opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
                                 <span className="relative flex items-center gap-2 text-sm font-bold text-white tracking-wide">
-                                    Backend Login
+                                    Login
                                     <LayoutDashboard size={16} className="group-hover:translate-x-0.5 transition-transform" />
                                 </span>
                             </Link>
@@ -140,7 +140,7 @@ export default function Home({ journals, conferences, symposiums }) {
                             <Link href="#symposiums" onClick={() => setMobileMenuOpen(false)} className="text-xl font-bold text-slate-800">Symposiums</Link>
                             <div className="w-full h-px bg-slate-100 my-2"></div>
                             <Link 
-                                href="/backend-login"
+                                href={u("/backend-login")}
                                 onClick={() => setMobileMenuOpen(false)}
                                 className="w-full bg-blue-600 text-white text-center py-4 rounded-2xl font-bold text-lg shadow-xl shadow-blue-500/20"
                             >
@@ -188,7 +188,7 @@ export default function Home({ journals, conferences, symposiums }) {
                                     href="#journals"
                                     className="w-full sm:w-auto px-8 py-4 bg-slate-900 text-white rounded-2xl font-bold shadow-2xl shadow-slate-900/20 hover:bg-slate-800 transition-all flex items-center justify-center gap-2 group"
                                 >
-                                    Explore Library
+                                    Explore
                                     <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                                 </Link>
                                 <button 
@@ -266,7 +266,7 @@ export default function Home({ journals, conferences, symposiums }) {
                                 {journals.map((journal, index) => (
                                     <motion.div key={journal.id} variants={itemVariants}>
                                         <PublicationCard 
-                                            href={`/journal/${journal.id}`}
+                                            href={u(`/journal/${journal.id}`)}
                                             image={journal.cover_image_url}
                                             title={journal.journal_title}
                                             subtitle={journal.university_name}
@@ -308,7 +308,7 @@ export default function Home({ journals, conferences, symposiums }) {
                                     {conferences.map((conf, index) => (
                                         <motion.div key={conf.id} variants={itemVariants}>
                                             <PublicationCard 
-                                                href={`/conference/${conf.id}`}
+                                                href={u(`/conference/${conf.id}`)}
                                                 image={conf.cover_image_url}
                                                 title={conf.conference_title}
                                                 subtitle={conf.university_name}
@@ -348,7 +348,7 @@ export default function Home({ journals, conferences, symposiums }) {
                                 {symposiums.map((symp, index) => (
                                     <motion.div key={symp.id} variants={itemVariants}>
                                         <PublicationCard 
-                                            href={`/symposium/${symp.id}`}
+                                            href={u(`/symposium/${symp.id}`)}
                                             image={symp.cover_image_url}
                                             title={symp.symposium_title}
                                             subtitle={symp.university_name}

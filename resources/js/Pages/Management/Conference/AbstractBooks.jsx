@@ -18,7 +18,7 @@ import {
     LayoutGrid
 } from 'lucide-react';
 import BackendLayout from '@/Layouts/BackendLayout';
-import { cn } from '@/lib/utils';
+import { u, cn } from '@/lib/utils';
 
 export default function AbstractBooks({ conference, abstractBooks }) {
     const [editingBook, setEditingBook] = React.useState(null);
@@ -34,7 +34,7 @@ export default function AbstractBooks({ conference, abstractBooks }) {
     const submit = (e) => {
         e.preventDefault();
         if (editingBook) {
-            post(`/editor/conference/abstract-book/${editingBook.id}`, {
+            post(u(`/editor/conference/abstract-book/${editingBook.id}`), {
                 onSuccess: () => {
                     reset();
                     setEditingBook(null);
@@ -43,7 +43,7 @@ export default function AbstractBooks({ conference, abstractBooks }) {
                 forceFormData: true,
             });
         } else {
-            post(`/editor/conference/${conference.id}/abstract-books`, {
+            post(u(`/editor/conference/${conference.id}/abstract-books`), {
                 onSuccess: () => {
                     reset();
                     setIsFormVisible(false);
@@ -98,7 +98,7 @@ export default function AbstractBooks({ conference, abstractBooks }) {
                 className="max-w-6xl mx-auto space-y-8 pb-20"
             >
                 <div className="flex items-center justify-between">
-                    <Link href="/editor/conference" className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-emerald-600 transition-colors group">
+                    <Link href={u("/editor/conference")} className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-emerald-600 transition-colors group">
                         <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" /> Back to Conferences
                     </Link>
                 </div>
@@ -153,7 +153,7 @@ export default function AbstractBooks({ conference, abstractBooks }) {
                                                 <td className="px-8 py-6">
                                                     <div className="flex justify-end gap-2">
                                                         <Link 
-                                                            href={`/editor/conference/abstract-book/${book.id}/articles`} 
+                                                            href={u(`/editor/conference/abstract-book/${book.id}/articles`)} 
                                                             className="p-2.5 bg-slate-50 text-slate-400 rounded-xl hover:text-emerald-600 hover:bg-white hover:shadow-lg transition-all"
                                                             title="Manage Articles"
                                                         >
@@ -167,7 +167,7 @@ export default function AbstractBooks({ conference, abstractBooks }) {
                                                             <Edit3 size={18} />
                                                         </button>
                                                         <Link 
-                                                            href={`/editor/conference/abstract-book/${book.id}`} 
+                                                            href={u(`/editor/conference/abstract-book/${book.id}`)} 
                                                             method="delete" as="button" 
                                                             className="p-2.5 bg-slate-50 text-slate-400 rounded-xl hover:text-rose-600 hover:bg-white hover:shadow-lg transition-all"
                                                             title="Delete"

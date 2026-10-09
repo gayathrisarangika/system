@@ -1,4 +1,5 @@
 import React from 'react';
+import { u } from '@/lib/utils';
 import { Head, Link } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { LayoutDashboard, LogIn, ChevronRight, GraduationCap, ShieldCheck } from 'lucide-react';
@@ -21,7 +22,7 @@ export default function DepartmentPortal({ department, type }) {
             <header className="fixed top-0 left-0 right-0 z-50 px-6 py-6">
                 <div className="max-w-7xl mx-auto">
                     <nav className="flex items-center justify-between px-6 py-3 bg-white/80 backdrop-blur-xl rounded-2xl border border-white/40 shadow-lg shadow-slate-200/50">
-                        <Link href="/" className="flex items-center gap-3 group">
+                        <Link href={u("/")} className="flex items-center gap-3 group">
                             <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform duration-300">
                                 P
                             </div>
@@ -31,7 +32,7 @@ export default function DepartmentPortal({ department, type }) {
                             </div>
                         </Link>
                         <div className="flex items-center gap-4">
-                            <Link href="/" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Home</Link>
+                            <Link href={u("/")} className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Home</Link>
                             <div className="h-4 w-px bg-slate-200"></div>
                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{type} PORTAL</span>
                         </div>
@@ -67,7 +68,7 @@ export default function DepartmentPortal({ department, type }) {
 
                             <div className="space-y-4">
                                 <Link 
-                                    href={`/login?id=${department.id}&type=${type}`}
+                                    href={u(`/login?id=${department.id}&type=${type}`)}
                                     className="flex items-center justify-center gap-3 w-full bg-slate-900 text-white py-5 rounded-2xl font-black shadow-xl shadow-slate-900/20 hover:bg-blue-600 hover:scale-[1.02] active:scale-95 transition-all duration-300 group"
                                 >
                                     <span>Sign in to Dashboard</span>
@@ -93,7 +94,7 @@ export default function DepartmentPortal({ department, type }) {
                     </div>
 
                     <div className="mt-8 text-center">
-                        <Link href="/" className="inline-flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors">
+                        <Link href={u("/")} className="inline-flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors">
                             <ChevronRight size={16} className="rotate-180" />
                             Return to Public Repository
                         </Link>

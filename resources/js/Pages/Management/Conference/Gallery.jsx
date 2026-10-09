@@ -12,7 +12,7 @@ import {
     Maximize2
 } from 'lucide-react';
 import BackendLayout from '@/Layouts/BackendLayout';
-import { cn } from '@/lib/utils';
+import { u, cn } from '@/lib/utils';
 
 export default function Gallery({ conference = null, symposium = null, images }) {
     const publication = conference || symposium;
@@ -26,7 +26,7 @@ export default function Gallery({ conference = null, symposium = null, images })
 
     const submit = (e) => {
         e.preventDefault();
-        post(`/editor/${type}/${publication.id}/gallery`, {
+        post(u(`/editor/${type}/${publication.id}/gallery`), {
             onSuccess: () => reset(),
             forceFormData: true,
         });
@@ -60,7 +60,7 @@ export default function Gallery({ conference = null, symposium = null, images })
                 className="space-y-8"
             >
                 <div className="flex items-center justify-between">
-                    <Link href={`/editor/${type}`} className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-emerald-600 transition-colors group">
+                    <Link href={u(`/editor/${type}`)} className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-emerald-600 transition-colors group">
                         <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" /> Back to {type === 'conference' ? 'Conferences' : 'Symposiums'}
                     </Link>
                 </div>
@@ -174,7 +174,7 @@ export default function Gallery({ conference = null, symposium = null, images })
                                                             <Maximize2 size={14} />
                                                         </button>
                                                         <Link 
-                                                            href={`/editor/${type}/gallery/${img.id}`}
+                                                            href={u(`/editor/${type}/gallery/${img.id}`)}
                                                             method="delete"
                                                             as="button"
                                                             className="p-1.5 bg-rose-500/20 backdrop-blur-md rounded-lg text-rose-200 hover:bg-rose-500 hover:text-white transition-all"

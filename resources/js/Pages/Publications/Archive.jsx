@@ -15,7 +15,7 @@ import {
     ChevronUp
 } from 'lucide-react';
 import PublicLayout from '@/Layouts/PublicLayout';
-import { splitAuthors } from '@/lib/utils';
+import { u, splitAuthors } from '@/lib/utils';
 
 export default function Archive({ journal, conference, symposium, is_current = false }) {
     const publication = journal || conference || symposium;
@@ -177,7 +177,7 @@ export default function Archive({ journal, conference, symposium, is_current = f
                                                                         {item.articles && item.articles.length > 0 ? (
                                                                             item.articles.map((article) => (
                                                                                 <div key={article.id} className="group">
-                                                                                    <Link href={`/article/${article.id}`} className="block mb-3">
+                                                                                    <Link href={u(`/article/${article.id}`)} className="block mb-3">
                                                                                         <h4 className="text-xl font-black text-slate-900 group-hover:text-blue-600 transition-colors leading-tight tracking-tight">
                                                                                             {article.title}
                                                                                         </h4>
@@ -188,7 +188,7 @@ export default function Archive({ journal, conference, symposium, is_current = f
                                                                                     </p>
                                                                                     <div className="flex flex-wrap gap-6 items-center">
                                                                                         <Link 
-                                                                                            href={`/article/${article.id}`} 
+                                                                                            href={u(`/article/${article.id}`)} 
                                                                                             className="text-xs font-black text-blue-600 uppercase tracking-widest flex items-center gap-1 hover:gap-2 transition-all"
                                                                                         >
                                                                                             View Abstract <ChevronRight size={14} />
@@ -228,8 +228,8 @@ export default function Archive({ journal, conference, symposium, is_current = f
                                         >
                                             <Link 
                                                 href={
-                                                    journal ? `/journal/${publication.id}/issue/${item.id}` : 
-                                                    (conference ? `/conference/${publication.id}/proceeding/${item.id}` : `/symposium/${publication.id}/proceeding/${item.id}`)
+                                                    journal ? u(`/journal/${publication.id}/issue/${item.id}`) : 
+                                                    (conference ? u(`/conference/${publication.id}/proceeding/${item.id}`) : u(`/symposium/${publication.id}/proceeding/${item.id}`))
                                                 }
                                                 className="block"
                                             >

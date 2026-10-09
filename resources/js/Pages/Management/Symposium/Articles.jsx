@@ -19,7 +19,7 @@ import {
     BookOpen
 } from 'lucide-react';
 import BackendLayout from '@/Layouts/BackendLayout';
-import { cn } from '@/lib/utils';
+import { u, cn } from '@/lib/utils';
 
 export default function Articles({ abstractBook, articles }) {
     const [editingArticle, setEditingArticle] = useState(null);
@@ -52,7 +52,7 @@ export default function Articles({ abstractBook, articles }) {
 
     const submit = (e) => {
         e.preventDefault();
-        post(`/editor/symposium/abstract-book/${abstractBook.id}/articles`, {
+        post(u(`/editor/symposium/abstract-book/${abstractBook.id}/articles`), {
             onSuccess: () => {
                 reset();
                 setIsFormVisible(false);
@@ -78,7 +78,7 @@ export default function Articles({ abstractBook, articles }) {
 
     const submitEdit = (e) => {
         e.preventDefault();
-        postEdit(`/editor/symposium/article/${editingArticle}`, {
+        postEdit(u(`/editor/symposium/article/${editingArticle}`), {
             onSuccess: () => {
                 setEditingArticle(null);
                 resetEdit();
@@ -125,7 +125,7 @@ export default function Articles({ abstractBook, articles }) {
                 className="max-w-6xl mx-auto space-y-8 pb-20"
             >
                 <div className="flex items-center justify-between">
-                    <Link href={`/editor/symposium/${abstractBook.symposium_id}/abstract-books`} className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-purple-600 transition-colors group">
+                    <Link href={u(`/editor/symposium/${abstractBook.symposium_id}/abstract-books`)} className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-purple-600 transition-colors group">
                         <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" /> Back to Abstract Books
                     </Link>
                 </div>
