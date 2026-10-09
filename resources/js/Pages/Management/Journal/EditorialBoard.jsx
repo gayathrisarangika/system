@@ -14,7 +14,7 @@ import {
     Search
 } from 'lucide-react';
 import BackendLayout from '@/Layouts/BackendLayout';
-import { cn } from '@/lib/utils';
+import { u, cn } from '@/lib/utils';
 
 export default function EditorialBoard({ journal, members }) {
     const { data, setData, post, reset, errors, processing } = useForm({
@@ -25,7 +25,7 @@ export default function EditorialBoard({ journal, members }) {
 
     const submit = (e) => {
         e.preventDefault();
-        post(`/editor/journal/${journal.id}/board`, {
+        post(u(`/editor/journal/${journal.id}/board`), {
             onSuccess: () => reset()
         });
     };
@@ -68,7 +68,7 @@ export default function EditorialBoard({ journal, members }) {
                 className="max-w-6xl mx-auto space-y-8 pb-20"
             >
                 <div className="flex items-center justify-between">
-                    <Link href="/editor/journal" className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors group">
+                    <Link href={u("/editor/journal")} className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors group">
                         <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" /> Back to Journals
                     </Link>
                 </div>
@@ -124,7 +124,7 @@ export default function EditorialBoard({ journal, members }) {
                                                 </td>
                                                 <td className="px-8 py-6 text-right">
                                                     <Link 
-                                                        href={`/editor/journal/board/${member.id}`} 
+                                                        href={u(`/editor/journal/board/${member.id}`)} 
                                                         method="delete" as="button" 
                                                         className="p-2.5 bg-slate-50 text-slate-400 rounded-xl hover:text-rose-600 hover:bg-white hover:shadow-lg transition-all"
                                                         title="Remove Member"

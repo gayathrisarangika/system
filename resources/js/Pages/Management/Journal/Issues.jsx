@@ -19,7 +19,7 @@ import {
     Hash
 } from 'lucide-react';
 import BackendLayout from '@/Layouts/BackendLayout';
-import { cn } from '@/lib/utils';
+import { u, cn } from '@/lib/utils';
 import { router } from '@inertiajs/react';
 
 export default function Issues({ journal, issues }) {
@@ -39,7 +39,7 @@ export default function Issues({ journal, issues }) {
     const submit = (e) => {
         e.preventDefault();
         if (editingIssue) {
-            post(`/editor/journal/issue/${editingIssue.id}`, {
+            post(u(`/editor/journal/issue/${editingIssue.id}`), {
                 onSuccess: () => {
                     reset();
                     setEditingIssue(null);
@@ -48,7 +48,7 @@ export default function Issues({ journal, issues }) {
                 forceFormData: true,
             });
         } else {
-            post(`/editor/journal/${journal.id}/issues`, {
+            post(u(`/editor/journal/${journal.id}/issues`), {
                 onSuccess: () => {
                     reset();
                     setIsFormVisible(false);
@@ -80,7 +80,7 @@ export default function Issues({ journal, issues }) {
 
     const handleDelete = (id) => {
         if (confirm('Are you sure you want to delete this issue? All associated articles will be affected.')) {
-            router.delete(`/editor/journal/issue/${id}`);
+            router.delete(u(`/editor/journal/issue/${id}`));
         }
     };
 
@@ -122,7 +122,7 @@ export default function Issues({ journal, issues }) {
                 className="max-w-6xl mx-auto space-y-8 pb-20"
             >
                 <div className="flex items-center justify-between">
-                    <Link href="/editor/journal" className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors group">
+                    <Link href={u("/editor/journal")} className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors group">
                         <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" /> Back to Journals
                     </Link>
                 </div>
@@ -269,7 +269,7 @@ export default function Issues({ journal, issues }) {
 
                                     <div className="space-y-3 mt-auto">
                                         <Link 
-                                            href={`/editor/journal/issue/${issue.id}/articles`} 
+                                            href={u(`/editor/journal/issue/${issue.id}/articles`)} 
                                             className="w-full flex items-center justify-center gap-2 py-3 bg-slate-900 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 shadow-md transition-all"
                                         >
                                             <Layers size={14} /> Manage Articles

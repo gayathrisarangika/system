@@ -1,0 +1,37 @@
+// Disposable cache for Copilot user responses, safe to delete. Managed automatically.
+// User settings belong in settings.json.
+{
+  "copilotUserCache": {
+    "v1:0eaeba5593d5daa873f4afefd3bea4477cff494b97f36415519222af143757c7": {
+      "schemaVersion": 1,
+      "generation": "d69b6069-d00e-4965-9831-4c39ac0e2b1b",
+      "retrievedAt": "2026-09-23T11:13:55.955Z",
+      "response": {
+        "login": "gayathrisarangika",
+        "access_type_sku": "no_access",
+        "analytics_tracking_id": "88e117bdaf4aa29dfd98ebf01107ca2e",
+        "assigned_date": null,
+        "can_signup_for_limited": true,
+        "chat_enabled": false,
+        "copilot_plan": "individual",
+        "copilotignore_enabled": false,
+        "endpoints": {
+          "api": "https://api.individual.githubcopilot.com",
+          "origin-tracker": "https://origin-tracker.individual.githubcopilot.com",
+          "proxy": "https://proxy.individual.githubcopilot.com",
+          "telemetry": "https://telemetry.individual.githubcopilot.com",
+          "exp": "https://exp.individual.githubcopilot.com"
+        },
+        "organization_login_list": [],
+        "organization_list": [],
+        "is_mcp_enabled": false,
+        "restricted_telemetry": true,
+        "is_staff": false,
+        "te": false,
+        "can_upgrade_plan": false,
+        "cloud_session_storage_enabled": false,
+        "cli_remote_control_enabled": false
+      }
+    }
+  }
+}

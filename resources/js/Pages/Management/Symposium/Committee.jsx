@@ -13,7 +13,7 @@ import {
     Search
 } from 'lucide-react';
 import BackendLayout from '@/Layouts/BackendLayout';
-import { cn } from '@/lib/utils';
+import { u, cn } from '@/lib/utils';
 
 export default function Committee({ symposium, members }) {
     const { data, setData, post, reset, errors, processing } = useForm({
@@ -24,7 +24,7 @@ export default function Committee({ symposium, members }) {
 
     const submit = (e) => {
         e.preventDefault();
-        post(`/editor/symposium/${symposium.id}/committee`, {
+        post(u(`/editor/symposium/${symposium.id}/committee`), {
             onSuccess: () => reset()
         });
     };
@@ -67,7 +67,7 @@ export default function Committee({ symposium, members }) {
                 className="max-w-6xl mx-auto space-y-8 pb-20"
             >
                 <div className="flex items-center justify-between">
-                    <Link href="/editor/symposium" className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-purple-600 transition-colors group">
+                    <Link href={u("/editor/symposium")} className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-purple-600 transition-colors group">
                         <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" /> Back to Symposiums
                     </Link>
                 </div>
@@ -123,7 +123,7 @@ export default function Committee({ symposium, members }) {
                                                 </td>
                                                 <td className="px-8 py-6 text-right">
                                                     <Link 
-                                                        href={`/editor/symposium/committee/${member.id}`} 
+                                                        href={u(`/editor/symposium/committee/${member.id}`)} 
                                                         method="delete" as="button" 
                                                         className="p-2.5 bg-slate-50 text-slate-400 rounded-xl hover:text-rose-600 hover:bg-white hover:shadow-lg transition-all"
                                                         title="Remove Member"

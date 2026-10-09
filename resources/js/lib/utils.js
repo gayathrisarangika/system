@@ -6,6 +6,22 @@ export function cn(...inputs) {
 }
 
 /**
+ * Prefix an internal app path with the deployment base path (e.g. "/journals").
+ *
+ * Reads Vite's `import.meta.env.BASE_URL` (set from `base` in vite.config.js),
+ * so links resolve to "/journals/..." in production and "/..." in local dev
+ * automatically. Pass absolute in-app paths only (starting with "/").
+ *
+ * @param {string} path - e.g. "/login" or `/journal/${id}`
+ * @returns {string} base-prefixed URL, e.g. "/journals/login"
+ */
+export function u(path = "/") {
+    const base = (import.meta.env.BASE_URL || "/").replace(/\/+$/, ""); // "/journals" or ""
+    if (!path || path === "/") return base || "/";
+    return base + (path.startsWith("/") ? path : "/" + path);
+}
+
+/**
  * Intelligently splits a string of authors into an array of individual author names.
  * Handles separators like ";", "and", "&", and commas while preserving "Surname, Given" formats.
  * @param {string} authorStr - The raw author string.

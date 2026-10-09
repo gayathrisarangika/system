@@ -9,7 +9,7 @@ import {
     AlertCircle,
     ChevronLeft
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { u, cn } from '@/lib/utils';
 
 export default function Login({ pub_id, type }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -21,7 +21,7 @@ export default function Login({ pub_id, type }) {
 
     const submit = (e) => {
         e.preventDefault();
-        post('/login');
+        post(u('/login'));
     };
 
     return (
@@ -87,7 +87,7 @@ export default function Login({ pub_id, type }) {
                                 <div>
                                     <div className="flex justify-between items-center mb-2 ml-1">
                                         <label className="block text-xs font-black text-slate-400 uppercase tracking-widest">Password</label>
-                                        <Link href="/forgot-password" size="sm" className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-800 transition-colors">Forgot?</Link>
+                                        <Link href={u("/forgot-password")} size="sm" className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-800 transition-colors">Forgot?</Link>
                                     </div>
                                     <div className="relative group">
                                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-600 transition-colors">
@@ -120,7 +120,7 @@ export default function Login({ pub_id, type }) {
 
                     <div className="mt-8 flex flex-col items-center gap-6">
                         <Link 
-                            href={pub_id ? "/backend-selection?type=" + type : "/backend-login"}
+                            href={pub_id ? u("/backend-selection?type=" + type) : u("/backend-login")}
                             className="inline-flex items-center gap-2 text-xs font-black text-slate-400 uppercase tracking-widest hover:text-slate-900 transition-colors"
                         >
                             <ChevronLeft size={16} />

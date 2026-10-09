@@ -19,7 +19,7 @@ import {
     Link2,
     Mail
 } from "lucide-react";
-import { cn, splitAuthors } from "@/lib/utils";
+import { u, cn, splitAuthors } from '@/lib/utils';
 
 export default function Article({ article, journal, conference, symposium }) {
     const [copied, setCopied] = useState(false);
@@ -114,10 +114,10 @@ export default function Article({ article, journal, conference, symposium }) {
     const citationAPA = `${authorsAPA} (${article.year}). ${article.title}. ${pubTitle}${article.issue ? `, ${article.issue.volume}(${article.issue.issue})` : ''}, ${article.pages || '??'}. ${article.doi ? `https://doi.org/${article.doi}` : window.location.href}`;
 
     const breadcrumbLinks = [
-        { label: "Archive", href: `/${type}/${publication.id}/archive` },
+        { label: "Archive", href: u(`/${type}/${publication.id}/archive`) },
         { 
             label: article.issue ? `Vol. ${article.issue.volume} No. ${article.issue.issue}` : 'Abstract Book', 
-            href: `/${type}/${publication.id}/archive#${article.issue ? `issue-${article.issue.id}` : (article.conference_proceeding_id ? `proceeding-${article.conference_proceeding_id}` : `proceeding-${article.symposium_proceeding_id}`)}` 
+            href: u(`/${type}/${publication.id}/archive#${article.issue ? `issue-${article.issue.id}` : (article.conference_proceeding_id ? `proceeding-${article.conference_proceeding_id}` : `proceeding-${article.symposium_proceeding_id}`)}`) 
         },
         { label: "Article Details", href: "#" }
     ];
@@ -154,7 +154,7 @@ export default function Article({ article, journal, conference, symposium }) {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-12">
                 {/* Breadcrumbs */}
                 <nav className="flex mb-8 items-center space-x-2 text-sm text-slate-500">
-                    <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
+                    <Link href={u("/")} className="hover:text-blue-600 transition-colors">Home</Link>
                     <ChevronLeft className="h-4 w-4 rotate-180" />
                     {breadcrumbLinks.map((link, idx) => (
                         <React.Fragment key={idx}>
@@ -329,7 +329,7 @@ export default function Article({ article, journal, conference, symposium }) {
                                 Full Text
                             </h3>
                             <a 
-                                href={`/article/${article.id}/download`}
+                                href={u(`/article/${article.id}/download`)}
                                 className="flex items-center justify-center w-full px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-blue-200 group"
                             >
                                 <Download className="h-5 w-5 mr-3 group-hover:translate-y-0.5 transition-transform" />
@@ -390,7 +390,7 @@ export default function Article({ article, journal, conference, symposium }) {
                                     )}
                                 </div>
                                 <Link 
-                                    href={`/${type}/${publication.id}`}
+                                    href={u(`/${type}/${publication.id}`)}
                                     className="inline-flex items-center text-sm font-bold text-white hover:underline pt-2"
                                 >
                                     View Publication

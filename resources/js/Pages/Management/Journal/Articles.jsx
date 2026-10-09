@@ -19,7 +19,21 @@ import {
     BookOpen
 } from 'lucide-react';
 import BackendLayout from '@/Layouts/BackendLayout';
-import { cn } from '@/lib/utils';
+import { u, cn } from '@/lib/utils';
+
+const InputGroup = ({ label, icon: Icon, children, error, className }) => (
+    <div className={cn("space-y-1.5", className)}>
+        <label className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] ml-1">
+            {Icon && <Icon size={12} className="text-blue-500" />} {label}
+        </label>
+        {children}
+        {error && (
+            <div className="text-rose-500 text-[10px] font-bold mt-1 ml-1 uppercase">
+                {error}
+            </div>
+        )}
+    </div>
+);
 
 export default function Articles({ issue, articles }) {
     const [editingArticle, setEditingArticle] = useState(null);
@@ -52,7 +66,7 @@ export default function Articles({ issue, articles }) {
 
     const submit = (e) => {
         e.preventDefault();
-        post(`/editor/journal/issue/${issue.id}/articles`, {
+        post(u(`/editor/journal/issue/${issue.id}/articles`), {
             onSuccess: () => {
                 reset();
                 setIsFormVisible(false);
@@ -78,7 +92,7 @@ export default function Articles({ issue, articles }) {
 
     const submitEdit = (e) => {
         e.preventDefault();
-        postEdit(`/editor/journal/article/${editingArticle}`, {
+        postEdit(u(`/editor/journal/article/${editingArticle}`), {
             onSuccess: () => {
                 setEditingArticle(null);
                 resetEdit();
@@ -104,15 +118,7 @@ export default function Articles({ issue, articles }) {
         }
     };
 
-    const InputGroup = ({ label, icon: Icon, children, error, className }) => (
-        <div className={cn("space-y-1.5", className)}>
-            <label className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] ml-1">
-                {Icon && <Icon size={12} className="text-blue-500" />} {label}
-            </label>
-            {children}
-            {error && <div className="text-rose-500 text-[10px] font-bold mt-1 ml-1 uppercase">{error}</div>}
-        </div>
-    );
+  
 
     return (
         <BackendLayout title={`Articles - Vol. ${issue.volume} No. ${issue.issue}`}>
@@ -125,7 +131,7 @@ export default function Articles({ issue, articles }) {
                 className="max-w-6xl mx-auto space-y-8 pb-20"
             >
                 <div className="flex items-center justify-between">
-                    <Link href={`/editor/journal/${issue.journal_id}/issues`} className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors group">
+                    <Link href={u(`/editor/journal/${issue.journal_id}/issues`)} className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors group">
                         <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" /> Back to Issues
                     </Link>
                 </div>

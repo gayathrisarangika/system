@@ -11,7 +11,7 @@ import {
     ExternalLink,
     LayoutDashboard
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { u, cn } from '@/lib/utils';
 
 export default function PublicLayout({ children, publication = {}, type = 'journal', active_page = '' }) {
     const pub = publication || {};
@@ -29,11 +29,11 @@ export default function PublicLayout({ children, publication = {}, type = 'journ
     }, []);
 
     const navLinks = [
-        { name: 'Home', href: `/${type}/${pubId}`, id: 'home' },
-        { name: type === 'journal' ? 'Editorial Board' : 'Committee', href: `/${type}/${pubId}/${type === 'journal' ? 'editorial-board' : 'committee'}`, id: 'editorial' },
-        { name: 'Current', href: `/${type}/${pubId}/current`, id: 'current' },
-        { name: 'Archive', href: `/${type}/${pubId}/archive`, id: 'archive' },
-        { name: 'Contact', href: `/${type}/${pubId}/contact`, id: 'contact' },
+        { name: 'Home', href: u(`/${type}/${pubId}`), id: 'home' },
+        { name: type === 'journal' ? 'Editorial Board' : 'Committee', href: u(`/${type}/${pubId}/${type === 'journal' ? 'editorial-board' : 'committee'}`), id: 'editorial' },
+        { name: 'Current', href: u(`/${type}/${pubId}/current`), id: 'current' },
+        { name: 'Archive', href: u(`/${type}/${pubId}/archive`), id: 'archive' },
+        { name: 'Contact', href: u(`/${type}/${pubId}/contact`), id: 'contact' },
     ];
 
     return (
@@ -61,7 +61,7 @@ export default function PublicLayout({ children, publication = {}, type = 'journ
                         )}
                     >
                         {/* Logo/Title */}
-                        <Link href="/" className="flex items-center gap-3 group">
+                        <Link href={u("/")} className="flex items-center gap-3 group">
                             <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform duration-300">
                                 {title ? title.charAt(0) : 'A'}
                             </div>
@@ -143,7 +143,7 @@ export default function PublicLayout({ children, publication = {}, type = 'journ
                             <p className="text-blue-400 font-bold uppercase tracking-widest text-xs mt-2">{universityName}</p>
                         </div>
                         <div className="flex gap-4">
-                            <Link href="/" className="px-6 py-3 bg-white/5 hover:bg-white/10 rounded-xl transition-all text-sm font-bold flex items-center gap-2">
+                            <Link href={u("/")} className="px-6 py-3 bg-white/5 hover:bg-white/10 rounded-xl transition-all text-sm font-bold flex items-center gap-2">
                                 <ExternalLink size={16} />
                                 Main Hub
                             </Link>

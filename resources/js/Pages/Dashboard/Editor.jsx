@@ -10,7 +10,7 @@ import {
     ShieldCheck
 } from 'lucide-react';
 import BackendLayout from '@/Layouts/BackendLayout';
-import { cn } from '@/lib/utils';
+import { u, cn } from '@/lib/utils';
 
 export default function Editor({ type = 'publication', user = {} }) {
     const safeType = type || 'publication';
@@ -100,7 +100,7 @@ export default function Editor({ type = 'publication', user = {} }) {
                 <div className="grid md:grid-cols-3 gap-6">
                     <motion.div variants={itemVariants}>
                         <Link 
-                            href={`/editor/${safeType}`}
+                            href={u(`/editor/${safeType}`)}
                             className="group block h-full bg-white p-8 rounded-3xl border border-slate-200/60 shadow-sm hover:shadow-2xl hover:shadow-blue-500/10 hover:border-blue-500/30 transition-all duration-500 relative overflow-hidden"
                         >
                             <div className="absolute top-0 right-0 p-8 text-slate-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500">

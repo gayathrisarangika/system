@@ -15,7 +15,7 @@ import {
     Globe
 } from 'lucide-react';
 import BackendLayout from '@/Layouts/BackendLayout';
-import { cn } from '@/lib/utils';
+import { u, cn } from '@/lib/utils';
 
 export default function Form({ conference = null, pre_filled_title = '' }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -38,11 +38,11 @@ export default function Form({ conference = null, pre_filled_title = '' }) {
     const submit = (e) => {
         e.preventDefault();
         if (conference) {
-            post(`/editor/conference/${conference.id}`, {
+            post(u(`/editor/conference/${conference.id}`), {
                 forceFormData: true,
             });
         } else {
-            post('/editor/conference', {
+            post(u('/editor/conference'), {
                 forceFormData: true,
             });
         }
@@ -95,7 +95,7 @@ export default function Form({ conference = null, pre_filled_title = '' }) {
                 className="max-w-5xl mx-auto space-y-8 pb-20"
             >
                 <div className="flex items-center justify-between">
-                    <Link href="/editor/conference" className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-emerald-600 transition-colors group">
+                    <Link href={u("/editor/conference")} className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-emerald-600 transition-colors group">
                         <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" /> Back to Conferences
                     </Link>
                 </div>

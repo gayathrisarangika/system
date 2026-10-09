@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { u } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
 
 export default function RecentPublicationsCarousel({ items, title = "Recent Publications" }) {
@@ -39,11 +40,11 @@ export default function RecentPublicationsCarousel({ items, title = "Recent Publ
                     {items.map((item, index) => (
                         <Link 
                             key={`${item.type}-${item.id}`} 
-                            href={
-                                item.type === 'issue' ? `/journal/${item.journal_id}/issue/${item.id}` : 
-                                item.type === 'conference' ? `/conference/${item.conference_id}/proceeding/${item.id}` : 
+                            href={u(
+                                item.type === 'issue' ? `/journal/${item.journal_id}/issue/${item.id}` :
+                                item.type === 'conference' ? `/conference/${item.conference_id}/proceeding/${item.id}` :
                                 `/symposium/${item.symposium_id}/proceeding/${item.id}`
-                            }
+                            )}
                             className="flex-none w-52 snap-start group/card"
                         >
                             <div className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 group-hover/card:shadow-xl group-hover/card:-translate-y-2 border border-gray-100">

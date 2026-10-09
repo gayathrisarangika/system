@@ -1,4 +1,5 @@
 import React from 'react';
+import { u } from '@/lib/utils';
 import { Head, useForm } from '@inertiajs/react';
 import BackendLayout from '@/Layouts/BackendLayout';
 
@@ -23,11 +24,11 @@ export default function Form({ symposium = null, pre_filled_title = '' }) {
     const submit = (e) => {
         e.preventDefault();
         if (symposium) {
-            post(`/editor/symposium/${symposium.id}`, {
+            post(u(`/editor/symposium/${symposium.id}`), {
                 forceFormData: true,
             });
         } else {
-            post('/editor/symposium', {
+            post(u('/editor/symposium'), {
                 forceFormData: true,
             });
         }

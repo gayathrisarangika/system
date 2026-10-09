@@ -5,6 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
 
 export default defineConfig({
+    base: '/journals/',
     plugins: [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.jsx'],
@@ -23,4 +24,5 @@ export default defineConfig({
             ignored: ['**/storage/framework/views/**'],
         },
     },
+    
 });
