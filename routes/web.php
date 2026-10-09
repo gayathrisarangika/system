@@ -7,6 +7,8 @@ use App\Http\Controllers\JournalManagementController;
 use App\Http\Controllers\ConferenceManagementController;
 use App\Http\Controllers\SymposiumManagementController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PaperSubmissionController;
+use App\Http\Controllers\JournalSubmissionManagementController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/backend-login', [AuthController::class, 'showBackendSelector'])->name('backend.selector');
@@ -45,7 +47,18 @@ Route::get('/symposium/{symposium}/archive', [PublicController::class, 'symposiu
 Route::get('/symposium/{symposium}/proceeding/{proceeding}', [PublicController::class, 'symposiumProceeding'])->name('symposium.proceeding');
 Route::get('/symposium/{symposium}/contact', [PublicController::class, 'symposiumContact'])->name('symposium.contact');
 
+// Paper Submission - Public & Author Routes
+Route::get('/submit-paper', [PaperSubmissionController::class, 'index'])->name('submissions.index');
+Route::get('/submit-paper/journal/{journal}', [PaperSubmissionController::class, 'create'])->name('submissions.create');
+Route::post('/submit-paper/journal/{journal}/confirm', [PaperSubmissionController::class, 'confirm'])->name('submissions.confirm');
+Route::post('/submit-paper/journal/{journal}', [PaperSubmissionController::class, 'store'])->name('submissions.store');
+
 Route::middleware('auth')->group(function () {
+    // Author Dashboard & Secure Downloads
+    Route::get('/author/submissions', [PaperSubmissionController::class, 'mySubmissions'])->name('author.submissions');
+    Route::get('/author/submission/{submission}', [PaperSubmissionController::class, 'showSubmission'])->name('author.submission.show');
+    Route::get('/author/submission/{submission}/file/{file}', [PaperSubmissionController::class, 'downloadFile'])->name('author.submission.file.download');
+
     Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
     Route::post('/admin/users', [DashboardController::class, 'storeUser'])->name('admin.users.store');
     
@@ -85,6 +98,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/journal/issue/{issue}/articles', [JournalManagementController::class, 'manageArticles'])->name('journal.articles');
         Route::post('/journal/issue/{issue}/articles', [JournalManagementController::class, 'storeArticle']);
         Route::post('/journal/article/{article}', [JournalManagementController::class, 'updateArticle'])->name('journal.article.update');
+
+        // Journal Operator Submissions Management & Settings
+        Route::get('/journal/{journal}/submissions', [JournalSubmissionManagementController::class, 'submissions'])->name('journal.submissions');
+        Route::get('/submission/{submission}', [JournalSubmissionManagementController::class, 'show'])->name('submission.show');
+        Route::post('/submission/{submission}/status', [JournalSubmissionManagementController::class, 'updateStatus'])->name('submission.status.update');
+        Route::get('/journal/{journal}/submission-settings', [JournalSubmissionManagementController::class, 'editSettings'])->name('journal.submission_settings');
+        Route::post('/journal/{journal}/submission-settings', [JournalSubmissionManagementController::class, 'updateSettings'])->name('journal.submission_settings.update');
+        Route::get('/submission/{submission}/file/{file}', [JournalSubmissionManagementController::class, 'downloadFile'])->name('submission.file.download');
 
         // Conference
         Route::get('/conference', [ConferenceManagementController::class, 'index'])->name('conference.index');
