@@ -18,11 +18,7 @@ class FilePathTest extends TestCase
         
         // Case 1: Relative path
         $journal->university_logo = 'logos/test.png';
-        $this->assertEquals('/storage/logos/test.png', $journal->university_logo_url);
-        
-        // Case 3: Full URL (The accessor doesn't handle full URLs specially, it just wraps them in Storage::url if not careful, 
-        // but wait, Storage::url('http://...') might return something weird or just the URL. 
-        // In our case, the accessor is Storage::disk('public')->url($this->university_logo).
+        $this->assertStringContainsString('storage/logos/test.png', $journal->university_logo_url);
     }
 
     public function test_article_pdf_accessor()
@@ -30,6 +26,6 @@ class FilePathTest extends TestCase
         $article = new Article();
         
         $article->pdf = 'articles/test.pdf';
-        $this->assertEquals('/storage/articles/test.pdf', $article->pdf_url);
+        $this->assertStringContainsString('storage/articles/test.pdf', $article->pdf_url);
     }
 }

@@ -5,7 +5,6 @@ import {
     LayoutDashboard, 
     BookOpen, 
     Users, 
-    Award, 
     ChevronRight, 
     ArrowRight,
     Globe,
@@ -13,8 +12,8 @@ import {
     Search,
     Menu,
     X,
-    ExternalLink,
-    GraduationCap
+    GraduationCap,
+    Send
 } from 'lucide-react';
 import { u, cn } from '@/lib/utils';
 import PublicationCard from '@/Components/PublicationCard';
@@ -94,22 +93,29 @@ export default function Home({ journals, conferences, symposiums }) {
                         </Link>
 
                         {/* Desktop Navigation */}
-                        <div className="hidden md:flex items-center gap-8">
+                        <div className="hidden md:flex items-center gap-6">
                             <Link href="#journals" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Journals</Link>
                             <Link href="#conferences" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Conferences</Link>
                             <Link href="#symposiums" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Symposiums</Link>
+
+                            <Link 
+                                href={u("/submit-paper")}
+                                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md shadow-blue-600/20 transition-all hover:scale-[1.02]"
+                            >
+                                <Send size={15} />
+                                <span>Paper Submission</span>
+                            </Link>
                             
-                            <div className="h-6 w-px bg-slate-200 mx-2"></div>
+                            <div className="h-6 w-px bg-slate-200 mx-1"></div>
                             
                             <Link 
-                                 href={u("/backend-login")}
-                                className="relative group px-6 py-2.5 rounded-xl overflow-hidden"
+                                href={u("/backend-login")}
+                                className="relative group px-5 py-2.5 rounded-xl overflow-hidden"
                             >
-                                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-700 group-hover:scale-105 transition-transform duration-300"></div>
-                                <div className="absolute inset-0 opacity-0 group-hover:opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
+                                <div className="absolute inset-0 bg-slate-900 group-hover:bg-slate-800 transition-colors"></div>
                                 <span className="relative flex items-center gap-2 text-sm font-bold text-white tracking-wide">
                                     Login
-                                    <LayoutDashboard size={16} className="group-hover:translate-x-0.5 transition-transform" />
+                                    <LayoutDashboard size={15} className="group-hover:translate-x-0.5 transition-transform" />
                                 </span>
                             </Link>
                         </div>
@@ -138,11 +144,22 @@ export default function Home({ journals, conferences, symposiums }) {
                             <Link href="#journals" onClick={() => setMobileMenuOpen(false)} className="text-xl font-bold text-slate-800">Journals</Link>
                             <Link href="#conferences" onClick={() => setMobileMenuOpen(false)} className="text-xl font-bold text-slate-800">Conferences</Link>
                             <Link href="#symposiums" onClick={() => setMobileMenuOpen(false)} className="text-xl font-bold text-slate-800">Symposiums</Link>
+                            
+                            <Link 
+                                href={u("/submit-paper")} 
+                                onClick={() => setMobileMenuOpen(false)} 
+                                className="w-full bg-blue-600 text-white text-center py-3.5 rounded-xl font-bold text-lg shadow-lg flex items-center justify-center gap-2"
+                            >
+                                <Send size={18} />
+                                Paper Submission
+                            </Link>
+
                             <div className="w-full h-px bg-slate-100 my-2"></div>
+                            
                             <Link 
                                 href={u("/backend-login")}
                                 onClick={() => setMobileMenuOpen(false)}
-                                className="w-full bg-blue-600 text-white text-center py-4 rounded-2xl font-bold text-lg shadow-xl shadow-blue-500/20"
+                                className="w-full bg-slate-900 text-white text-center py-3.5 rounded-xl font-bold text-lg shadow-xl"
                             >
                                 Backend Login
                             </Link>
@@ -185,19 +202,20 @@ export default function Home({ journals, conferences, symposiums }) {
 
                             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                                 <Link 
-                                    href="#journals"
-                                    className="w-full sm:w-auto px-8 py-4 bg-slate-900 text-white rounded-2xl font-bold shadow-2xl shadow-slate-900/20 hover:bg-slate-800 transition-all flex items-center justify-center gap-2 group"
+                                    href={u("/submit-paper")}
+                                    className="w-full sm:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold shadow-2xl shadow-blue-600/30 transition-all flex items-center justify-center gap-3 group text-lg"
                                 >
-                                    Explore
+                                    <Send size={20} />
+                                    Submit Paper
                                     <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                                 </Link>
-                                <button 
-                                    onClick={() => window.open('https://www.sab.ac.lk/fssl/', '_blank')}
-                                    className="w-full sm:w-auto px-8 py-4 bg-white text-slate-700 border border-slate-200 rounded-2xl font-bold hover:bg-slate-50 transition-all shadow-sm flex items-center justify-center gap-2"
+
+                                <Link 
+                                    href="#journals"
+                                    className="w-full sm:w-auto px-8 py-4 bg-slate-900 text-white rounded-2xl font-bold shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all flex items-center justify-center gap-2 group text-lg"
                                 >
-                                    Faculty Website
-                                    <Globe size={18} />
-                                </button>
+                                    Explore Publications
+                                </Link>
                             </div>
                         </motion.div>
                     </div>
@@ -263,7 +281,7 @@ export default function Home({ journals, conferences, symposiums }) {
                             </div>
                             
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
-                                {journals.map((journal, index) => (
+                                {journals.map((journal) => (
                                     <motion.div key={journal.id} variants={itemVariants}>
                                         <PublicationCard 
                                             href={u(`/journal/${journal.id}`)}
@@ -305,7 +323,7 @@ export default function Home({ journals, conferences, symposiums }) {
                                 </div>
                                 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
-                                    {conferences.map((conf, index) => (
+                                    {conferences.map((conf) => (
                                         <motion.div key={conf.id} variants={itemVariants}>
                                             <PublicationCard 
                                                 href={u(`/conference/${conf.id}`)}
@@ -345,7 +363,7 @@ export default function Home({ journals, conferences, symposiums }) {
                             </div>
                             
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
-                                {symposiums.map((symp, index) => (
+                                {symposiums.map((symp) => (
                                     <motion.div key={symp.id} variants={itemVariants}>
                                         <PublicationCard 
                                             href={u(`/symposium/${symp.id}`)}
@@ -394,14 +412,6 @@ export default function Home({ journals, conferences, symposiums }) {
                             <p className="text-slate-400 text-lg max-w-md leading-relaxed font-medium mb-8">
                                 Empowering academic excellence through a unified platform for journals, conferences, and symposiums. Part of the Faculty of Social Sciences and Languages.
                             </p>
-                            <div className="flex gap-4">
-                                {['Facebook', 'Twitter', 'LinkedIn', 'YouTube'].map(social => (
-                                    <button key={social} className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white hover:text-slate-950 transition-all duration-300">
-                                        <span className="sr-only">{social}</span>
-                                        <ChevronRight size={18} className="opacity-50" />
-                                    </button>
-                                ))}
-                            </div>
                         </div>
 
                         <div>
@@ -418,6 +428,12 @@ export default function Home({ journals, conferences, symposiums }) {
                                         </Link>
                                     </li>
                                 ))}
+                                <li>
+                                    <Link href={u("/submit-paper")} className="text-blue-400 hover:text-blue-300 font-bold transition-colors flex items-center gap-2">
+                                        <Send size={14} />
+                                        Paper Submission
+                                    </Link>
+                                </li>
                             </ul>
                         </div>
 

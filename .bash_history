@@ -82,3 +82,7 @@ cd  /var/www/html/journals
 pwd
 ls
 npm run build
+git status
+git add .
+git commit -m "Update publication management system"
+git push 
