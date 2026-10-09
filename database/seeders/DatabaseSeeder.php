@@ -14,88 +14,128 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $dept = Department::create(['name' => 'Department of Computing']);
+        $dept1 = Department::firstOrCreate(['name' => 'Department of Computing']);
+        $dept2 = Department::firstOrCreate(['name' => 'Department of Economics and Statistics']);
+        $dept3 = Department::firstOrCreate(['name' => 'Department of Social Sciences']);
+        $dept4 = Department::firstOrCreate(['name' => 'Department of Languages']);
+        $dept5 = Department::firstOrCreate(['name' => 'Department of Geography']);
 
-        $admin = User::create([
-            'name' => 'Admin User',
-            'username' => 'admin',
-            'password' => Hash::make('password'),
-            'role' => 'admin',
-        ]);
+        $admin = User::firstOrCreate(
+            ['username' => 'admin'],
+            [
+                'name' => 'Admin User',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+            ]
+        );
 
-        $editor = User::create([
-            'name' => 'Editor User',
-            'username' => 'editor',
-            'password' => Hash::make('password'),
-            'role' => 'editor',
-            'department_id' => $dept->id,
-        ]);
+        $editor = User::firstOrCreate(
+            ['username' => 'editor'],
+            [
+                'name' => 'Editor User',
+                'password' => Hash::make('password'),
+                'role' => 'editor',
+                'department_id' => $dept1->id,
+            ]
+        );
 
-        $journal = Journal::create([
-            'editor_id' => $editor->id,
-            'department_id' => $dept->id,
-            'journal_title' => 'International Journal of AI Research',
-            'university_name' => 'Sabaragamuwa University of Sri Lanka',
-            'journal_details' => 'Leading journal in Artificial Intelligence.',
-            'aim_scope' => 'Covers all aspects of AI.',
-            'mission' => 'To advance AI research.',
-            'status' => 'approved',
-        ]);
+        // Ensure 5 approved journals exist for testing paper submission
+        $journalsData = [
+            [
+                'journal_title' => 'Sabaragamuwa Journal of Social Sciences',
+                'dept_id' => $dept3->id,
+            ],
+            [
+                'journal_title' => 'Journal of Economics and Development',
+                'dept_id' => $dept2->id,
+            ],
+            [
+                'journal_title' => 'Journal of Languages and Culture',
+                'dept_id' => $dept4->id,
+            ],
+            [
+                'journal_title' => 'Journal of Computing and Information Technology',
+                'dept_id' => $dept1->id,
+            ],
+            [
+                'journal_title' => 'Journal of Geographical Studies',
+                'dept_id' => $dept5->id,
+            ],
+        ];
 
-        $conf = \App\Models\Conference::create([
-            'editor_id' => $admin->id,
-            'department_id' => $dept->id,
-            'conference_title' => 'International Conference on Social Sciences and Languages',
-            'university_name' => 'Sabaragamuwa University of Sri Lanka',
-            'status' => 'approved',
-        ]);
+        foreach ($journalsData as $jData) {
+            Journal::firstOrCreate(
+                ['journal_title' => $jData['journal_title']],
+                [
+                    'editor_id' => $editor->id,
+                    'department_id' => $jData['dept_id'],
+                    'university_name' => 'Sabaragamuwa University of Sri Lanka',
+                    'journal_details' => 'Premier research journal by Sabaragamuwa University of Sri Lanka.',
+                    'aim_scope' => 'Covers peer-reviewed academic research.',
+                    'mission' => 'Advancing academic knowledge and scholarly research.',
+                    'status' => 'approved',
+                ]
+            );
+        }
 
-        \App\Models\ConferenceProceeding::create([
-            'conference_id' => $conf->id,
-            'year' => 2026,
-            'version' => 'First Edition',
-            'pdf_link' => '#',
-        ]);
+        $conf = \App\Models\Conference::firstOrCreate(
+            ['conference_title' => 'International Conference on Social Sciences and Languages'],
+            [
+                'editor_id' => $admin->id,
+                'department_id' => $dept1->id,
+                'university_name' => 'Sabaragamuwa University of Sri Lanka',
+                'status' => 'approved',
+            ]
+        );
 
-        $symp = \App\Models\Symposium::create([
-            'editor_id' => $admin->id,
-            'department_id' => $dept->id,
-            'symposium_title' => "Sabaragamuwa Social Sciences & Languages Students' Annual Symposium",
-            'university_name' => 'Sabaragamuwa University of Sri Lanka',
-            'status' => 'approved',
-        ]);
+        \App\Models\ConferenceProceeding::firstOrCreate(
+            ['conference_id' => $conf->id, 'year' => 2026],
+            [
+                'version' => 'First Edition',
+                'pdf_link' => '#',
+            ]
+        );
 
-        \App\Models\SymposiumProceeding::create([
-            'symposium_id' => $symp->id,
-            'year' => 2026,
-            'version' => 'Inaugural Issue',
-            'pdf_link' => '#',
-        ]);
+        $symp = \App\Models\Symposium::firstOrCreate(
+            ['symposium_title' => "Sabaragamuwa Social Sciences & Languages Students' Annual Symposium"],
+            [
+                'editor_id' => $admin->id,
+                'department_id' => $dept1->id,
+                'university_name' => 'Sabaragamuwa University of Sri Lanka',
+                'status' => 'approved',
+            ]
+        );
 
-        $issue = Issue::create([
-            'journal_id' => $journal->id,
-            'volume' => 1,
-            'issue' => 1,
-            'year' => 2026,
-            'is_current_issue' => true,
-        ]);
+        \App\Models\SymposiumProceeding::firstOrCreate(
+            ['symposium_id' => $symp->id, 'year' => 2026],
+            [
+                'version' => 'Inaugural Issue',
+                'pdf_link' => '#',
+            ]
+        );
 
-        Article::create([
-            'issue_id' => $issue->id,
-            'title' => 'Deep Learning in 2026',
-            'author' => 'Dr. Jane Smith, Prof. Alan Turing',
-            'abstract' => 'An overview of deep learning advancements.',
-            'keywords' => 'AI, Deep Learning',
-            'year' => 2026,
-            'pdf' => '#',
-        ]);
+        $firstJournal = Journal::where('status', 'approved')->first();
+        if ($firstJournal) {
+            $issue = Issue::firstOrCreate(
+                ['journal_id' => $firstJournal->id, 'volume' => 1, 'issue' => 1],
+                [
+                    'year' => 2026,
+                    'is_current_issue' => true,
+                ]
+            );
 
-        Journal::create([
-            'editor_id' => $editor->id,
-            'department_id' => $dept->id,
-            'journal_title' => 'Pending Journal',
-            'university_name' => 'Test Uni',
-            'status' => 'pending',
-        ]);
+            Article::firstOrCreate(
+                ['issue_id' => $issue->id, 'title' => 'Deep Learning in 2026'],
+                [
+                    'author' => 'Dr. Jane Smith, Prof. Alan Turing',
+                    'abstract' => 'An overview of deep learning advancements.',
+                    'keywords' => 'AI, Deep Learning',
+                    'year' => 2026,
+                    'pdf' => '#',
+                ]
+            );
+        }
+
+        $this->call(SubmissionSettingsSeeder::class);
     }
 }

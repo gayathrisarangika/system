@@ -9,7 +9,7 @@ import {
     BookOpen, 
     Mail, 
     ExternalLink,
-    LayoutDashboard
+    Send
 } from 'lucide-react';
 import { u, cn } from '@/lib/utils';
 
@@ -87,6 +87,14 @@ export default function PublicLayout({ children, publication = {}, type = 'journ
                                     {link.name}
                                 </Link>
                             ))}
+
+                            <Link
+                                href={u("/submit-paper")}
+                                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition-all uppercase tracking-wider"
+                            >
+                                <Send size={13} />
+                                <span>Paper Submission</span>
+                            </Link>
                         </div>
 
                         {/* Right Side: University Logo */}
@@ -122,6 +130,14 @@ export default function PublicLayout({ children, publication = {}, type = 'journ
                                 {link.name}
                             </Link>
                         ))}
+                        <Link
+                            href={u("/submit-paper")}
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="w-full bg-blue-600 text-white text-center py-3.5 rounded-xl font-bold text-lg shadow-lg flex items-center justify-center gap-2 mt-4"
+                        >
+                            <Send size={18} />
+                            Paper Submission
+                        </Link>
                     </div>
                 </div>
             )}
