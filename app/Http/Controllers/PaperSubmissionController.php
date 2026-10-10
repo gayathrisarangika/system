@@ -69,6 +69,7 @@ class PaperSubmissionController extends Controller
         }
 
         $journal->load(['documentRequirements']);
+        $draft = session("submission_draft_{$journal->id}");
 
         return Inertia::render('Submissions/Create', [
             'journal' => [
@@ -80,6 +81,7 @@ class PaperSubmissionController extends Controller
                 'code' => $setting->code,
                 'document_requirements' => $journal->documentRequirements,
             ],
+            'draft' => $draft,
             'auth' => [
                 'user' => Auth::user(),
             ],
@@ -87,7 +89,8 @@ class PaperSubmissionController extends Controller
     }
 
     /**
-     * Preview / Confirmation Step before final submission.
+     * Process Step 1 submission: store uploaded files in temporary disk storage
+     * and save draft in session before redirecting to confirmation page.
      */
     public function confirm(Request $request, Journal $journal)
     {
@@ -116,8 +119,12 @@ class PaperSubmissionController extends Controller
             'authors.*.order' => 'required|integer',
         ];
 
+        // Check if draft already has files stored
+        $existingDraft = session("submission_draft_{$journal->id}");
+
         foreach ($requirements as $req) {
-            $fileRule = $req->is_required ? 'required|file' : 'nullable|file';
+            $hasExistingFile = isset($existingDraft['file_details'][$req->document_type]);
+            $fileRule = ($req->is_required && !$hasExistingFile) ? 'required|file' : 'nullable|file';
             $mimes = $req->allowed_mimes ? str_replace(' ', '', $req->allowed_mimes) : 'pdf,doc,docx';
             $maxKb = ($req->max_size_mb ?: 10) * 1024;
             $rules["files.{$req->document_type}"] = "{$fileRule}|mimes:{$mimes}|max:{$maxKb}";
@@ -131,18 +138,57 @@ class PaperSubmissionController extends Controller
             $validated['authors'][0]['is_corresponding'] = true;
         }
 
-        // Return confirmation details to frontend without saving yet
-        $fileDetails = [];
+        // Maintain existing files from session draft if not replaced
+        $fileDetails = $existingDraft['file_details'] ?? [];
+
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $type => $file) {
-                if ($file) {
+                if ($file && $file->isValid()) {
+                    $ext = $file->getClientOriginalExtension();
+                    $tempFilename = $type . '_' . uniqid() . ($ext ? '.' . $ext : '');
+                    $tempPath = $file->storeAs("tmp_submissions/" . session()->getId(), $tempFilename, 'local');
+
                     $fileDetails[$type] = [
                         'original_filename' => $file->getClientOriginalName(),
                         'size_mb' => round($file->getSize() / (1024 * 1024), 2),
                         'mime_type' => $file->getClientMimeType(),
+                        'file_size' => $file->getSize(),
+                        'temp_path' => $tempPath,
                     ];
                 }
             }
+        }
+
+        session(["submission_draft_{$journal->id}" => [
+            'title' => $validated['title'],
+            'abstract' => $validated['abstract'],
+            'keywords' => $validated['keywords'] ?? '',
+            'authors' => $validated['authors'],
+            'file_details' => $fileDetails,
+        ]]);
+
+        return redirect()->route('submissions.confirm.view', $journal);
+    }
+
+    /**
+     * Render confirmation step GET page.
+     */
+    public function showConfirm(Journal $journal)
+    {
+        if ($journal->status !== 'approved') {
+            abort(404);
+        }
+
+        $setting = $journal->submissionSetting;
+        if (!$setting || !$setting->isCurrentlyOpen()) {
+            return redirect()->route('submissions.index')
+                ->with('error', 'Submissions for this journal are currently closed.');
+        }
+
+        $draft = session("submission_draft_{$journal->id}");
+        if (!$draft) {
+            return redirect()->route('submissions.create', $journal)
+                ->with('error', 'Please complete the submission form first.');
         }
 
         return Inertia::render('Submissions/Confirm', [
@@ -151,13 +197,7 @@ class PaperSubmissionController extends Controller
                 'journal_title' => $journal->journal_title,
                 'university_name' => $journal->university_name,
             ],
-            'paper' => [
-                'title' => $validated['title'],
-                'abstract' => $validated['abstract'],
-                'keywords' => $validated['keywords'] ?? '',
-                'authors' => $validated['authors'],
-                'file_details' => $fileDetails,
-            ],
+            'paper' => $draft,
             'auth' => [
                 'user' => Auth::user(),
             ],
@@ -184,6 +224,101 @@ class PaperSubmissionController extends Controller
                 ->with('error', 'Submissions for this journal are currently closed.');
         }
 
+        $draftKey = "submission_draft_{$journal->id}";
+
+        // Handle submission from session draft (2-step browser flow)
+        if (session()->has($draftKey)) {
+            $validated = $request->validate([
+                'agreement' => 'required|accepted',
+            ]);
+
+            $draft = session($draftKey);
+
+            $paperId = $idGenerator->generate($journal);
+            $code = $setting ? strtoupper($setting->code) : 'JRN';
+            $year = date('Y');
+            $directoryPath = "submissions/{$code}/{$year}/{$paperId}";
+
+            $submission = Submission::create([
+                'paper_id' => $paperId,
+                'journal_id' => $journal->id,
+                'user_id' => Auth::id(),
+                'title' => $draft['title'],
+                'abstract' => $draft['abstract'],
+                'keywords' => $draft['keywords'] ?? '',
+                'status' => 'Submitted',
+                'submitted_at' => now(),
+            ]);
+
+            foreach ($draft['authors'] as $authorData) {
+                $submission->authors()->create([
+                    'full_name' => $authorData['full_name'],
+                    'email' => $authorData['email'],
+                    'affiliation' => $authorData['affiliation'],
+                    'designation' => $authorData['designation'] ?? null,
+                    'is_corresponding' => (bool) $authorData['is_corresponding'],
+                    'order' => (int) $authorData['order'],
+                ]);
+            }
+
+            if (!empty($draft['file_details'])) {
+                foreach ($draft['file_details'] as $docType => $fileInfo) {
+                    if (isset($fileInfo['temp_path']) && Storage::disk('local')->exists($fileInfo['temp_path'])) {
+                        $ext = pathinfo($fileInfo['original_filename'], PATHINFO_EXTENSION);
+                        $filename = $docType . '_' . time() . ($ext ? '.' . $ext : '');
+                        $filePath = "{$directoryPath}/{$filename}";
+
+                        Storage::disk('local')->move($fileInfo['temp_path'], $filePath);
+
+                        $submission->files()->create([
+                            'document_type' => $docType,
+                            'original_filename' => $fileInfo['original_filename'],
+                            'file_path' => $filePath,
+                            'file_size' => $fileInfo['file_size'] ?? 0,
+                            'mime_type' => $fileInfo['mime_type'] ?? 'application/octet-stream',
+                        ]);
+                    }
+                }
+            }
+
+            SubmissionStatusHistory::create([
+                'submission_id' => $submission->id,
+                'status' => 'Submitted',
+                'user_id' => Auth::id(),
+                'note' => 'Paper submitted by author.',
+            ]);
+
+            try {
+                $correspondingAuthor = $submission->correspondingAuthor();
+                if ($correspondingAuthor && $correspondingAuthor->email) {
+                    Mail::to($correspondingAuthor->email)->send(new AuthorSubmissionConfirmationMail($submission));
+                }
+
+                $operator = $journal->editor;
+                if ($operator && $operator->email) {
+                    Mail::to($operator->email)->send(new OperatorSubmissionNotificationMail($submission));
+                }
+            } catch (\Throwable $e) {
+                logger()->error("Failed to send paper submission email for {$paperId}: " . $e->getMessage());
+            }
+
+            session()->forget($draftKey);
+
+            return Inertia::render('Submissions/Success', [
+                'submission' => [
+                    'paper_id' => $submission->paper_id,
+                    'title' => $submission->title,
+                    'status' => $submission->status,
+                    'journal_title' => $journal->journal_title,
+                    'submitted_at' => $submission->submitted_at->format('d F Y, h:i A'),
+                ],
+                'auth' => [
+                    'user' => Auth::user(),
+                ],
+            ]);
+        }
+
+        // Direct single-request submission payload (backward compatibility)
         $requirements = $journal->documentRequirements;
 
         $rules = [
@@ -209,15 +344,11 @@ class PaperSubmissionController extends Controller
 
         $validated = $request->validate($rules);
 
-        // Generate atomic Paper ID
         $paperId = $idGenerator->generate($journal);
         $code = $setting ? strtoupper($setting->code) : 'JRN';
         $year = date('Y');
-
-        // Path structure: /submissions/ECO/2026/ECO-2026-0001/
         $directoryPath = "submissions/{$code}/{$year}/{$paperId}";
 
-        // Create Submission record
         $submission = Submission::create([
             'paper_id' => $paperId,
             'journal_id' => $journal->id,
@@ -229,7 +360,6 @@ class PaperSubmissionController extends Controller
             'submitted_at' => now(),
         ]);
 
-        // Save Authors
         foreach ($validated['authors'] as $authorData) {
             $submission->authors()->create([
                 'full_name' => $authorData['full_name'],
@@ -241,12 +371,11 @@ class PaperSubmissionController extends Controller
             ]);
         }
 
-        // Save Files on private disk
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $docType => $file) {
                 if ($file && $file->isValid()) {
                     $filename = $docType . '_' . time() . '.' . $file->getClientOriginalExtension();
-                    $filePath = $file->storeAs($directoryPath, $filename, 'local'); // Private disk
+                    $filePath = $file->storeAs($directoryPath, $filename, 'local');
 
                     $submission->files()->create([
                         'document_type' => $docType,
@@ -259,7 +388,6 @@ class PaperSubmissionController extends Controller
             }
         }
 
-        // Add Initial Status History
         SubmissionStatusHistory::create([
             'submission_id' => $submission->id,
             'status' => 'Submitted',
@@ -267,20 +395,17 @@ class PaperSubmissionController extends Controller
             'note' => 'Paper submitted by author.',
         ]);
 
-        // Send Emails asynchronously or inline safely
         try {
             $correspondingAuthor = $submission->correspondingAuthor();
             if ($correspondingAuthor && $correspondingAuthor->email) {
                 Mail::to($correspondingAuthor->email)->send(new AuthorSubmissionConfirmationMail($submission));
             }
 
-            // Find journal operator email
             $operator = $journal->editor;
             if ($operator && $operator->email) {
                 Mail::to($operator->email)->send(new OperatorSubmissionNotificationMail($submission));
             }
         } catch (\Throwable $e) {
-            // Log mail exception without failing submission response
             logger()->error("Failed to send paper submission email for {$paperId}: " . $e->getMessage());
         }
 

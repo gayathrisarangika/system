@@ -16,14 +16,14 @@ import {
 } from 'lucide-react';
 import { u, cn } from '@/lib/utils';
 
-export default function SubmissionsCreate({ journal, auth }) {
+export default function SubmissionsCreate({ journal, auth, draft }) {
     const user = auth.user;
 
     const { data, setData, post, processing, errors } = useForm({
-        title: '',
-        abstract: '',
-        keywords: '',
-        authors: [
+        title: draft?.title || '',
+        abstract: draft?.abstract || '',
+        keywords: draft?.keywords || '',
+        authors: draft?.authors || [
             {
                 full_name: user ? user.name || '' : '',
                 email: user ? user.email || '' : '',
@@ -280,6 +280,7 @@ export default function SubmissionsCreate({ journal, auth }) {
                             <div className="space-y-4">
                                 {journal.document_requirements.map((req) => {
                                     const file = data.files[req.document_type];
+                                    const existingFile = draft?.file_details?.[req.document_type];
 
                                     return (
                                         <div key={req.id} className="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -300,22 +301,27 @@ export default function SubmissionsCreate({ journal, auth }) {
                                             <div className="flex items-center gap-3">
                                                 <label className="px-4 py-2.5 rounded-xl bg-white border border-slate-300 hover:border-blue-500 font-bold text-xs text-slate-700 cursor-pointer shadow-sm transition-all flex items-center gap-2">
                                                     <Upload size={14} />
-                                                    {file ? 'Change File' : 'Choose File'}
+                                                    {file || existingFile ? 'Change File' : 'Choose File'}
                                                     <input
                                                         type="file"
                                                         accept={req.allowed_mimes.split(',').map(m => `.${m.trim()}`).join(',')}
                                                         onChange={(e) => handleFileChange(req.document_type, e.target.files[0])}
                                                         className="hidden"
-                                                        required={req.is_required && !file}
+                                                        required={req.is_required && !file && !existingFile}
                                                     />
                                                 </label>
 
-                                                {file && (
+                                                {file ? (
                                                     <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1">
                                                         <CheckCircle size={14} />
                                                         {file.name}
                                                     </span>
-                                                )}
+                                                ) : existingFile ? (
+                                                    <span className="text-xs font-semibold text-blue-600 flex items-center gap-1">
+                                                        <CheckCircle size={14} />
+                                                        {existingFile.original_filename} (Uploaded)
+                                                    </span>
+                                                ) : null}
                                             </div>
                                         </div>
                                     );
