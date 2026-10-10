@@ -5,7 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
 
 export default defineConfig({
-    base: '/journals/',
+    base: '/',
     plugins: [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.jsx'],
