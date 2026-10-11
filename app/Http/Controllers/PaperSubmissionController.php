@@ -58,6 +58,10 @@ class PaperSubmissionController extends Controller
      */
     public function create(Journal $journal)
     {
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Please log in to submit a paper.');
+        }
+
         if ($journal->status !== 'approved') {
             abort(404, 'Journal not found or not approved.');
         }
@@ -94,6 +98,10 @@ class PaperSubmissionController extends Controller
      */
     public function confirm(Request $request, Journal $journal)
     {
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Please log in to submit a paper.');
+        }
+
         if ($journal->status !== 'approved') {
             abort(404);
         }
@@ -175,6 +183,10 @@ class PaperSubmissionController extends Controller
      */
     public function showConfirm(Journal $journal)
     {
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Please log in to submit a paper.');
+        }
+
         if ($journal->status !== 'approved') {
             abort(404);
         }
@@ -211,7 +223,7 @@ class PaperSubmissionController extends Controller
     public function store(Request $request, Journal $journal, PaperIdGeneratorService $idGenerator)
     {
         if (!Auth::check()) {
-            abort(401, 'Authentication required to submit paper.');
+            return redirect()->route('login')->with('error', 'Please log in to submit a paper.');
         }
 
         if ($journal->status !== 'approved') {
