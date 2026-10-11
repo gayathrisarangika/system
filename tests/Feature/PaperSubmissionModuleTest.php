@@ -189,4 +189,143 @@ class PaperSubmissionModuleTest extends TestCase
         $responseAuthor = $this->actingAs($author)->get("/author/submission/{$submission->id}/file/{$fileRecord->id}");
         $responseAuthor->assertStatus(200);
     }
+
+    public function test_two_step_confirmation_submission_flow_succeeds()
+    {
+        Storage::fake('local');
+
+        $editor = User::factory()->create();
+        $dept = Department::create(['name' => 'Department of Computing']);
+        $journal = Journal::create([
+            'editor_id' => $editor->id,
+            'journal_title' => 'Journal of AI Research',
+            'university_name' => 'Sabaragamuwa University',
+            'department_id' => $dept->id,
+            'status' => 'approved',
+        ]);
+
+        $journal->submissionSetting()->create([
+            'code' => 'AIR',
+            'is_open' => true,
+            'opening_datetime' => now()->subDay(),
+            'closing_datetime' => now()->addMonth(),
+        ]);
+
+        $journal->documentRequirements()->create([
+            'document_type' => 'manuscript',
+            'label' => 'Main Manuscript',
+            'is_required' => true,
+            'allowed_mimes' => 'pdf,doc,docx',
+            'max_size_mb' => 10,
+        ]);
+
+        $author = User::factory()->create();
+        $manuscript = UploadedFile::fake()->create('manuscript.pdf', 500, 'application/pdf');
+
+        $payload = [
+            'title' => 'Multi-step Submission Test Title',
+            'abstract' => 'Multi-step Submission Test Abstract',
+            'keywords' => 'Test, Confirmation',
+            'authors' => [
+                [
+                    'full_name' => 'John Doe',
+                    'email' => 'john@example.com',
+                    'affiliation' => 'Sabaragamuwa University',
+                    'designation' => 'Researcher',
+                    'is_corresponding' => true,
+                    'order' => 1,
+                ]
+            ],
+            'files' => [
+                'manuscript' => $manuscript,
+            ],
+        ];
+
+        // Step 1: Submit details for confirmation
+        $confirmResponse = $this->actingAs($author)->post("/submit-paper/journal/{$journal->id}/confirm", $payload);
+        $confirmResponse->assertRedirect(route('submissions.confirm.view', $journal));
+
+        // Step 2: Render GET confirmation page
+        $showConfirmResponse = $this->actingAs($author)->get("/submit-paper/journal/{$journal->id}/confirm");
+        $showConfirmResponse->assertStatus(200);
+        $showConfirmResponse->assertInertia(fn ($page) => $page
+            ->component('Submissions/Confirm')
+            ->where('paper.title', 'Multi-step Submission Test Title')
+        );
+
+        // Step 3: Final submission post
+        $finalResponse = $this->actingAs($author)->post("/submit-paper/journal/{$journal->id}", [
+            'agreement' => true,
+        ]);
+        $finalResponse->assertStatus(200);
+        $finalResponse->assertInertia(fn ($page) => $page->component('Submissions/Success'));
+
+        $submission = Submission::where('user_id', $author->id)->first();
+        $this->assertNotNull($submission);
+        $this->assertEquals("AIR-" . date('Y') . "-0001", $submission->paper_id);
+
+        $fileRecord = $submission->files()->first();
+        $this->assertNotNull($fileRecord);
+        Storage::disk('local')->assertExists($fileRecord->file_path);
+    }
+
+    public function test_confirmation_redirects_back_without_405_error_when_agreement_unaccepted()
+    {
+        Storage::fake('local');
+
+        $editor = User::factory()->create();
+        $dept = Department::create(['name' => 'Department of Computing']);
+        $journal = Journal::create([
+            'editor_id' => $editor->id,
+            'journal_title' => 'Journal of AI Research',
+            'university_name' => 'Sabaragamuwa University',
+            'department_id' => $dept->id,
+            'status' => 'approved',
+        ]);
+
+        $journal->submissionSetting()->create([
+            'code' => 'AIR',
+            'is_open' => true,
+            'opening_datetime' => now()->subDay(),
+            'closing_datetime' => now()->addMonth(),
+        ]);
+
+        $author = User::factory()->create();
+        $manuscript = UploadedFile::fake()->create('manuscript.pdf', 500, 'application/pdf');
+
+        $payload = [
+            'title' => 'Validation Test Title',
+            'abstract' => 'Validation Test Abstract',
+            'authors' => [
+                [
+                    'full_name' => 'Jane Doe',
+                    'email' => 'jane@example.com',
+                    'affiliation' => 'Sabaragamuwa University',
+                    'is_corresponding' => true,
+                    'order' => 1,
+                ]
+            ],
+            'files' => [
+                'manuscript' => $manuscript,
+            ],
+        ];
+
+        // Step 1: Post to confirm
+        $this->actingAs($author)->post("/submit-paper/journal/{$journal->id}/confirm", $payload);
+
+        // Step 2: Visit GET confirm page first
+        $this->actingAs($author)->get("/submit-paper/journal/{$journal->id}/confirm");
+
+        // Step 3: Attempt final submission without agreement
+        $response = $this->actingAs($author)
+            ->from(route('submissions.confirm.view', $journal))
+            ->post("/submit-paper/journal/{$journal->id}", [
+                'agreement' => false,
+            ]);
+
+        // Redirects back to GET /submit-paper/journal/{journal}/confirm with 302, NOT 405!
+        $response->assertStatus(302);
+        $response->assertRedirect(route('submissions.confirm.view', $journal));
+        $response->assertSessionHasErrors(['agreement']);
+    }
 }
