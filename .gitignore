@@ -25,3 +25,10 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 .vscode-server/
+
+# Server/user cache and private files
+.npm/
+.ssh/
+.cache/
+.config/
+.bash_history
