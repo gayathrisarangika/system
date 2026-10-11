@@ -69,7 +69,7 @@ class AuthorSubmissionConfirmationMail extends Mailable
                     </tr>
                 </table>
 
-                <p>You can track the status of your submission by logging into your account dashboard.</p>
+                <p>You will receive email notifications whenever there is an update on your paper status.</p>
                 <p>Best regards,<br/>Editorial Office<br/>{$this->submission->journal->journal_title}</p>
             </div>
         </div>
