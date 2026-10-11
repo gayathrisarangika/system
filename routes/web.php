@@ -57,10 +57,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/submit-paper/journal/{journal}/confirm', [PaperSubmissionController::class, 'confirm'])->name('submissions.confirm');
     Route::post('/submit-paper/journal/{journal}', [PaperSubmissionController::class, 'store'])->name('submissions.store');
 
-    // Author Dashboard & Secure Downloads
-    Route::get('/author/submissions', [PaperSubmissionController::class, 'mySubmissions'])->name('author.submissions');
-    Route::get('/author/submission/{submission}', [PaperSubmissionController::class, 'showSubmission'])->name('author.submission.show');
-    Route::get('/author/submission/{submission}/file/{file}', [PaperSubmissionController::class, 'downloadFile'])->name('author.submission.file.download');
 
     Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
     Route::post('/admin/users', [DashboardController::class, 'storeUser'])->name('admin.users.store');

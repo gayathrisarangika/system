@@ -2,7 +2,7 @@ import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { 
     CheckCircle, 
-    BookOpen, 
+    Send,
     ArrowRight, 
     Calendar, 
     FileText, 
@@ -89,17 +89,17 @@ export default function SubmissionsSuccess({ submission, auth }) {
 
                 {/* Notification Banner */}
                 <div className="p-4 rounded-xl bg-blue-50/60 border border-blue-100 text-xs text-blue-900 font-medium leading-relaxed">
-                    A confirmation email with these details has been sent to the corresponding author's email address.
+                    A confirmation email with these details has been sent to the corresponding author's email address. You will receive email notifications whenever there is an update to your paper status.
                 </div>
 
                 {/* Actions */}
                 <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
                     <Link
-                        href={u('/author/submissions')}
-                        className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm shadow-lg flex items-center justify-center gap-2 transition-all"
+                        href={u('/submit-paper')}
+                        className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 transition-all"
                     >
-                        <BookOpen size={16} />
-                        View My Submissions
+                        <Send size={16} />
+                        Submit Another Paper
                     </Link>
 
                     <Link

@@ -6,8 +6,10 @@ use App\Models\Journal;
 use App\Models\Submission;
 use App\Models\SubmissionFile;
 use App\Models\SubmissionStatusHistory;
+use App\Mail\AuthorStatusUpdateMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -111,15 +113,36 @@ class JournalSubmissionManagementController extends Controller
         ]);
 
         $oldStatus = $submission->status;
-        $submission->update(['status' => $validated['status']]);
+        $newStatus = $validated['status'];
+        $note = $validated['note'] ?? null;
+
+        $submission->update(['status' => $newStatus]);
 
         // Record history entry
         SubmissionStatusHistory::create([
             'submission_id' => $submission->id,
-            'status' => $validated['status'],
+            'status' => $newStatus,
             'user_id' => Auth::id(),
-            'note' => $validated['note'] ?? "Status updated from '{$oldStatus}' to '{$validated['status']}'.",
+            'note' => $note ?? "Status updated from '{$oldStatus}' to '{$newStatus}'.",
         ]);
+
+        // Send email notification to author
+        try {
+            $submission->loadMissing(['journal', 'authors', 'user']);
+            $correspondingAuthor = $submission->correspondingAuthor();
+            $recipientEmail = $correspondingAuthor?->email ?? $submission->user?->email;
+
+            if ($recipientEmail) {
+                Mail::to($recipientEmail)->send(new AuthorStatusUpdateMail(
+                    submission: $submission,
+                    oldStatus: $oldStatus,
+                    newStatus: $newStatus,
+                    note: $note
+                ));
+            }
+        } catch (\Throwable $e) {
+            logger()->error("Failed to send status update email for paper {$submission->paper_id}: " . $e->getMessage());
+        }
 
         return back()->with('success', 'Submission status updated successfully.');
     }

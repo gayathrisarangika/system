@@ -8,8 +8,10 @@ use App\Models\Department;
 use App\Models\Submission;
 use App\Models\SubmissionFile;
 use App\Services\PaperIdGeneratorService;
+use App\Mail\AuthorStatusUpdateMail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -145,49 +147,53 @@ class PaperSubmissionModuleTest extends TestCase
         Storage::disk('local')->assertExists($fileRecord->file_path);
     }
 
-    public function test_unauthorized_user_cannot_download_author_submission_file()
+    public function test_editor_status_update_sends_email_notification_to_author()
     {
-        Storage::fake('local');
+        Mail::fake();
 
-        $editor = User::factory()->create();
+        $editor = User::factory()->create(['role' => 'editor']);
         $dept = Department::create(['name' => 'Department of Computing']);
         $journal = Journal::create([
             'editor_id' => $editor->id,
-            'journal_title' => 'Security Test Journal',
+            'journal_title' => 'Test Status Update Journal',
             'university_name' => 'Sabaragamuwa University',
             'department_id' => $dept->id,
             'status' => 'approved',
         ]);
 
         $author = User::factory()->create();
-        $otherUser = User::factory()->create();
 
         $submission = Submission::create([
-            'paper_id' => 'SEC-2026-0001',
+            'paper_id' => 'TSU-2026-0001',
             'journal_id' => $journal->id,
             'user_id' => $author->id,
-            'title' => 'Secret Paper',
-            'abstract' => 'Secret Abstract',
+            'title' => 'Status Update Test Paper',
+            'abstract' => 'Test Abstract',
             'status' => 'Submitted',
         ]);
 
-        $fileRecord = $submission->files()->create([
-            'document_type' => 'manuscript',
-            'original_filename' => 'manuscript.pdf',
-            'file_path' => 'submissions/SEC/2026/SEC-2026-0001/manuscript.pdf',
-            'file_size' => 1024,
-            'mime_type' => 'application/pdf',
+        $submission->authors()->create([
+            'full_name' => 'Corresponding Author',
+            'email' => 'author.status@example.com',
+            'affiliation' => 'Sabaragamuwa University',
+            'is_corresponding' => true,
+            'order' => 1,
         ]);
 
-        Storage::disk('local')->put($fileRecord->file_path, 'PDF Content');
+        $response = $this->actingAs($editor)->post("/editor/submission/{$submission->id}/status", [
+            'status' => 'Under Review',
+            'note' => 'Your manuscript is currently under peer review.',
+        ]);
 
-        // Other user attempting to download author's paper file
-        $response = $this->actingAs($otherUser)->get("/author/submission/{$submission->id}/file/{$fileRecord->id}");
-        $response->assertStatus(403);
+        $response->assertStatus(302);
+        $this->assertEquals('Under Review', $submission->fresh()->status);
 
-        // Submitting author downloading own paper file
-        $responseAuthor = $this->actingAs($author)->get("/author/submission/{$submission->id}/file/{$fileRecord->id}");
-        $responseAuthor->assertStatus(200);
+        Mail::assertSent(AuthorStatusUpdateMail::class, function ($mail) use ($submission) {
+            return $mail->hasTo('author.status@example.com') &&
+                   $mail->submission->id === $submission->id &&
+                   $mail->newStatus === 'Under Review' &&
+                   $mail->note === 'Your manuscript is currently under peer review.';
+        });
     }
 
     public function test_two_step_confirmation_submission_flow_succeeds()
