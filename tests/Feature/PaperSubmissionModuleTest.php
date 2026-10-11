@@ -328,4 +328,40 @@ class PaperSubmissionModuleTest extends TestCase
         $response->assertRedirect(route('submissions.confirm.view', $journal));
         $response->assertSessionHasErrors(['agreement']);
     }
+
+    public function test_unauthenticated_user_redirected_to_login_when_accessing_submission_routes()
+    {
+        $editor = User::factory()->create();
+        $dept = Department::create(['name' => 'Department of Computing']);
+        $journal = Journal::create([
+            'editor_id' => $editor->id,
+            'journal_title' => 'Unauth Test Journal',
+            'university_name' => 'Test University',
+            'department_id' => $dept->id,
+            'status' => 'approved',
+        ]);
+
+        $journal->submissionSetting()->create([
+            'code' => 'UTJ',
+            'is_open' => true,
+            'opening_datetime' => now()->subDay(),
+            'closing_datetime' => now()->addMonth(),
+        ]);
+
+        // Unauthenticated access to form create
+        $responseCreate = $this->get("/submit-paper/journal/{$journal->id}");
+        $responseCreate->assertRedirect(route('login'));
+
+        // Unauthenticated access to confirm view
+        $responseConfirmView = $this->get("/submit-paper/journal/{$journal->id}/confirm");
+        $responseConfirmView->assertRedirect(route('login'));
+
+        // Unauthenticated post to confirm
+        $responseConfirm = $this->post("/submit-paper/journal/{$journal->id}/confirm", []);
+        $responseConfirm->assertRedirect(route('login'));
+
+        // Unauthenticated final store
+        $responseStore = $this->post("/submit-paper/journal/{$journal->id}", ['agreement' => true]);
+        $responseStore->assertRedirect(route('login'));
+    }
 }
