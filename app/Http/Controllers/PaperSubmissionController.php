@@ -7,6 +7,7 @@ use App\Models\Submission;
 use App\Models\SubmissionAuthor;
 use App\Models\SubmissionFile;
 use App\Models\SubmissionStatusHistory;
+use App\Models\User;
 use App\Services\PaperIdGeneratorService;
 use App\Mail\AuthorSubmissionConfirmationMail;
 use App\Mail\OperatorSubmissionNotificationMail;
@@ -300,19 +301,7 @@ class PaperSubmissionController extends Controller
                 'note' => 'Paper submitted by author.',
             ]);
 
-            try {
-                $correspondingAuthor = $submission->correspondingAuthor();
-                if ($correspondingAuthor && $correspondingAuthor->email) {
-                    Mail::to($correspondingAuthor->email)->send(new AuthorSubmissionConfirmationMail($submission));
-                }
-
-                $operator = $journal->editor;
-                if ($operator && $operator->email) {
-                    Mail::to($operator->email)->send(new OperatorSubmissionNotificationMail($submission));
-                }
-            } catch (\Throwable $e) {
-                logger()->error("Failed to send paper submission email for {$paperId}: " . $e->getMessage());
-            }
+            $this->sendSubmissionEmails($submission, $journal);
 
             session()->forget($draftKey);
 
@@ -407,19 +396,7 @@ class PaperSubmissionController extends Controller
             'note' => 'Paper submitted by author.',
         ]);
 
-        try {
-            $correspondingAuthor = $submission->correspondingAuthor();
-            if ($correspondingAuthor && $correspondingAuthor->email) {
-                Mail::to($correspondingAuthor->email)->send(new AuthorSubmissionConfirmationMail($submission));
-            }
-
-            $operator = $journal->editor;
-            if ($operator && $operator->email) {
-                Mail::to($operator->email)->send(new OperatorSubmissionNotificationMail($submission));
-            }
-        } catch (\Throwable $e) {
-            logger()->error("Failed to send paper submission email for {$paperId}: " . $e->getMessage());
-        }
+        $this->sendSubmissionEmails($submission, $journal);
 
         return Inertia::render('Submissions/Success', [
             'submission' => [
@@ -435,4 +412,52 @@ class PaperSubmissionController extends Controller
         ]);
     }
 
+    /**
+     * Eager loads relations and sends email notifications to corresponding author
+     * and responsible journal editors / operators.
+     */
+    private function sendSubmissionEmails(Submission $submission, Journal $journal): void
+    {
+        try {
+            $submission->loadMissing(['journal', 'authors', 'files', 'user']);
+
+            // 1. Author email dispatch
+            $correspondingAuthor = $submission->correspondingAuthor();
+            $authorEmail = $correspondingAuthor?->email ?? $submission->user?->email;
+
+            if ($authorEmail) {
+                Mail::to($authorEmail)->send(new AuthorSubmissionConfirmationMail($submission));
+            }
+
+            // 2. Editor / Operator email dispatch
+            $editorEmails = collect();
+
+            if ($journal->editor && $journal->editor->email) {
+                $editorEmails->push($journal->editor->email);
+            }
+
+            if ($journal->department_id) {
+                $deptEditors = User::where('role', 'editor')
+                    ->where('department_id', $journal->department_id)
+                    ->whereNotNull('email')
+                    ->pluck('email');
+                $editorEmails = $editorEmails->merge($deptEditors);
+            }
+
+            if ($editorEmails->isEmpty()) {
+                $adminEmails = User::where('role', 'admin')
+                    ->whereNotNull('email')
+                    ->pluck('email');
+                $editorEmails = $editorEmails->merge($adminEmails);
+            }
+
+            $uniqueEditorEmails = $editorEmails->unique()->filter();
+
+            foreach ($uniqueEditorEmails as $email) {
+                Mail::to($email)->send(new OperatorSubmissionNotificationMail($submission));
+            }
+        } catch (\Throwable $e) {
+            logger()->error("Failed to send paper submission email for paper {$submission->paper_id}: " . $e->getMessage());
+        }
+    }
 }
