@@ -36,7 +36,7 @@ return new class extends Migration
             $table->id();
             $table->string('paper_id')->unique();
             $table->foreignId('journal_id')->constrained('journals')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // submitting author user
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade'); // submitting author user (nullable for guests)
             $table->text('title');
             $table->text('abstract');
             $table->text('keywords')->nullable();
