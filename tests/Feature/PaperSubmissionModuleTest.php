@@ -9,6 +9,8 @@ use App\Models\Submission;
 use App\Models\SubmissionFile;
 use App\Services\PaperIdGeneratorService;
 use App\Mail\AuthorStatusUpdateMail;
+use App\Mail\AuthorSubmissionConfirmationMail;
+use App\Mail\OperatorSubmissionNotificationMail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
@@ -333,6 +335,136 @@ class PaperSubmissionModuleTest extends TestCase
         $response->assertStatus(302);
         $response->assertRedirect(route('submissions.confirm.view', $journal));
         $response->assertSessionHasErrors(['agreement']);
+    }
+
+    public function test_submission_sends_emails_to_author_and_editor_in_two_step_flow()
+    {
+        Mail::fake();
+        Storage::fake('local');
+
+        $editor = User::factory()->create([
+            'role' => 'editor',
+            'email' => 'journal.editor@example.com'
+        ]);
+        $dept = Department::create(['name' => 'Department of Computing']);
+        $journal = Journal::create([
+            'editor_id' => $editor->id,
+            'journal_title' => 'Email Test Journal',
+            'university_name' => 'Sabaragamuwa University',
+            'department_id' => $dept->id,
+            'status' => 'approved',
+        ]);
+
+        $journal->submissionSetting()->create([
+            'code' => 'ETJ',
+            'is_open' => true,
+            'opening_datetime' => now()->subDay(),
+            'closing_datetime' => now()->addMonth(),
+        ]);
+
+        $authorUser = User::factory()->create(['email' => 'author.user@example.com']);
+        $manuscript = UploadedFile::fake()->create('manuscript.pdf', 500, 'application/pdf');
+
+        $payload = [
+            'title' => 'Email Flow Paper Title',
+            'abstract' => 'Email Flow Paper Abstract',
+            'keywords' => 'Email, Test',
+            'authors' => [
+                [
+                    'full_name' => 'Corresponding Author',
+                    'email' => 'corr.author@example.com',
+                    'affiliation' => 'Sabaragamuwa University',
+                    'is_corresponding' => true,
+                    'order' => 1,
+                ]
+            ],
+            'files' => [
+                'manuscript' => $manuscript,
+            ],
+        ];
+
+        // Step 1: Confirm post
+        $this->actingAs($authorUser)->post("/submit-paper/journal/{$journal->id}/confirm", $payload);
+
+        // Step 2: Final store post
+        $response = $this->actingAs($authorUser)->post("/submit-paper/journal/{$journal->id}", [
+            'agreement' => true,
+        ]);
+
+        $response->assertStatus(200);
+
+        Mail::assertSent(AuthorSubmissionConfirmationMail::class, function ($mail) {
+            return $mail->hasTo('corr.author@example.com');
+        });
+
+        Mail::assertSent(OperatorSubmissionNotificationMail::class, function ($mail) {
+            return $mail->hasTo('journal.editor@example.com');
+        });
+    }
+
+    public function test_submission_sends_emails_to_department_editors_when_journal_editor_has_no_email()
+    {
+        Mail::fake();
+        Storage::fake('local');
+
+        $dept = Department::create(['name' => 'Department of Computing']);
+        $noEmailEditor = User::factory()->create([
+            'role' => 'editor',
+            'department_id' => $dept->id,
+            'email' => null,
+        ]);
+        $deptEditor = User::factory()->create([
+            'role' => 'editor',
+            'department_id' => $dept->id,
+            'email' => 'dept.editor@example.com'
+        ]);
+
+        $journal = Journal::create([
+            'editor_id' => $noEmailEditor->id,
+            'journal_title' => 'Department Editor Journal',
+            'university_name' => 'Sabaragamuwa University',
+            'department_id' => $dept->id,
+            'status' => 'approved',
+        ]);
+
+        $journal->submissionSetting()->create([
+            'code' => 'DEJ',
+            'is_open' => true,
+            'opening_datetime' => now()->subDay(),
+            'closing_datetime' => now()->addMonth(),
+        ]);
+
+        $authorUser = User::factory()->create(['email' => 'submitting.author@example.com']);
+        $manuscript = UploadedFile::fake()->create('manuscript.pdf', 500, 'application/pdf');
+
+        $payload = [
+            'title' => 'Null Editor ID Test Title',
+            'abstract' => 'Null Editor ID Test Abstract',
+            'authors' => [
+                [
+                    'full_name' => 'Submitting Author',
+                    'email' => 'submitting.author@example.com',
+                    'affiliation' => 'Sabaragamuwa University',
+                    'is_corresponding' => true,
+                    'order' => 1,
+                ]
+            ],
+            'files' => [
+                'manuscript' => $manuscript,
+            ],
+            'agreement' => true,
+        ];
+
+        $response = $this->actingAs($authorUser)->post("/submit-paper/journal/{$journal->id}", $payload);
+        $response->assertStatus(200);
+
+        Mail::assertSent(AuthorSubmissionConfirmationMail::class, function ($mail) {
+            return $mail->hasTo('submitting.author@example.com');
+        });
+
+        Mail::assertSent(OperatorSubmissionNotificationMail::class, function ($mail) {
+            return $mail->hasTo('dept.editor@example.com');
+        });
     }
 
     public function test_unauthenticated_user_redirected_to_login_when_accessing_submission_routes()
