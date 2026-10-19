@@ -544,4 +544,72 @@ class PaperSubmissionModuleTest extends TestCase
             return $mail->hasTo('operator.editor@example.com');
         });
     }
+
+    public function test_admin_user_submission_sends_email_to_specified_author_email_not_admin()
+    {
+        Mail::fake();
+        Storage::fake('local');
+
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'name' => 'Admin User',
+            'email' => 'admin@gmail.com',
+        ]);
+
+        $editor = User::factory()->create([
+            'role' => 'editor',
+            'email' => 'operator.editor@example.com',
+        ]);
+
+        $dept = Department::create(['name' => 'Department of Social Sciences']);
+        $journal = Journal::create([
+            'editor_id' => $editor->id,
+            'journal_title' => 'Social Sciences Journal',
+            'university_name' => 'Test University',
+            'department_id' => $dept->id,
+            'status' => 'approved',
+        ]);
+
+        $journal->submissionSetting()->create([
+            'code' => 'SSJ',
+            'is_open' => true,
+            'opening_datetime' => now()->subDay(),
+            'closing_datetime' => now()->addMonth(),
+        ]);
+
+        // Accessing create form as admin
+        $response = $this->actingAs($admin)->get("/submit-paper/journal/{$journal->id}");
+        $response->assertStatus(200);
+
+        $manuscript = UploadedFile::fake()->create('manuscript.pdf', 500, 'application/pdf');
+
+        $payload = [
+            'title' => 'Admin Testing Paper Submission',
+            'abstract' => 'Abstract for admin submission test',
+            'authors' => [
+                [
+                    'full_name' => 'John Real Author',
+                    'email' => 'real.author@example.com',
+                    'affiliation' => 'Sabaragamuwa University',
+                    'is_corresponding' => true,
+                    'order' => 1,
+                ]
+            ],
+            'files' => [
+                'manuscript' => $manuscript,
+            ],
+        ];
+
+        $this->actingAs($admin)->post("/submit-paper/journal/{$journal->id}/confirm", $payload);
+
+        $storeResponse = $this->actingAs($admin)->post("/submit-paper/journal/{$journal->id}", [
+            'agreement' => true,
+        ]);
+        $storeResponse->assertStatus(200);
+
+        // Verify author confirmation mail is sent to real.author@example.com
+        Mail::assertSent(AuthorSubmissionConfirmationMail::class, function ($mail) {
+            return $mail->hasTo('real.author@example.com') && !$mail->hasTo('admin@gmail.com');
+        });
+    }
 }
