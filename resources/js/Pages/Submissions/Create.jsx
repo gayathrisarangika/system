@@ -18,6 +18,7 @@ import { u, cn } from '@/lib/utils';
 
 export default function SubmissionsCreate({ journal, auth, draft }) {
     const user = auth.user;
+    const isSystemStaff = user && (user.role === 'admin' || user.role === 'editor');
 
     const { data, setData, post, processing, errors } = useForm({
         title: draft?.title || '',
@@ -25,8 +26,8 @@ export default function SubmissionsCreate({ journal, auth, draft }) {
         keywords: draft?.keywords || '',
         authors: draft?.authors || [
             {
-                full_name: user ? user.name || '' : '',
-                email: user ? user.email || '' : '',
+                full_name: (user && !isSystemStaff) ? user.name || '' : '',
+                email: (user && !isSystemStaff) ? user.email || '' : '',
                 affiliation: '',
                 designation: '',
                 is_corresponding: true,

@@ -408,7 +408,6 @@ class PaperSubmissionController extends Controller
             // 1. Author email dispatch (Corresponding author and any submission author emails)
             $authorEmails = $submission->authors
                 ->pluck('email')
-                ->when($submission->user?->email, fn ($collection, $userEmail) => $collection->push($userEmail))
                 ->filter()
                 ->unique();
 
