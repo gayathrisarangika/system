@@ -47,17 +47,14 @@ Route::get('/symposium/{symposium}/archive', [PublicController::class, 'symposiu
 Route::get('/symposium/{symposium}/proceeding/{proceeding}', [PublicController::class, 'symposiumProceeding'])->name('symposium.proceeding');
 Route::get('/symposium/{symposium}/contact', [PublicController::class, 'symposiumContact'])->name('symposium.contact');
 
-// Paper Submission - Public Route
+// Paper Submission - Public Routes (No login required)
 Route::get('/submit-paper', [PaperSubmissionController::class, 'index'])->name('submissions.index');
+Route::get('/submit-paper/journal/{journal}', [PaperSubmissionController::class, 'create'])->name('submissions.create');
+Route::get('/submit-paper/journal/{journal}/confirm', [PaperSubmissionController::class, 'showConfirm'])->name('submissions.confirm.view');
+Route::post('/submit-paper/journal/{journal}/confirm', [PaperSubmissionController::class, 'confirm'])->name('submissions.confirm');
+Route::post('/submit-paper/journal/{journal}', [PaperSubmissionController::class, 'store'])->name('submissions.store');
 
 Route::middleware('auth')->group(function () {
-    // Paper Submission - Authenticated Author Routes
-    Route::get('/submit-paper/journal/{journal}', [PaperSubmissionController::class, 'create'])->name('submissions.create');
-    Route::get('/submit-paper/journal/{journal}/confirm', [PaperSubmissionController::class, 'showConfirm'])->name('submissions.confirm.view');
-    Route::post('/submit-paper/journal/{journal}/confirm', [PaperSubmissionController::class, 'confirm'])->name('submissions.confirm');
-    Route::post('/submit-paper/journal/{journal}', [PaperSubmissionController::class, 'store'])->name('submissions.store');
-
-
     Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
     Route::post('/admin/users', [DashboardController::class, 'storeUser'])->name('admin.users.store');
     

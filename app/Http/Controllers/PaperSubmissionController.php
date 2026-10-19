@@ -59,10 +59,6 @@ class PaperSubmissionController extends Controller
      */
     public function create(Journal $journal)
     {
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Please log in to submit a paper.');
-        }
-
         if ($journal->status !== 'approved') {
             abort(404, 'Journal not found or not approved.');
         }
@@ -99,10 +95,6 @@ class PaperSubmissionController extends Controller
      */
     public function confirm(Request $request, Journal $journal)
     {
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Please log in to submit a paper.');
-        }
-
         if ($journal->status !== 'approved') {
             abort(404);
         }
@@ -184,10 +176,6 @@ class PaperSubmissionController extends Controller
      */
     public function showConfirm(Journal $journal)
     {
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Please log in to submit a paper.');
-        }
-
         if ($journal->status !== 'approved') {
             abort(404);
         }
@@ -223,10 +211,6 @@ class PaperSubmissionController extends Controller
      */
     public function store(Request $request, Journal $journal, PaperIdGeneratorService $idGenerator)
     {
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Please log in to submit a paper.');
-        }
-
         if ($journal->status !== 'approved') {
             abort(404);
         }
@@ -419,30 +403,51 @@ class PaperSubmissionController extends Controller
     private function sendSubmissionEmails(Submission $submission, Journal $journal): void
     {
         try {
-            $submission->loadMissing(['journal', 'authors', 'files', 'user']);
+            $submission->load(['journal', 'authors', 'files', 'user']);
 
-            // 1. Author email dispatch
-            $correspondingAuthor = $submission->correspondingAuthor();
-            $authorEmail = $correspondingAuthor?->email ?? $submission->user?->email;
+            // 1. Author email dispatch (Corresponding author and any submission author emails)
+            $authorEmails = $submission->authors
+                ->pluck('email')
+                ->when($submission->user?->email, fn ($collection, $userEmail) => $collection->push($userEmail))
+                ->filter()
+                ->unique();
 
-            if ($authorEmail) {
-                Mail::to($authorEmail)->send(new AuthorSubmissionConfirmationMail($submission));
+            if ($authorEmails->isEmpty()) {
+                $correspondingAuthor = $submission->correspondingAuthor();
+                if ($correspondingAuthor?->email) {
+                    $authorEmails->push($correspondingAuthor->email);
+                } elseif ($submission->user?->email) {
+                    $authorEmails->push($submission->user->email);
+                }
+            }
+
+            foreach ($authorEmails as $email) {
+                Mail::to($email)->send(new AuthorSubmissionConfirmationMail($submission));
             }
 
             // 2. Editor / Operator email dispatch
             $editorEmails = collect();
 
-            if ($journal->editor && $journal->editor->email) {
-                $editorEmails->push($journal->editor->email);
+            if ($journal->editor_id) {
+                $journalEditor = User::find($journal->editor_id);
+                if ($journalEditor && $journalEditor->email) {
+                    $editorEmails->push($journalEditor->email);
+                }
             }
 
-            if ($journal->department_id) {
-                $deptEditors = User::where('role', 'editor')
-                    ->where('department_id', $journal->department_id)
-                    ->whereNotNull('email')
-                    ->pluck('email');
-                $editorEmails = $editorEmails->merge($deptEditors);
-            }
+            $assignedEditors = User::where('role', 'editor')
+                ->where(function ($q) use ($journal) {
+                    $q->where('publication_id', $journal->id)
+                      ->orWhere(function ($q2) use ($journal) {
+                          if ($journal->department_id) {
+                              $q2->where('department_id', $journal->department_id);
+                          }
+                      });
+                })
+                ->whereNotNull('email')
+                ->pluck('email');
+
+            $editorEmails = $editorEmails->merge($assignedEditors);
 
             if ($editorEmails->isEmpty()) {
                 $adminEmails = User::where('role', 'admin')

@@ -467,39 +467,81 @@ class PaperSubmissionModuleTest extends TestCase
         });
     }
 
-    public function test_unauthenticated_user_redirected_to_login_when_accessing_submission_routes()
+    public function test_guest_unauthenticated_user_can_access_and_submit_paper_without_login()
     {
-        $editor = User::factory()->create();
+        Mail::fake();
+        Storage::fake('local');
+
+        $editor = User::factory()->create([
+            'role' => 'editor',
+            'email' => 'operator.editor@example.com'
+        ]);
         $dept = Department::create(['name' => 'Department of Computing']);
         $journal = Journal::create([
             'editor_id' => $editor->id,
-            'journal_title' => 'Unauth Test Journal',
+            'journal_title' => 'Guest Submission Journal',
             'university_name' => 'Test University',
             'department_id' => $dept->id,
             'status' => 'approved',
         ]);
 
         $journal->submissionSetting()->create([
-            'code' => 'UTJ',
+            'code' => 'GSJ',
             'is_open' => true,
             'opening_datetime' => now()->subDay(),
             'closing_datetime' => now()->addMonth(),
         ]);
 
-        // Unauthenticated access to form create
+        $manuscript = UploadedFile::fake()->create('manuscript.pdf', 500, 'application/pdf');
+
+        // Unauthenticated access to form create succeeds (status 200)
         $responseCreate = $this->get("/submit-paper/journal/{$journal->id}");
-        $responseCreate->assertRedirect(route('login'));
+        $responseCreate->assertStatus(200);
 
-        // Unauthenticated access to confirm view
-        $responseConfirmView = $this->get("/submit-paper/journal/{$journal->id}/confirm");
-        $responseConfirmView->assertRedirect(route('login'));
+        // Guest submits Step 1 payload
+        $payload = [
+            'title' => 'Guest Research Paper Title',
+            'abstract' => 'Guest Research Paper Abstract',
+            'keywords' => 'Guest, Public',
+            'authors' => [
+                [
+                    'full_name' => 'Guest Author Name',
+                    'email' => 'guest.author@example.com',
+                    'affiliation' => 'Sabaragamuwa University',
+                    'is_corresponding' => true,
+                    'order' => 1,
+                ]
+            ],
+            'files' => [
+                'manuscript' => $manuscript,
+            ],
+        ];
 
-        // Unauthenticated post to confirm
-        $responseConfirm = $this->post("/submit-paper/journal/{$journal->id}/confirm", []);
-        $responseConfirm->assertRedirect(route('login'));
+        $confirmResponse = $this->post("/submit-paper/journal/{$journal->id}/confirm", $payload);
+        $confirmResponse->assertRedirect(route('submissions.confirm.view', $journal));
 
-        // Unauthenticated final store
-        $responseStore = $this->post("/submit-paper/journal/{$journal->id}", ['agreement' => true]);
-        $responseStore->assertRedirect(route('login'));
+        // Unauthenticated access to confirmation view succeeds
+        $showConfirmResponse = $this->get("/submit-paper/journal/{$journal->id}/confirm");
+        $showConfirmResponse->assertStatus(200);
+
+        // Guest completes final store
+        $storeResponse = $this->post("/submit-paper/journal/{$journal->id}", [
+            'agreement' => true,
+        ]);
+        $storeResponse->assertStatus(200);
+
+        // Assert submission created with null user_id
+        $submission = Submission::where('paper_id', 'GSJ-' . date('Y') . '-0001')->first();
+        $this->assertNotNull($submission);
+        $this->assertNull($submission->user_id);
+
+        // Assert emails sent to both parties (guest author and journal operator)
+        Mail::assertSent(AuthorSubmissionConfirmationMail::class, function ($mail) {
+            return $mail->hasTo('guest.author@example.com');
+        });
+
+        Mail::assertSent(OperatorSubmissionNotificationMail::class, function ($mail) {
+            return $mail->hasTo('operator.editor@example.com');
+        });
     }
 }
