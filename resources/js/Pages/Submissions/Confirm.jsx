@@ -14,14 +14,14 @@ import {
 } from 'lucide-react';
 import { u, cn } from '@/lib/utils';
 
-export default function SubmissionsConfirm({ journal, paper, auth }) {
+export default function SubmissionsConfirm({ journal = {}, paper = {}, auth = {} }) {
     const [agreed, setAgreed] = useState(false);
 
     const { data, setData, post, processing, errors } = useForm({
-        title: paper.title,
-        abstract: paper.abstract,
-        keywords: paper.keywords,
-        authors: paper.authors,
+        title: paper?.title || '',
+        abstract: paper?.abstract || '',
+        keywords: paper?.keywords || '',
+        authors: paper?.authors || [],
         agreement: false,
     });
 
@@ -110,7 +110,7 @@ export default function SubmissionsConfirm({ journal, paper, auth }) {
                                 Author(s) List
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {paper.authors.map((author, index) => (
+                                {(paper?.authors || []).map((author, index) => (
                                     <div key={index} className="p-4 rounded-xl bg-white border border-slate-200 space-y-1 text-sm">
                                         <div className="flex items-center justify-between">
                                             <span className="font-bold text-slate-900">{author.full_name}</span>
@@ -137,7 +137,7 @@ export default function SubmissionsConfirm({ journal, paper, auth }) {
                                 Uploaded Documents
                             </h3>
                             <div className="space-y-2">
-                                {Object.entries(paper.file_details).map(([docType, file]) => (
+                                {Object.entries(paper?.file_details || {}).map(([docType, file]) => (
                                     <div key={docType} className="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200 text-xs font-semibold">
                                         <span className="capitalize text-slate-800 font-bold">{docType.replace('_', ' ')}</span>
                                         <span className="text-slate-500">{file.original_filename} ({file.size_mb} MB)</span>
