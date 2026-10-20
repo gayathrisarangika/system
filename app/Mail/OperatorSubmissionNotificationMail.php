@@ -38,7 +38,15 @@ class OperatorSubmissionNotificationMail extends Mailable
         $authorName = $author ? $author->full_name : ($this->submission->user?->name ?? 'Author');
         $authorEmail = $author ? $author->email : ($this->submission->user?->email ?? '');
         $journalTitle = $this->submission->journal?->journal_title ?? 'Academic Journal';
-        $submittedDate = $this->submission->submitted_at ? $this->submission->submitted_at->format('d F Y, h:i A') : now()->format('d F Y, h:i A');
+
+        $submittedDate = now()->format('d F Y, h:i A');
+        if ($this->submission->submitted_at) {
+            if ($this->submission->submitted_at instanceof \DateTimeInterface) {
+                $submittedDate = $this->submission->submitted_at->format('d F Y, h:i A');
+            } elseif (is_string($this->submission->submitted_at)) {
+                $submittedDate = date('d F Y, h:i A', strtotime($this->submission->submitted_at));
+            }
+        }
 
         $filesList = '';
         foreach ($this->submission->files as $file) {
