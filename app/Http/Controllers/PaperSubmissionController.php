@@ -466,7 +466,11 @@ class PaperSubmissionController extends Controller
             }
 
             foreach ($authorEmails as $email) {
-                Mail::to($email)->send(new AuthorSubmissionConfirmationMail($submission));
+                try {
+                    Mail::to($email)->send(new AuthorSubmissionConfirmationMail($submission));
+                } catch (\Throwable $e) {
+                    logger()->error("Failed sending author confirmation email to {$email} for paper {$submission->paper_id}: " . $e->getMessage());
+                }
             }
 
             // 2. Editor / Operator email dispatch
@@ -503,7 +507,11 @@ class PaperSubmissionController extends Controller
             $uniqueEditorEmails = $editorEmails->unique()->filter();
 
             foreach ($uniqueEditorEmails as $email) {
-                Mail::to($email)->send(new OperatorSubmissionNotificationMail($submission));
+                try {
+                    Mail::to($email)->send(new OperatorSubmissionNotificationMail($submission));
+                } catch (\Throwable $e) {
+                    logger()->error("Failed sending operator notification email to {$email} for paper {$submission->paper_id}: " . $e->getMessage());
+                }
             }
         } catch (\Throwable $e) {
             logger()->error("Failed to send paper submission email for paper {$submission->paper_id}: " . $e->getMessage());
