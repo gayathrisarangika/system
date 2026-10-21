@@ -42,16 +42,6 @@ export default function SubmissionsIndex({ journals = [], auth = {} }) {
                         </div>
                     </Link>
 
-                    <div className="flex items-center gap-4">
-                        {!user && (
-                            <Link 
-                                href={u('/login')}
-                                className="px-5 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-sm shadow-md hover:bg-blue-700 transition-all"
-                            >
-                                Author Login
-                            </Link>
-                        )}
-                    </div>
                 </div>
             </header>
 
