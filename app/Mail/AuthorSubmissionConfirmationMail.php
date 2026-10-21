@@ -37,7 +37,15 @@ class AuthorSubmissionConfirmationMail extends Mailable
         $author = $this->submission->correspondingAuthor();
         $authorName = $author ? $author->full_name : ($this->submission->user?->name ?? 'Author');
         $journalTitle = $this->submission->journal?->journal_title ?? 'Academic Journal';
-        $submittedDate = $this->submission->submitted_at ? $this->submission->submitted_at->format('d F Y, h:i A') : now()->format('d F Y, h:i A');
+
+        $submittedDate = now()->format('d F Y, h:i A');
+        if ($this->submission->submitted_at) {
+            if ($this->submission->submitted_at instanceof \DateTimeInterface) {
+                $submittedDate = $this->submission->submitted_at->format('d F Y, h:i A');
+            } elseif (is_string($this->submission->submitted_at)) {
+                $submittedDate = date('d F Y, h:i A', strtotime($this->submission->submitted_at));
+            }
+        }
 
         return "
         <div style='font-family: Arial, sans-serif; color: #1e293b; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;'>

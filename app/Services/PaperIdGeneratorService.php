@@ -19,7 +19,7 @@ class PaperIdGeneratorService
     {
         return DB::transaction(function () use ($journal) {
             $setting = $journal->submissionSetting;
-            $code = $setting ? strtoupper($setting->code) : 'JRN';
+            $code = ($setting && !empty(trim($setting->code ?? ''))) ? strtoupper(trim($setting->code)) : 'JRN';
             $year = date('Y');
 
             $prefix = "{$code}-{$year}-";

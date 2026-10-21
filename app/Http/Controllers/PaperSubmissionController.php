@@ -13,6 +13,7 @@ use App\Mail\AuthorSubmissionConfirmationMail;
 use App\Mail\OperatorSubmissionNotificationMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -187,7 +188,7 @@ class PaperSubmissionController extends Controller
         }
 
         $draft = session("submission_draft_{$journal->id}");
-        if (!$draft) {
+        if (!$draft || !is_array($draft) || empty($draft['title']) || empty($draft['authors'])) {
             return redirect()->route('submissions.create', $journal)
                 ->with('error', 'Please complete the submission form first.');
         }
@@ -231,63 +232,88 @@ class PaperSubmissionController extends Controller
 
             $draft = session($draftKey);
 
+            if (!is_array($draft) || empty($draft['title']) || empty($draft['authors']) || !is_array($draft['authors'])) {
+                session()->forget($draftKey);
+                return redirect()->route('submissions.create', $journal)
+                    ->with('error', 'Your submission draft has expired or is invalid. Please fill the submission form again.');
+            }
+
             $paperId = $idGenerator->generate($journal);
-            $code = $setting ? strtoupper($setting->code) : 'JRN';
+            $code = ($setting && !empty($setting->code)) ? strtoupper($setting->code) : 'JRN';
             $year = date('Y');
             $directoryPath = "submissions/{$code}/{$year}/{$paperId}";
 
-            $submission = Submission::create([
-                'paper_id' => $paperId,
-                'journal_id' => $journal->id,
-                'user_id' => Auth::id(),
-                'title' => $draft['title'],
-                'abstract' => $draft['abstract'],
-                'keywords' => $draft['keywords'] ?? '',
-                'status' => 'Submitted',
-                'submitted_at' => now(),
-            ]);
-
-            foreach ($draft['authors'] as $authorData) {
-                $submission->authors()->create([
-                    'full_name' => $authorData['full_name'],
-                    'email' => $authorData['email'],
-                    'affiliation' => $authorData['affiliation'],
-                    'designation' => $authorData['designation'] ?? null,
-                    'is_corresponding' => (bool) $authorData['is_corresponding'],
-                    'order' => (int) $authorData['order'],
+            $submission = DB::transaction(function () use ($journal, $paperId, $draft) {
+                $submission = Submission::create([
+                    'paper_id' => $paperId,
+                    'journal_id' => $journal->id,
+                    'user_id' => Auth::id(),
+                    'title' => $draft['title'],
+                    'abstract' => $draft['abstract'],
+                    'keywords' => $draft['keywords'] ?? '',
+                    'status' => 'Submitted',
+                    'submitted_at' => now(),
                 ]);
-            }
 
-            if (!empty($draft['file_details'])) {
+                foreach ($draft['authors'] as $authorData) {
+                    $submission->authors()->create([
+                        'full_name' => $authorData['full_name'],
+                        'email' => $authorData['email'],
+                        'affiliation' => $authorData['affiliation'],
+                        'designation' => $authorData['designation'] ?? null,
+                        'is_corresponding' => (bool) ($authorData['is_corresponding'] ?? false),
+                        'order' => (int) ($authorData['order'] ?? 1),
+                    ]);
+                }
+
+                SubmissionStatusHistory::create([
+                    'submission_id' => $submission->id,
+                    'status' => 'Submitted',
+                    'user_id' => Auth::id(),
+                    'note' => 'Paper submitted by author.',
+                ]);
+
+                return $submission;
+            });
+
+            if (!empty($draft['file_details']) && is_array($draft['file_details'])) {
+                Storage::disk('local')->makeDirectory($directoryPath);
+
                 foreach ($draft['file_details'] as $docType => $fileInfo) {
                     if (isset($fileInfo['temp_path']) && Storage::disk('local')->exists($fileInfo['temp_path'])) {
-                        $ext = pathinfo($fileInfo['original_filename'], PATHINFO_EXTENSION);
+                        $ext = pathinfo($fileInfo['original_filename'] ?? '', PATHINFO_EXTENSION);
                         $filename = $docType . '_' . time() . ($ext ? '.' . $ext : '');
                         $filePath = "{$directoryPath}/{$filename}";
 
-                        Storage::disk('local')->move($fileInfo['temp_path'], $filePath);
+                        try {
+                            Storage::disk('local')->move($fileInfo['temp_path'], $filePath);
 
-                        $submission->files()->create([
-                            'document_type' => $docType,
-                            'original_filename' => $fileInfo['original_filename'],
-                            'file_path' => $filePath,
-                            'file_size' => $fileInfo['file_size'] ?? 0,
-                            'mime_type' => $fileInfo['mime_type'] ?? 'application/octet-stream',
-                        ]);
+                            $submission->files()->create([
+                                'document_type' => $docType,
+                                'original_filename' => $fileInfo['original_filename'] ?? 'file',
+                                'file_path' => $filePath,
+                                'file_size' => $fileInfo['file_size'] ?? 0,
+                                'mime_type' => $fileInfo['mime_type'] ?? 'application/octet-stream',
+                            ]);
+                        } catch (\Throwable $e) {
+                            logger()->error("Failed to move submission file {$fileInfo['temp_path']} to {$filePath}: " . $e->getMessage());
+                        }
                     }
                 }
             }
 
-            SubmissionStatusHistory::create([
-                'submission_id' => $submission->id,
-                'status' => 'Submitted',
-                'user_id' => Auth::id(),
-                'note' => 'Paper submitted by author.',
-            ]);
-
             $this->sendSubmissionEmails($submission, $journal);
 
             session()->forget($draftKey);
+
+            $submittedAtFormatted = now()->format('d F Y, h:i A');
+            if ($submission->submitted_at) {
+                if ($submission->submitted_at instanceof \DateTimeInterface) {
+                    $submittedAtFormatted = $submission->submitted_at->format('d F Y, h:i A');
+                } elseif (is_string($submission->submitted_at)) {
+                    $submittedAtFormatted = date('d F Y, h:i A', strtotime($submission->submitted_at));
+                }
+            }
 
             return Inertia::render('Submissions/Success', [
                 'submission' => [
@@ -295,7 +321,7 @@ class PaperSubmissionController extends Controller
                     'title' => $submission->title,
                     'status' => $submission->status,
                     'journal_title' => $journal->journal_title,
-                    'submitted_at' => $submission->submitted_at->format('d F Y, h:i A'),
+                    'submitted_at' => $submittedAtFormatted,
                 ],
                 'auth' => [
                     'user' => Auth::user(),
@@ -330,57 +356,76 @@ class PaperSubmissionController extends Controller
         $validated = $request->validate($rules);
 
         $paperId = $idGenerator->generate($journal);
-        $code = $setting ? strtoupper($setting->code) : 'JRN';
+        $code = ($setting && !empty($setting->code)) ? strtoupper($setting->code) : 'JRN';
         $year = date('Y');
         $directoryPath = "submissions/{$code}/{$year}/{$paperId}";
 
-        $submission = Submission::create([
-            'paper_id' => $paperId,
-            'journal_id' => $journal->id,
-            'user_id' => Auth::id(),
-            'title' => $validated['title'],
-            'abstract' => $validated['abstract'],
-            'keywords' => $validated['keywords'] ?? '',
-            'status' => 'Submitted',
-            'submitted_at' => now(),
-        ]);
-
-        foreach ($validated['authors'] as $authorData) {
-            $submission->authors()->create([
-                'full_name' => $authorData['full_name'],
-                'email' => $authorData['email'],
-                'affiliation' => $authorData['affiliation'],
-                'designation' => $authorData['designation'] ?? null,
-                'is_corresponding' => (bool) $authorData['is_corresponding'],
-                'order' => (int) $authorData['order'],
+        $submission = DB::transaction(function () use ($journal, $paperId, $validated) {
+            $submission = Submission::create([
+                'paper_id' => $paperId,
+                'journal_id' => $journal->id,
+                'user_id' => Auth::id(),
+                'title' => $validated['title'],
+                'abstract' => $validated['abstract'],
+                'keywords' => $validated['keywords'] ?? '',
+                'status' => 'Submitted',
+                'submitted_at' => now(),
             ]);
-        }
+
+            foreach ($validated['authors'] as $authorData) {
+                $submission->authors()->create([
+                    'full_name' => $authorData['full_name'],
+                    'email' => $authorData['email'],
+                    'affiliation' => $authorData['affiliation'],
+                    'designation' => $authorData['designation'] ?? null,
+                    'is_corresponding' => (bool) ($authorData['is_corresponding'] ?? false),
+                    'order' => (int) ($authorData['order'] ?? 1),
+                ]);
+            }
+
+            SubmissionStatusHistory::create([
+                'submission_id' => $submission->id,
+                'status' => 'Submitted',
+                'user_id' => Auth::id(),
+                'note' => 'Paper submitted by author.',
+            ]);
+
+            return $submission;
+        });
 
         if ($request->hasFile('files')) {
+            Storage::disk('local')->makeDirectory($directoryPath);
+
             foreach ($request->file('files') as $docType => $file) {
                 if ($file && $file->isValid()) {
-                    $filename = $docType . '_' . time() . '.' . $file->getClientOriginalExtension();
-                    $filePath = $file->storeAs($directoryPath, $filename, 'local');
+                    try {
+                        $filename = $docType . '_' . time() . '.' . $file->getClientOriginalExtension();
+                        $filePath = $file->storeAs($directoryPath, $filename, 'local');
 
-                    $submission->files()->create([
-                        'document_type' => $docType,
-                        'original_filename' => $file->getClientOriginalName(),
-                        'file_path' => $filePath,
-                        'file_size' => $file->getSize(),
-                        'mime_type' => $file->getClientMimeType(),
-                    ]);
+                        $submission->files()->create([
+                            'document_type' => $docType,
+                            'original_filename' => $file->getClientOriginalName(),
+                            'file_path' => $filePath,
+                            'file_size' => $file->getSize(),
+                            'mime_type' => $file->getClientMimeType(),
+                        ]);
+                    } catch (\Throwable $e) {
+                        logger()->error("Failed to store submission file for {$docType}: " . $e->getMessage());
+                    }
                 }
             }
         }
 
-        SubmissionStatusHistory::create([
-            'submission_id' => $submission->id,
-            'status' => 'Submitted',
-            'user_id' => Auth::id(),
-            'note' => 'Paper submitted by author.',
-        ]);
-
         $this->sendSubmissionEmails($submission, $journal);
+
+        $submittedAtFormatted = now()->format('d F Y, h:i A');
+        if ($submission->submitted_at) {
+            if ($submission->submitted_at instanceof \DateTimeInterface) {
+                $submittedAtFormatted = $submission->submitted_at->format('d F Y, h:i A');
+            } elseif (is_string($submission->submitted_at)) {
+                $submittedAtFormatted = date('d F Y, h:i A', strtotime($submission->submitted_at));
+            }
+        }
 
         return Inertia::render('Submissions/Success', [
             'submission' => [
@@ -388,7 +433,7 @@ class PaperSubmissionController extends Controller
                 'title' => $submission->title,
                 'status' => $submission->status,
                 'journal_title' => $journal->journal_title,
-                'submitted_at' => $submission->submitted_at->format('d F Y, h:i A'),
+                'submitted_at' => $submittedAtFormatted,
             ],
             'auth' => [
                 'user' => Auth::user(),

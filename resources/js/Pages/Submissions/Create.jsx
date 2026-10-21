@@ -2,342 +2,189 @@ import React, { useState } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { 
     Send, 
-    Plus, 
-    Trash2, 
-    Upload, 
-    FileText, 
-    CheckCircle, 
     ArrowLeft, 
-    AlertCircle, 
+    CheckSquare, 
+    Square, 
+    FileText, 
     User, 
-    Mail, 
+    CheckCircle2, 
+    ShieldCheck, 
     Building2, 
-    Star 
+    Mail 
 } from 'lucide-react';
 import { u, cn } from '@/lib/utils';
 
-export default function SubmissionsCreate({ journal, auth, draft }) {
-    const user = auth.user;
-    const isSystemStaff = user && (user.role === 'admin' || user.role === 'editor');
+export default function SubmissionsConfirm({ journal = {}, paper = {}, auth = {} }) {
+    const [agreed, setAgreed] = useState(false);
 
     const { data, setData, post, processing, errors } = useForm({
-        title: draft?.title || '',
-        abstract: draft?.abstract || '',
-        keywords: draft?.keywords || '',
-        authors: draft?.authors || [
-            {
-                full_name: (user && !isSystemStaff) ? user.name || '' : '',
-                email: (user && !isSystemStaff) ? user.email || '' : '',
-                affiliation: '',
-                designation: '',
-                is_corresponding: true,
-                order: 1,
-            }
-        ],
-        files: {},
+        title: paper?.title || '',
+        abstract: paper?.abstract || '',
+        keywords: paper?.keywords || '',
+        authors: paper?.authors || [],
+        agreement: false,
     });
 
-    const handleAddAuthor = () => {
-        setData('authors', [
-            ...data.authors,
-            {
-                full_name: '',
-                email: '',
-                affiliation: '',
-                designation: '',
-                is_corresponding: false,
-                order: data.authors.length + 1,
-            }
-        ]);
+    const handleToggleAgreement = () => {
+        const nextVal = !agreed;
+        setAgreed(nextVal);
+        setData('agreement', nextVal);
     };
 
-    const handleRemoveAuthor = (index) => {
-        if (data.authors.length === 1) return;
-        const updated = data.authors.filter((_, i) => i !== index).map((author, i) => ({
-            ...author,
-            order: i + 1,
-            is_corresponding: index === 0 && author.is_corresponding ? false : author.is_corresponding
-        }));
-
-        // Ensure at least one corresponding
-        if (!updated.some(a => a.is_corresponding)) {
-            updated[0].is_corresponding = true;
-        }
-
-        setData('authors', updated);
-    };
-
-    const handleAuthorChange = (index, field, value) => {
-        const updated = [...data.authors];
-        if (field === 'is_corresponding') {
-            updated.forEach((a, i) => {
-                a.is_corresponding = i === index;
-            });
-        } else {
-            updated[index][field] = value;
-        }
-        setData('authors', updated);
-    };
-
-    const handleFileChange = (documentType, file) => {
-        setData('files', {
-            ...data.files,
-            [documentType]: file,
-        });
-    };
-
-    const handleSubmit = (e) => {
+    const handleFinalSubmit = (e) => {
         e.preventDefault();
-        post(u(`/submit-paper/journal/${journal.id}/confirm`));
+        if (!agreed) return;
+
+        post(u(`/submit-paper/journal/${journal.id}`));
     };
 
     return (
         <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
-            <Head title={`Paper Submission - ${journal.journal_title}`} />
+            <Head title={`Confirm Submission - ${journal.journal_title}`} />
 
             <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 py-4 px-6">
-                <div className="max-w-5xl mx-auto flex items-center justify-between">
-                    <Link href={u('/submit-paper')} className="flex items-center gap-2 text-slate-600 hover:text-blue-600 font-bold text-sm transition-colors">
+                <div className="max-w-4xl mx-auto flex items-center justify-between">
+                    <Link href={u(`/submit-paper/journal/${journal.id}`)} className="flex items-center gap-2 text-slate-600 hover:text-blue-600 font-bold text-sm transition-colors">
                         <ArrowLeft size={18} />
-                        Back to Journal Selection
+                        Back to Edit Details
                     </Link>
                     <span className="text-xs font-black tracking-widest text-slate-400 uppercase">
-                        Journal: {journal.code}
+                        Step 2: Confirmation
                     </span>
                 </div>
             </header>
 
             <main className="max-w-4xl mx-auto px-6 py-12">
-                <div className="bg-white rounded-3xl border border-slate-200 shadow-xl shadow-slate-200/50 p-8 sm:p-12">
+                <div className="bg-white rounded-3xl border border-slate-200 shadow-xl shadow-slate-200/50 p-8 sm:p-12 space-y-10">
                     
                     {/* Header */}
-                    <div className="border-b border-slate-100 pb-8 mb-8">
-                        <span className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-2 block">
-                            Manuscript Submission Form
-                        </span>
+                    <div className="border-b border-slate-100 pb-8">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider mb-3">
+                            <ShieldCheck size={14} />
+                            Submission Review
+                        </div>
                         <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-2">
-                            {journal.journal_title}
+                            Review Paper Details
                         </h1>
                         <p className="text-sm font-semibold text-slate-500">
-                            {journal.university_name}
+                            Target Journal: <strong className="text-slate-800">{journal.journal_title}</strong>
                         </p>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-10">
-                        
-                        {/* Section 1: Paper Details */}
-                        <div className="space-y-6">
-                            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                <FileText className="text-blue-600" size={20} />
-                                1. Paper Details
-                            </h2>
-
+                    {/* Paper Summary Card */}
+                    <div className="space-y-6">
+                        <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
                             <div>
-                                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                                    Paper Title <span className="text-red-500">*</span>
-                                </label>
-                                <textarea
-                                    rows={2}
-                                    value={data.title}
-                                    onChange={(e) => setData('title', e.target.value)}
-                                    placeholder="Enter full paper title..."
-                                    className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-slate-900 text-sm font-medium transition-all"
-                                    required
-                                />
-                                {errors.title && <p className="text-red-500 text-xs mt-1 font-semibold">{errors.title}</p>}
+                                <span className="text-xs font-bold uppercase tracking-widest text-slate-400 block mb-1">
+                                    Paper Title
+                                </span>
+                                <h2 className="text-xl font-extrabold text-slate-900 leading-snug">
+                                    {paper.title}
+                                </h2>
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                                    Abstract <span className="text-red-500">*</span>
-                                </label>
-                                <textarea
-                                    rows={5}
-                                    value={data.abstract}
-                                    onChange={(e) => setData('abstract', e.target.value)}
-                                    placeholder="Provide structured abstract (maximum 500 words)..."
-                                    className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-slate-900 text-sm transition-all"
-                                    required
-                                />
-                                {errors.abstract && <p className="text-red-500 text-xs mt-1 font-semibold">{errors.abstract}</p>}
+                                <span className="text-xs font-bold uppercase tracking-widest text-slate-400 block mb-1">
+                                    Abstract
+                                </span>
+                                <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">
+                                    {paper.abstract}
+                                </p>
                             </div>
 
-                            <div>
-                                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                                    Keywords
-                                </label>
-                                <input
-                                    type="text"
-                                    value={data.keywords}
-                                    onChange={(e) => setData('keywords', e.target.value)}
-                                    placeholder="e.g. Artificial Intelligence, Machine Learning, Social Analytics"
-                                    className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-slate-900 text-sm font-medium transition-all"
-                                />
-                                {errors.keywords && <p className="text-red-500 text-xs mt-1 font-semibold">{errors.keywords}</p>}
-                            </div>
+                            {paper.keywords && (
+                                <div>
+                                    <span className="text-xs font-bold uppercase tracking-widest text-slate-400 block mb-1">
+                                        Keywords
+                                    </span>
+                                    <p className="text-xs font-semibold text-blue-700 bg-blue-50 inline-block px-3 py-1 rounded-lg">
+                                        {paper.keywords}
+                                    </p>
+                                </div>
+                            )}
                         </div>
 
-                        {/* Section 2: Authors */}
-                        <div className="space-y-6 pt-6 border-t border-slate-100">
-                            <div className="flex items-center justify-between">
-                                <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                    <User className="text-blue-600" size={20} />
-                                    2. Author Details
-                                </h2>
-                                <button
-                                    type="button"
-                                    onClick={handleAddAuthor}
-                                    className="px-4 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs flex items-center gap-1.5 transition-colors"
-                                >
-                                    <Plus size={15} />
-                                    Add Another Author
-                                </button>
-                            </div>
-
-                            <div className="space-y-4">
-                                {data.authors.map((author, index) => (
-                                    <div key={index} className="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 relative space-y-4">
+                        {/* Authors List */}
+                        <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">
+                                Author(s) List
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {(paper?.authors || []).map((author, index) => (
+                                    <div key={index} className="p-4 rounded-xl bg-white border border-slate-200 space-y-1 text-sm">
                                         <div className="flex items-center justify-between">
-                                            <span className="text-xs font-black uppercase text-slate-500">
-                                                Author #{index + 1}
-                                            </span>
-                                            <div className="flex items-center gap-4">
-                                                <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
-                                                    <input
-                                                        type="radio"
-                                                        name="corresponding_author"
-                                                        checked={author.is_corresponding}
-                                                        onChange={() => handleAuthorChange(index, 'is_corresponding', true)}
-                                                        className="text-blue-600 focus:ring-blue-500"
-                                                    />
+                                            <span className="font-bold text-slate-900">{author.full_name}</span>
+                                            {author.is_corresponding && (
+                                                <span className="text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full">
                                                     Corresponding Author
-                                                </label>
-
-                                                {data.authors.length > 1 && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleRemoveAuthor(index)}
-                                                        className="text-red-500 hover:text-red-700 p-1"
-                                                    >
-                                                        <Trash2 size={16} />
-                                                    </button>
-                                                )}
-                                            </div>
+                                                </span>
+                                            )}
                                         </div>
-
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div>
-                                                <input
-                                                    type="text"
-                                                    placeholder="Full Name *"
-                                                    value={author.full_name}
-                                                    onChange={(e) => handleAuthorChange(index, 'full_name', e.target.value)}
-                                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm"
-                                                    required
-                                                />
-                                            </div>
-                                            <div>
-                                                <input
-                                                    type="email"
-                                                    placeholder="Email Address *"
-                                                    value={author.email}
-                                                    onChange={(e) => handleAuthorChange(index, 'email', e.target.value)}
-                                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm"
-                                                    required
-                                                />
-                                            </div>
-                                            <div>
-                                                <input
-                                                    type="text"
-                                                    placeholder="Affiliation / University *"
-                                                    value={author.affiliation}
-                                                    onChange={(e) => handleAuthorChange(index, 'affiliation', e.target.value)}
-                                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm"
-                                                    required
-                                                />
-                                            </div>
-                                            <div>
-                                                <input
-                                                    type="text"
-                                                    placeholder="Designation (Optional)"
-                                                    value={author.designation}
-                                                    onChange={(e) => handleAuthorChange(index, 'designation', e.target.value)}
-                                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm"
-                                                />
-                                            </div>
-                                        </div>
+                                        <p className="text-xs text-slate-500 flex items-center gap-1">
+                                            <Mail size={12} /> {author.email}
+                                        </p>
+                                        <p className="text-xs text-slate-500 flex items-center gap-1">
+                                            <Building2 size={12} /> {author.affiliation} {author.designation ? `(${author.designation})` : ''}
+                                        </p>
                                     </div>
                                 ))}
                             </div>
                         </div>
 
-                        {/* Section 3: File Uploads */}
-                        <div className="space-y-6 pt-6 border-t border-slate-100">
-                            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                <Upload className="text-blue-600" size={20} />
-                                3. Document Uploads
-                            </h2>
-
-                            <div className="space-y-4">
-                                {journal.document_requirements.map((req) => {
-                                    const file = data.files[req.document_type];
-                                    const existingFile = draft?.file_details?.[req.document_type];
-
-                                    return (
-                                        <div key={req.id} className="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                            <div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-sm font-bold text-slate-900">{req.label}</span>
-                                                    {req.is_required ? (
-                                                        <span className="text-[10px] font-bold text-red-600 bg-red-50 border border-red-100 px-2 py-0.5 rounded-full">Required</span>
-                                                    ) : (
-                                                        <span className="text-[10px] font-bold text-slate-500 bg-slate-200/60 px-2 py-0.5 rounded-full">Optional</span>
-                                                    )}
-                                                </div>
-                                                <p className="text-xs text-slate-500 mt-1">
-                                                    Allowed formats: {req.allowed_mimes} (Max: {req.max_size_mb}MB)
-                                                </p>
-                                            </div>
-
-                                            <div className="flex items-center gap-3">
-                                                <label className="px-4 py-2.5 rounded-xl bg-white border border-slate-300 hover:border-blue-500 font-bold text-xs text-slate-700 cursor-pointer shadow-sm transition-all flex items-center gap-2">
-                                                    <Upload size={14} />
-                                                    {file || existingFile ? 'Change File' : 'Choose File'}
-                                                    <input
-                                                        type="file"
-                                                        accept={req.allowed_mimes.split(',').map(m => `.${m.trim()}`).join(',')}
-                                                        onChange={(e) => handleFileChange(req.document_type, e.target.files[0])}
-                                                        className="hidden"
-                                                        required={req.is_required && !file && !existingFile}
-                                                    />
-                                                </label>
-
-                                                {file ? (
-                                                    <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1">
-                                                        <CheckCircle size={14} />
-                                                        {file.name}
-                                                    </span>
-                                                ) : existingFile ? (
-                                                    <span className="text-xs font-semibold text-blue-600 flex items-center gap-1">
-                                                        <CheckCircle size={14} />
-                                                        {existingFile.original_filename} (Uploaded)
-                                                    </span>
-                                                ) : null}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
+                        {/* Uploaded Files */}
+                        <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">
+                                Uploaded Documents
+                            </h3>
+                            <div className="space-y-2">
+                                {Object.entries(paper?.file_details || {}).map(([docType, file]) => (
+                                    <div key={docType} className="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200 text-xs font-semibold">
+                                        <span className="capitalize text-slate-800 font-bold">{docType.replace('_', ' ')}</span>
+                                        <span className="text-slate-500">{file.original_filename} ({file.size_mb} MB)</span>
+                                    </div>
+                                ))}
                             </div>
                         </div>
+                    </div>
 
-                        <div className="pt-8 border-t border-slate-100 flex justify-end">
+                    {/* Checkbox Agreement & Submit */}
+                    <form onSubmit={handleFinalSubmit} className="pt-6 border-t border-slate-100 space-y-6">
+                        <div 
+                            onClick={handleToggleAgreement}
+                            className={cn(
+                                "p-5 rounded-2xl border cursor-pointer transition-all flex items-start gap-3",
+                                agreed ? "bg-blue-50/50 border-blue-300" : "bg-slate-50 border-slate-200 hover:border-slate-300"
+                            )}
+                        >
+                            <div className="mt-0.5 text-blue-600">
+                                {agreed ? <CheckSquare size={20} /> : <Square size={20} className="text-slate-400" />}
+                            </div>
+                            <p className="text-xs font-semibold text-slate-700 leading-relaxed select-none">
+                                I confirm that the information provided is accurate and that I agree to the journal's submission requirements, publication ethics, and editorial policies.
+                            </p>
+                        </div>
+                        {errors.agreement && <p className="text-red-500 text-xs font-semibold">{errors.agreement}</p>}
+
+                        <div className="flex items-center justify-between pt-4">
+                            <Link
+                                href={u(`/submit-paper/journal/${journal.id}`)}
+                                className="px-6 py-3.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-100 transition-colors"
+                            >
+                                Edit Paper Information
+                            </Link>
+
                             <button
                                 type="submit"
-                                disabled={processing}
-                                className="px-8 py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-xl shadow-blue-600/30 transition-all flex items-center gap-2"
+                                disabled={!agreed || processing}
+                                className={cn(
+                                    "px-8 py-4 rounded-2xl font-bold text-sm shadow-xl flex items-center gap-2 transition-all",
+                                    agreed && !processing
+                                        ? "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/30"
+                                        : "bg-slate-300 text-slate-500 cursor-not-allowed shadow-none"
+                                )}
                             >
-                                Continue to Confirmation
                                 <Send size={16} />
+                                Submit Paper
                             </button>
                         </div>
                     </form>
