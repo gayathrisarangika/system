@@ -612,4 +612,64 @@ class PaperSubmissionModuleTest extends TestCase
             return $mail->hasTo('real.author@example.com') && !$mail->hasTo('admin@gmail.com');
         });
     }
+
+    public function test_paper_submission_succeeds_even_if_mail_transport_fails()
+    {
+        Storage::fake('local');
+
+        // Mock Mail to throw an exception when send is called
+        Mail::shouldReceive('to')->andThrow(new \Exception('Mail transport error simulation'));
+
+        $editor = User::factory()->create(['role' => 'editor']);
+        $dept = Department::create(['name' => 'Department of Computing']);
+        $journal = Journal::create([
+            'editor_id' => $editor->id,
+            'journal_title' => 'Resilience Test Journal',
+            'university_name' => 'Sabaragamuwa University',
+            'department_id' => $dept->id,
+            'status' => 'approved',
+        ]);
+
+        $journal->submissionSetting()->create([
+            'code' => 'RTJ',
+            'is_open' => true,
+            'opening_datetime' => now()->subDay(),
+            'closing_datetime' => now()->addMonth(),
+        ]);
+
+        $author = User::factory()->create();
+        $manuscript = UploadedFile::fake()->create('manuscript.pdf', 500, 'application/pdf');
+
+        $payload = [
+            'title' => 'Resilience Test Title',
+            'abstract' => 'Resilience Test Abstract',
+            'authors' => [
+                [
+                    'full_name' => 'Resilient Author',
+                    'email' => 'resilient@example.com',
+                    'affiliation' => 'Sabaragamuwa University',
+                    'is_corresponding' => true,
+                    'order' => 1,
+                ]
+            ],
+            'files' => [
+                'manuscript' => $manuscript,
+            ],
+        ];
+
+        // Step 1: Confirm post
+        $this->actingAs($author)->post("/submit-paper/journal/{$journal->id}/confirm", $payload);
+
+        // Step 2: Final store post should succeed with 200 (renders Submissions/Success) despite mail error
+        $response = $this->actingAs($author)->post("/submit-paper/journal/{$journal->id}", [
+            'agreement' => true,
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page->component('Submissions/Success'));
+
+        $submission = Submission::where('user_id', $author->id)->first();
+        $this->assertNotNull($submission);
+        $this->assertEquals("RTJ-" . date('Y') . "-0001", $submission->paper_id);
+    }
 }
