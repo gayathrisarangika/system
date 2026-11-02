@@ -19,9 +19,8 @@ class AuthorSubmissionConfirmationMail extends Mailable
 
     public function envelope(): Envelope
     {
-        $journalTitle = $this->submission->journal?->journal_title ?? 'Academic Journal';
         return new Envelope(
-            subject: "Paper Submission Confirmation [{$this->submission->paper_id}] - {$journalTitle}",
+            subject: "Paper Submission Confirmation – [{$this->submission->paper_id}]",
         );
     }
 

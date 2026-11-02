@@ -450,26 +450,15 @@ class PaperSubmissionController extends Controller
         try {
             $submission->load(['journal', 'authors', 'files', 'user']);
 
-            // 1. Author email dispatch (Corresponding author and any submission author emails)
-            $authorEmails = $submission->authors
-                ->pluck('email')
-                ->filter()
-                ->unique();
+            // 1. Author email dispatch (Strictly to the corresponding author's email from SubmissionAuthor)
+            $correspondingAuthor = $submission->correspondingAuthor();
+            $authorEmail = $correspondingAuthor?->email;
 
-            if ($authorEmails->isEmpty()) {
-                $correspondingAuthor = $submission->correspondingAuthor();
-                if ($correspondingAuthor?->email) {
-                    $authorEmails->push($correspondingAuthor->email);
-                } elseif ($submission->user?->email) {
-                    $authorEmails->push($submission->user->email);
-                }
-            }
-
-            foreach ($authorEmails as $email) {
+            if ($authorEmail) {
                 try {
-                    Mail::to($email)->send(new AuthorSubmissionConfirmationMail($submission));
+                    Mail::to($authorEmail)->send(new AuthorSubmissionConfirmationMail($submission));
                 } catch (\Throwable $e) {
-                    logger()->error("Failed to send author confirmation mail to {$email} for paper {$submission->paper_id}: " . $e->getMessage());
+                    logger()->error("Failed to send author confirmation mail to {$authorEmail} for paper {$submission->paper_id}: " . $e->getMessage());
                 }
             }
 
