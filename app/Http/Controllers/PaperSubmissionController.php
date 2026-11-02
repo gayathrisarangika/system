@@ -462,25 +462,19 @@ class PaperSubmissionController extends Controller
                 }
             }
 
-            // 2. Editor / Operator email dispatch
+            // 2. Editor / Operator email dispatch (strictly assigned to this journal)
             $editorEmails = collect();
 
             if ($journal->editor_id) {
                 $journalEditor = User::find($journal->editor_id);
-                if ($journalEditor && $journalEditor->email) {
+                if ($journalEditor && !empty($journalEditor->email)) {
                     $editorEmails->push($journalEditor->email);
                 }
             }
 
             $assignedEditors = User::where('role', 'editor')
-                ->where(function ($q) use ($journal) {
-                    $q->where('publication_id', $journal->id)
-                      ->orWhere(function ($q2) use ($journal) {
-                          if ($journal->department_id) {
-                              $q2->where('department_id', $journal->department_id);
-                          }
-                      });
-                })
+                ->where('type', 'journal')
+                ->where('publication_id', $journal->id)
                 ->whereNotNull('email')
                 ->pluck('email');
 
@@ -493,7 +487,13 @@ class PaperSubmissionController extends Controller
                 $editorEmails = $editorEmails->merge($adminEmails);
             }
 
-            $uniqueEditorEmails = $editorEmails->unique()->filter();
+            $normalizedAuthorEmail = $authorEmail ? strtolower(trim($authorEmail)) : null;
+
+            $uniqueEditorEmails = $editorEmails
+                ->filter()
+                ->map(fn ($email) => trim($email))
+                ->filter(fn ($email) => $normalizedAuthorEmail === null || strtolower($email) !== $normalizedAuthorEmail)
+                ->unique(fn ($email) => strtolower($email));
 
             foreach ($uniqueEditorEmails as $email) {
                 try {

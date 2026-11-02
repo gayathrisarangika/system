@@ -519,10 +519,104 @@ class PaperSubmissionModuleTest extends TestCase
         Mail::assertSent(OperatorSubmissionNotificationMail::class, 1);
     }
 
-    public function test_submission_sends_emails_to_department_editors_when_journal_editor_has_no_email()
+    public function test_submission_sends_emails_only_to_assigned_journal_operator_not_other_department_editors()
     {
         Mail::fake();
         Storage::fake('local');
+
+        $dept = Department::create(['name' => 'Department of Computing']);
+
+        // Editor assigned to Journal A
+        $editorA = User::factory()->create([
+            'role' => 'editor',
+            'type' => 'journal',
+            'department_id' => $dept->id,
+            'email' => 'editor.journal.a@example.com',
+        ]);
+
+        // Editor assigned to Journal B in the same department
+        $editorB = User::factory()->create([
+            'role' => 'editor',
+            'type' => 'journal',
+            'department_id' => $dept->id,
+            'email' => 'editor.journal.b@example.com',
+        ]);
+
+        $journalA = Journal::create([
+            'editor_id' => $editorA->id,
+            'journal_title' => 'Journal of Computing Alpha',
+            'university_name' => 'Sabaragamuwa University',
+            'department_id' => $dept->id,
+            'status' => 'approved',
+        ]);
+
+        $journalB = Journal::create([
+            'editor_id' => $editorB->id,
+            'journal_title' => 'Journal of Computing Beta',
+            'university_name' => 'Sabaragamuwa University',
+            'department_id' => $dept->id,
+            'status' => 'approved',
+        ]);
+
+        $journalA->submissionSetting()->create([
+            'code' => 'JCA',
+            'is_open' => true,
+            'opening_datetime' => now()->subDay(),
+            'closing_datetime' => now()->addMonth(),
+        ]);
+
+        $authorUser = User::factory()->create(['email' => 'author.journal.a@example.com']);
+        $manuscript = UploadedFile::fake()->create('manuscript.pdf', 500, 'application/pdf');
+
+        $payload = [
+            'title' => 'Isolated Journal Submission Title',
+            'abstract' => 'Isolated Journal Submission Abstract',
+            'authors' => [
+                [
+                    'full_name' => 'Submitting Author',
+                    'email' => 'author.journal.a@example.com',
+                    'affiliation' => 'Sabaragamuwa University',
+                    'is_corresponding' => true,
+                    'order' => 1,
+                ]
+            ],
+            'files' => [
+                'manuscript' => $manuscript,
+            ],
+            'agreement' => true,
+        ];
+
+        $response = $this->actingAs($authorUser)->post("/submit-paper/journal/{$journalA->id}", $payload);
+        $response->assertStatus(200);
+
+        // Author receives confirmation email
+        Mail::assertSent(AuthorSubmissionConfirmationMail::class, function ($mail) {
+            return $mail->hasTo('author.journal.a@example.com');
+        });
+
+        // Journal A operator receives notification
+        Mail::assertSent(OperatorSubmissionNotificationMail::class, function ($mail) {
+            return $mail->hasTo('editor.journal.a@example.com');
+        });
+
+        // Journal B operator MUST NOT receive notification
+        Mail::assertNotSent(OperatorSubmissionNotificationMail::class, function ($mail) {
+            return $mail->hasTo('editor.journal.b@example.com');
+        });
+
+        // Total operator notifications sent should be exactly 1
+        Mail::assertSent(OperatorSubmissionNotificationMail::class, 1);
+    }
+
+    public function test_submission_falls_back_to_admin_when_journal_has_no_operator_email()
+    {
+        Mail::fake();
+        Storage::fake('local');
+
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'email' => 'admin.fallback@example.com',
+        ]);
 
         $dept = Department::create(['name' => 'Department of Computing']);
         $noEmailEditor = User::factory()->create([
@@ -530,22 +624,23 @@ class PaperSubmissionModuleTest extends TestCase
             'department_id' => $dept->id,
             'email' => null,
         ]);
-        $deptEditor = User::factory()->create([
+        // Other editor in department but NOT assigned to this journal
+        User::factory()->create([
             'role' => 'editor',
             'department_id' => $dept->id,
-            'email' => 'dept.editor@example.com'
+            'email' => 'other.dept.editor@example.com'
         ]);
 
         $journal = Journal::create([
             'editor_id' => $noEmailEditor->id,
-            'journal_title' => 'Department Editor Journal',
+            'journal_title' => 'Admin Fallback Journal',
             'university_name' => 'Sabaragamuwa University',
             'department_id' => $dept->id,
             'status' => 'approved',
         ]);
 
         $journal->submissionSetting()->create([
-            'code' => 'DEJ',
+            'code' => 'AFJ',
             'is_open' => true,
             'opening_datetime' => now()->subDay(),
             'closing_datetime' => now()->addMonth(),
@@ -555,8 +650,8 @@ class PaperSubmissionModuleTest extends TestCase
         $manuscript = UploadedFile::fake()->create('manuscript.pdf', 500, 'application/pdf');
 
         $payload = [
-            'title' => 'Null Editor ID Test Title',
-            'abstract' => 'Null Editor ID Test Abstract',
+            'title' => 'Null Editor ID Fallback Title',
+            'abstract' => 'Null Editor ID Fallback Abstract',
             'authors' => [
                 [
                     'full_name' => 'Submitting Author',
@@ -579,8 +674,14 @@ class PaperSubmissionModuleTest extends TestCase
             return $mail->hasTo('submitting.author@example.com');
         });
 
+        // Other department editor must NOT receive notification
+        Mail::assertNotSent(OperatorSubmissionNotificationMail::class, function ($mail) {
+            return $mail->hasTo('other.dept.editor@example.com');
+        });
+
+        // Admin fallback receives notification
         Mail::assertSent(OperatorSubmissionNotificationMail::class, function ($mail) {
-            return $mail->hasTo('dept.editor@example.com');
+            return $mail->hasTo('admin.fallback@example.com');
         });
     }
 
