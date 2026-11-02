@@ -396,12 +396,127 @@ class PaperSubmissionModuleTest extends TestCase
         $response->assertStatus(200);
 
         Mail::assertSent(AuthorSubmissionConfirmationMail::class, function ($mail) {
-            return $mail->hasTo('corr.author@example.com');
+            return $mail->hasTo('corr.author@example.com')
+                && $mail->envelope()->subject === 'Paper Submission Confirmation – [ETJ-' . date('Y') . '-0001]';
         });
 
         Mail::assertSent(OperatorSubmissionNotificationMail::class, function ($mail) {
-            return $mail->hasTo('journal.editor@example.com');
+            return $mail->hasTo('journal.editor@example.com')
+                && $mail->envelope()->subject === 'New Paper Submission – [ETJ-' . date('Y') . '-0001]';
         });
+    }
+
+    public function test_author_receives_confirmation_email_and_operator_receives_separate_notification_email()
+    {
+        Mail::fake();
+        Storage::fake('local');
+
+        $editor = User::factory()->create([
+            'role' => 'editor',
+            'email' => 'operator.journal@example.com',
+        ]);
+        $dept = Department::create(['name' => 'Department of Computing']);
+        $journal = Journal::create([
+            'editor_id' => $editor->id,
+            'journal_title' => 'Journal of Separate Emails',
+            'university_name' => 'Sabaragamuwa University',
+            'department_id' => $dept->id,
+            'status' => 'approved',
+        ]);
+
+        $journal->submissionSetting()->create([
+            'code' => 'JSE',
+            'is_open' => true,
+            'opening_datetime' => now()->subDay(),
+            'closing_datetime' => now()->addMonth(),
+        ]);
+
+        $manuscript = UploadedFile::fake()->create('manuscript.pdf', 500, 'application/pdf');
+
+        $payload = [
+            'title' => 'Quantum Computing and Cryptography',
+            'abstract' => 'In-depth analysis of quantum key distribution protocols.',
+            'keywords' => 'Quantum, Cryptography',
+            'authors' => [
+                [
+                    'full_name' => 'Prof. Primary Corresponding Author',
+                    'email' => 'corresponding.author@example.com',
+                    'affiliation' => 'Department of Physics, Sabaragamuwa University',
+                    'designation' => 'Professor',
+                    'is_corresponding' => true,
+                    'order' => 1,
+                ],
+                [
+                    'full_name' => 'Co-Author One',
+                    'email' => 'coauthor1@example.com',
+                    'affiliation' => 'Department of Physics',
+                    'designation' => 'Lecturer',
+                    'is_corresponding' => false,
+                    'order' => 2,
+                ],
+            ],
+            'files' => [
+                'manuscript' => $manuscript,
+            ],
+            'agreement' => true,
+        ];
+
+        $response = $this->post("/submit-paper/journal/{$journal->id}", $payload);
+        $response->assertStatus(200);
+
+        $expectedPaperId = 'JSE-' . date('Y') . '-0001';
+
+        // 1. Author Confirmation Email checks
+        Mail::assertSent(AuthorSubmissionConfirmationMail::class, function ($mail) use ($expectedPaperId) {
+            // Recipient must be strictly corresponding author
+            $hasCorrectRecipient = $mail->hasTo('corresponding.author@example.com')
+                && !$mail->hasTo('operator.journal@example.com')
+                && !$mail->hasTo('coauthor1@example.com');
+
+            // Subject must follow format: Paper Submission Confirmation – [Paper ID]
+            $hasCorrectSubject = $mail->envelope()->subject === "Paper Submission Confirmation – [{$expectedPaperId}]";
+
+            // Content checks
+            $rendered = $mail->render();
+            $hasContent = str_contains($rendered, $expectedPaperId)
+                && str_contains($rendered, 'Quantum Computing and Cryptography')
+                && str_contains($rendered, 'Journal of Separate Emails')
+                && str_contains($rendered, 'Prof. Primary Corresponding Author')
+                && str_contains($rendered, 'Paper Submission Successful');
+
+            return $hasCorrectRecipient && $hasCorrectSubject && $hasContent;
+        });
+
+        // Ensure Author NEVER receives OperatorSubmissionNotificationMail
+        Mail::assertNotSent(OperatorSubmissionNotificationMail::class, function ($mail) {
+            return $mail->hasTo('corresponding.author@example.com')
+                || $mail->hasTo('coauthor1@example.com');
+        });
+
+        // 2. Operator Notification Email checks
+        Mail::assertSent(OperatorSubmissionNotificationMail::class, function ($mail) use ($expectedPaperId) {
+            // Recipient must be journal operator
+            $hasCorrectRecipient = $mail->hasTo('operator.journal@example.com')
+                && !$mail->hasTo('corresponding.author@example.com');
+
+            // Subject must follow format: New Paper Submission – [Paper ID]
+            $hasCorrectSubject = $mail->envelope()->subject === "New Paper Submission – [{$expectedPaperId}]";
+
+            // Content checks
+            $rendered = $mail->render();
+            $hasContent = str_contains($rendered, $expectedPaperId)
+                && str_contains($rendered, 'Quantum Computing and Cryptography')
+                && str_contains($rendered, 'Journal of Separate Emails')
+                && str_contains($rendered, 'Prof. Primary Corresponding Author')
+                && str_contains($rendered, 'corresponding.author@example.com')
+                && str_contains($rendered, 'New Paper Submission Alert');
+
+            return $hasCorrectRecipient && $hasCorrectSubject && $hasContent;
+        });
+
+        // Verify exact count of sent emails: 1 author confirmation, 1 operator notification
+        Mail::assertSent(AuthorSubmissionConfirmationMail::class, 1);
+        Mail::assertSent(OperatorSubmissionNotificationMail::class, 1);
     }
 
     public function test_submission_sends_emails_to_department_editors_when_journal_editor_has_no_email()
