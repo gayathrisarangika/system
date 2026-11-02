@@ -452,9 +452,10 @@ class PaperSubmissionController extends Controller
 
             // 1. Author email dispatch (Strictly to the corresponding author's email from SubmissionAuthor)
             $correspondingAuthor = $submission->correspondingAuthor();
-            $authorEmail = $correspondingAuthor?->email;
+            $authorEmail = $correspondingAuthor?->email ? trim($correspondingAuthor->email) : null;
 
             if ($authorEmail) {
+                logger()->info("Dispatching author submission confirmation email for paper {$submission->paper_id} to recipient: {$authorEmail}");
                 try {
                     Mail::to($authorEmail)->send(new AuthorSubmissionConfirmationMail($submission));
                 } catch (\Throwable $e) {
@@ -467,7 +468,7 @@ class PaperSubmissionController extends Controller
 
             if ($journal->editor_id) {
                 $journalEditor = User::find($journal->editor_id);
-                if ($journalEditor && $journalEditor->email) {
+                if ($journalEditor && !empty($journalEditor->email)) {
                     $editorEmails->push($journalEditor->email);
                 }
             }
@@ -493,9 +494,19 @@ class PaperSubmissionController extends Controller
                 $editorEmails = $editorEmails->merge($adminEmails);
             }
 
-            $uniqueEditorEmails = $editorEmails->unique()->filter();
+            $normalizedAuthorEmail = $authorEmail ? strtolower(trim($authorEmail)) : null;
+
+            $uniqueEditorEmails = $editorEmails
+                ->filter(fn ($email) => !empty($email) && filter_var(trim($email), FILTER_VALIDATE_EMAIL))
+                ->map(fn ($email) => trim($email))
+                ->unique(fn ($email) => strtolower($email))
+                ->reject(function ($email) use ($normalizedAuthorEmail) {
+                    return $normalizedAuthorEmail !== null && strtolower($email) === $normalizedAuthorEmail;
+                })
+                ->values();
 
             foreach ($uniqueEditorEmails as $email) {
+                logger()->info("Dispatching operator submission notification email for paper {$submission->paper_id} to recipient: {$email}");
                 try {
                     Mail::to($email)->send(new OperatorSubmissionNotificationMail($submission));
                 } catch (\Throwable $e) {

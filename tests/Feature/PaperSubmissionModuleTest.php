@@ -729,4 +729,168 @@ class PaperSubmissionModuleTest extends TestCase
             return $mail->hasTo('real.author@example.com') && !$mail->hasTo('admin@gmail.com');
         });
     }
+
+    public function test_corresponding_author_excluded_from_operator_notifications_and_operators_deduplicated_direct_flow()
+    {
+        Mail::fake();
+        Storage::fake('local');
+
+        $dept = Department::create(['name' => 'Department of Computing']);
+
+        // Journal editor who is also the author submitting a paper
+        $editorAuthor = User::factory()->create([
+            'role' => 'editor',
+            'email' => 'Author.Editor@example.com',
+            'department_id' => $dept->id,
+        ]);
+
+        // Second editor in same department
+        $otherEditor = User::factory()->create([
+            'role' => 'editor',
+            'email' => 'other.editor@example.com',
+            'department_id' => $dept->id,
+        ]);
+
+        $journal = Journal::create([
+            'editor_id' => $editorAuthor->id,
+            'journal_title' => 'Exclusion Direct Test Journal',
+            'university_name' => 'Test University',
+            'department_id' => $dept->id,
+            'status' => 'approved',
+        ]);
+
+        $journal->submissionSetting()->create([
+            'code' => 'EXD',
+            'is_open' => true,
+            'opening_datetime' => now()->subDay(),
+            'closing_datetime' => now()->addMonth(),
+        ]);
+
+        $manuscript = UploadedFile::fake()->create('manuscript.pdf', 500, 'application/pdf');
+
+        $payload = [
+            'title' => 'Direct Flow Paper Exclusion Test',
+            'abstract' => 'Testing exclusion of corresponding author from operator notification',
+            'authors' => [
+                [
+                    'full_name' => 'Author Editor',
+                    'email' => 'author.editor@example.com', // lowercase vs mixed case
+                    'affiliation' => 'Test University',
+                    'is_corresponding' => true,
+                    'order' => 1,
+                ]
+            ],
+            'files' => [
+                'manuscript' => $manuscript,
+            ],
+            'agreement' => true,
+        ];
+
+        $response = $this->post("/submit-paper/journal/{$journal->id}", $payload);
+        $response->assertStatus(200);
+
+        // Author should receive confirmation mail
+        Mail::assertSent(AuthorSubmissionConfirmationMail::class, function ($mail) {
+            return $mail->hasTo('author.editor@example.com');
+        });
+
+        // Author should NEVER receive operator notification mail
+        Mail::assertNotSent(OperatorSubmissionNotificationMail::class, function ($mail) {
+            return $mail->hasTo('author.editor@example.com') || $mail->hasTo('Author.Editor@example.com');
+        });
+
+        // Other legitimate editor should receive operator notification
+        Mail::assertSent(OperatorSubmissionNotificationMail::class, function ($mail) {
+            return $mail->hasTo('other.editor@example.com');
+        });
+
+        Mail::assertSent(OperatorSubmissionNotificationMail::class, 1);
+        Mail::assertSent(AuthorSubmissionConfirmationMail::class, 1);
+    }
+
+    public function test_corresponding_author_excluded_from_operator_notifications_and_operators_deduplicated_session_draft_flow()
+    {
+        Mail::fake();
+        Storage::fake('local');
+
+        $dept = Department::create(['name' => 'Department of Computing']);
+
+        // Journal editor who is also the corresponding author
+        $editorAuthor = User::factory()->create([
+            'role' => 'editor',
+            'email' => 'Editor.Author@example.com',
+            'department_id' => $dept->id,
+        ]);
+
+        // Second editor assigned to journal directly
+        $otherEditor = User::factory()->create([
+            'role' => 'editor',
+            'email' => 'co.operator@example.com',
+            'publication_id' => 999, // placeholder, will update
+        ]);
+
+        $journal = Journal::create([
+            'editor_id' => $editorAuthor->id,
+            'journal_title' => 'Exclusion Session Test Journal',
+            'university_name' => 'Test University',
+            'department_id' => $dept->id,
+            'status' => 'approved',
+        ]);
+
+        $otherEditor->update(['publication_id' => $journal->id]);
+
+        $journal->submissionSetting()->create([
+            'code' => 'EXS',
+            'is_open' => true,
+            'opening_datetime' => now()->subDay(),
+            'closing_datetime' => now()->addMonth(),
+        ]);
+
+        $manuscript = UploadedFile::fake()->create('manuscript.pdf', 500, 'application/pdf');
+
+        $payload = [
+            'title' => 'Session Draft Flow Paper Exclusion Test',
+            'abstract' => 'Testing exclusion of corresponding author from operator notification in two step flow',
+            'authors' => [
+                [
+                    'full_name' => 'Editor Author',
+                    'email' => 'editor.author@example.com',
+                    'affiliation' => 'Test University',
+                    'is_corresponding' => true,
+                    'order' => 1,
+                ]
+            ],
+            'files' => [
+                'manuscript' => $manuscript,
+            ],
+        ];
+
+        // Step 1: Confirm post
+        $confirmResponse = $this->post("/submit-paper/journal/{$journal->id}/confirm", $payload);
+        $confirmResponse->assertRedirect(route('submissions.confirm.view', $journal));
+
+        // Step 2: Final store post
+        $storeResponse = $this->post("/submit-paper/journal/{$journal->id}", [
+            'agreement' => true,
+        ]);
+        $storeResponse->assertStatus(200);
+
+        // Author should receive confirmation mail
+        Mail::assertSent(AuthorSubmissionConfirmationMail::class, function ($mail) {
+            return $mail->hasTo('editor.author@example.com');
+        });
+
+        // Author should NEVER receive operator notification mail
+        Mail::assertNotSent(OperatorSubmissionNotificationMail::class, function ($mail) {
+            return $mail->hasTo('editor.author@example.com') || $mail->hasTo('Editor.Author@example.com');
+        });
+
+        // Co-operator should receive operator notification
+        Mail::assertSent(OperatorSubmissionNotificationMail::class, function ($mail) {
+            return $mail->hasTo('co.operator@example.com');
+        });
+
+        Mail::assertSent(OperatorSubmissionNotificationMail::class, 1);
+        Mail::assertSent(AuthorSubmissionConfirmationMail::class, 1);
+    }
 }
