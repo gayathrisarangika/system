@@ -19,9 +19,8 @@ class OperatorSubmissionNotificationMail extends Mailable
 
     public function envelope(): Envelope
     {
-        $journalTitle = $this->submission->journal?->journal_title ?? 'Academic Journal';
         return new Envelope(
-            subject: "New Paper Submission Received [{$this->submission->paper_id}] - {$journalTitle}",
+            subject: "New Paper Submission – [{$this->submission->paper_id}]",
         );
     }
 
@@ -75,8 +74,8 @@ class OperatorSubmissionNotificationMail extends Mailable
                         <td style='padding: 10px; border: 1px solid #e2e8f0;'>".e($this->submission->title)."</td>
                     </tr>
                     <tr style='background-color: #f8fafc;'>
-                        <td style='padding: 10px; font-weight: bold; border: 1px solid #e2e8f0;'>Corresponding Author:</td>
-                        <td style='padding: 10px; border: 1px solid #e2e8f0;'>".e($authorName)." (".e($authorEmail).")</td>
+                        <td style='padding: 10px; font-weight: bold; border: 1px solid #e2e8f0;'>Author Details:</td>
+                        <td style='padding: 10px; border: 1px solid #e2e8f0;'>".e($authorName)." (".e($authorEmail).")".($author && $author->affiliation ? " - " . e($author->affiliation) : "")."</td>
                     </tr>
                     <tr>
                         <td style='padding: 10px; font-weight: bold; border: 1px solid #e2e8f0;'>Submission Date/Time:</td>
