@@ -247,7 +247,7 @@ class PaperSubmissionController extends Controller
                 $submission = Submission::create([
                     'paper_id' => $paperId,
                     'journal_id' => $journal->id,
-                    'user_id' => Auth::id(),
+                    'user_id' => null,
                     'title' => $draft['title'],
                     'abstract' => $draft['abstract'],
                     'keywords' => $draft['keywords'] ?? '',
@@ -269,7 +269,7 @@ class PaperSubmissionController extends Controller
                 SubmissionStatusHistory::create([
                     'submission_id' => $submission->id,
                     'status' => 'Submitted',
-                    'user_id' => Auth::id(),
+                    'user_id' => null,
                     'note' => 'Paper submitted by author.',
                 ]);
 
@@ -364,7 +364,7 @@ class PaperSubmissionController extends Controller
             $submission = Submission::create([
                 'paper_id' => $paperId,
                 'journal_id' => $journal->id,
-                'user_id' => Auth::id(),
+                'user_id' => null,
                 'title' => $validated['title'],
                 'abstract' => $validated['abstract'],
                 'keywords' => $validated['keywords'] ?? '',
@@ -386,7 +386,7 @@ class PaperSubmissionController extends Controller
             SubmissionStatusHistory::create([
                 'submission_id' => $submission->id,
                 'status' => 'Submitted',
-                'user_id' => Auth::id(),
+                'user_id' => null,
                 'note' => 'Paper submitted by author.',
             ]);
 

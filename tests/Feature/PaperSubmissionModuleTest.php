@@ -139,8 +139,9 @@ class PaperSubmissionModuleTest extends TestCase
 
         $response->assertStatus(200);
 
-        $submission = Submission::where('user_id', $author->id)->first();
+        $submission = Submission::where('paper_id', "AIR-" . date('Y') . "-0001")->first();
         $this->assertNotNull($submission);
+        $this->assertNull($submission->user_id);
         $this->assertEquals("AIR-" . date('Y') . "-0001", $submission->paper_id);
 
         // Assert file exists on private storage
@@ -268,8 +269,9 @@ class PaperSubmissionModuleTest extends TestCase
         $finalResponse->assertStatus(200);
         $finalResponse->assertInertia(fn ($page) => $page->component('Submissions/Success'));
 
-        $submission = Submission::where('user_id', $author->id)->first();
+        $submission = Submission::where('paper_id', "AIR-" . date('Y') . "-0001")->first();
         $this->assertNotNull($submission);
+        $this->assertNull($submission->user_id);
         $this->assertEquals("AIR-" . date('Y') . "-0001", $submission->paper_id);
 
         $fileRecord = $submission->files()->first();
